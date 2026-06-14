@@ -3343,6 +3343,20 @@ A story with 5 lint iterations re-reads `SKILL.md` (10k tokens) and the constitu
 
 Caching is optionally enabled via a Claude-Code hook. If the hook is not set up: everything keeps working, just without the caching benefit and without cost aggregate in the sprint review (`meta.json.token_tracking` stays empty). No hard block — operator can retro-fit caching at any time.
 
+### N.3 Actual measurement with ccusage (BOO-189)
+
+The per-story token estimate (`meta.json.token_tracking`, N.2) answers *what we expect*. For the question *what it actually cost*, a **capture hook** measures the actual consumption from the local Claude Code JSONL logs — a measured quantity instead of a guess. Both views thus stand side by side: **estimate** (`meta.json`, deterministic, per story) and **measurement** (ccusage, ex post, per day/run).
+
+**Tool.** [ccusage](https://github.com/ryoppippi/ccusage) (MIT) reads the local Claude Code logs and computes tokens + cost; call `npx --yes ccusage@latest daily`. No network dependency on Anthropic — pure local log evaluation.
+
+**Wiring.** A setup template provides the capture script `.claude/hooks/ccusage-capture.sh`. Three skills call it at their close — `/implement` (`/implement <story-id>`), `/sprint-run` (`/sprint-run <sprint>`), `/sprint-review` (`/sprint-review <sprint>`) — each as the last step. Output: a token/cost snapshot, appended to **`docs/financials/sprint-costs.md`**.
+
+**Relation to the estimate.** The ccusage actual value **complements** the `token_tracking` from the story `meta.json`; it does not replace it. Pricing reads against `bootstrap/references/model-tiers.json` (the same SSoT as the estimate aggregate in N.1), so the Max-Pro shadow price (subscription seat) and API real cost come from the same catalog.
+
+**Soft gate.** If ccusage/npx is missing or no log exists, the hook only **warns** — it does **not** abort any skill. Consistent with the lightweight design decision (N.2 caching hook): token visibility is added value, not a hard block.
+
+**Known limitation — sub-agent tracking.** ccusage does **not** cleanly attribute tokens consumed in **sub-agents** (Task tool) — see issues [#313](https://github.com/ryoppippi/ccusage/issues/313), [#806](https://github.com/ryoppippi/ccusage/issues/806), [#950](https://github.com/ryoppippi/ccusage/issues/950). In heavily sub-agent-driven runs (e.g. `/implement` with parallel subagents, agentic mode) the reported consumption may be incomplete or charged to the parent. For complete attribution, the `meta.json` `token_tracking` (kept per skill invocation) remains the finer source; ccusage provides the daily/run aggregate as a cross-check.
+
 ## Appendix O: Privacy by Design (BOO-69) — DPO as a Framework Bundle Skill
 
 ![Privacy pipeline — DPO + security-architect, three modes (ASSESS / REVIEW / AUDIT) along the skill chain](docs/assets/boo-69-privacy-pipeline.en.png)

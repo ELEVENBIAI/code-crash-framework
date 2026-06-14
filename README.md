@@ -275,6 +275,12 @@ A quality gate can be *configured* and still be **blind**: a custom Semgrep rule
 
 ---
 
+## Token visibility — measured, not guessed (BOO-189)
+
+Token and cost consumption is **measured**, not assumed. After every story (`/implement`), every sprint (`/sprint-run`) and every review (`/sprint-review`), a capture hook runs [ccusage](https://github.com/ryoppippi/ccusage) (MIT) against the local Claude Code JSONL logs and appends a token/cost snapshot to **`docs/financials/sprint-costs.md`**. This complements the per-story estimate in `meta.json.token_tracking` — estimate vs. measurement side by side. Pricing reads against `bootstrap/references/model-tiers.json`, so the two cost views (**Max-Pro = shadow price** for subscription seats, **API = real cost**) come from the same catalog. Soft gate: a missing ccusage/npx only warns, it never blocks a skill. **Known limitation:** ccusage does not attribute sub-agent (Task-tool) tokens cleanly ([issues #313/#806/#950](https://github.com/ryoppippi/ccusage/issues/313)), so heavily sub-agent-driven runs may under-report or charge the parent. Background: [HANDBUCH Appendix N](HANDBUCH.en.md).
+
+---
+
 ## Where to Start
 
 | Situation | Recommendation |
@@ -626,6 +632,12 @@ Kein Spec, kein Commit. Das ist der Unterschied zwischen einem Prompt und einem 
 ### Quality-Gate-Wiring — ein konfiguriertes Gate ist noch kein verdrahtetes Gate
 
 Ein Quality-Gate kann *konfiguriert* und trotzdem **blind** sein: Ein Custom-Semgrep-Regelverzeichnis, das nie via `--config` an die CLI übergeben wird, läuft schlicht nie. Damit beweisbar ist, dass ein Gate wirklich greift, rollt der Bootstrap eine **Wiring-Canary** aus — eine Fixture-Datei mit einem absichtlichen Verstoss, die *nur dann* eine Meldung produziert, wenn das Gate wirklich verdrahtet ist. Bei Semgrep ist das `.semgrep/test-fixtures/wiring-canary.py` (Tripwire-Literal `QGAUDIT-CANARY-TRIPWIRE`), getroffen von der Custom-Rule `qgaudit-wiring-canary`; die Fixture ist via `.semgrepignore` aus dem Repo-weiten Scan ausgenommen und wird nur vom gezielten Audit-Scan gelesen. Ein Treffer beweist die lebende Verdrahtung; Stille beweist, dass das Gate blind ist. Das Pattern ist auf andere Gates übertragbar (Slopsquatting, Coverage, Layer-0). Der künftige **`quality-gate-audit`**-Skill (BOO-183) automatisiert diesen Check. Klartext-Definitionen von *Slopsquatting*, *Wiring-Canary* und den Audit-Status `verdrahtet` / `nominell` / `blind` stehen im [Klartext-Glossar](docs/glossar.md); die technische Kurzfassung in [HANDBUCH Anhang C](HANDBUCH.md), die vollständige Skill-Erklärung in **Anhang AF**.
+
+---
+
+## Token-Sichtbarkeit — gemessen statt vermutet (BOO-189)
+
+Token- und Kosten-Verbrauch wird **gemessen**, nicht angenommen. Nach jeder Story (`/implement`), jedem Sprint (`/sprint-run`) und jedem Review (`/sprint-review`) laufen ein Capture-Hook und [ccusage](https://github.com/ryoppippi/ccusage) (MIT) gegen die lokalen Claude-Code-JSONL-Logs und hängen einen Token-/Kosten-Snapshot an **`docs/financials/sprint-costs.md`** an. Das ergänzt die Pro-Story-Schätzung in `meta.json.token_tracking` — Schätzung vs. Messung nebeneinander. Das Pricing liest gegen `bootstrap/references/model-tiers.json`, sodass beide Kosten-Sichten (**Max-Pro = Schattenpreis** für Abo-Seats, **API = Echtkosten**) aus demselben Katalog stammen. Soft-Gate: fehlt ccusage/npx, wird nur gewarnt — kein Skill wird blockiert. **Bekannte Grenze:** ccusage attribuiert Sub-Agent-Token (Task-Tool) nicht sauber ([Issues #313/#806/#950](https://github.com/ryoppippi/ccusage/issues/313)), stark sub-agent-getriebene Läufe können daher untermelden oder dem Parent zuschlagen. Hintergrund: [HANDBUCH Anhang N](HANDBUCH.md).
 
 ---
 

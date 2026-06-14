@@ -20,7 +20,7 @@ metadata:
 
 Periodic audit of the whole system plus learning-loop entry. The skill closes the learning loop by capturing lessons-learned at the end (level L1/L2/L3 depending on project configuration).
 
-## Workflow (9 steps)
+## Workflow (10 steps)
 
 ### Step 0: Load environment
 
@@ -388,6 +388,23 @@ In addition to L2:
 - Tables: `sprints`, `events`, `metrics`, `experiments` (schema see `bootstrap/references/learning-loop.en.md`)
 
 The skill optionally asks for additional metrics (e.g. `avg_story_time_days`, `api_cost_total`).
+
+### Step 9: Cost snapshot (BOO-189)
+
+At review close, capture the **actual consumption** from the local Claude Code logs — as a measured
+quantity, complementary to the estimated `token_tracking` cost aggregate from step 2b:
+
+- Call: `bash .claude/hooks/ccusage-capture.sh "/sprint-review <sprint>"` (capture template from setup,
+  internally `npx --yes ccusage@latest daily`). Appends a token/cost snapshot to
+  `docs/financials/sprint-costs.md`.
+- **Soft gate:** if the call fails (ccusage/npx not installed, no log), **only warn** and **do not abort**
+  the review — the report stays valid.
+- **Complementary to the estimate:** the actual value complements the aggregated `token_tracking` from the
+  story `meta.json` (step 2b); it does not replace it — estimate (`meta.json`) vs. measurement (ccusage)
+  side by side.
+- **Known limitation:** ccusage does not attribute sub-agent tokens (Task tool) cleanly (issues
+  #313/#806/#950) — in heavily sub-agent-driven runs the reported consumption may be incomplete or
+  charged to the parent.
 
 ### Conclusion
 

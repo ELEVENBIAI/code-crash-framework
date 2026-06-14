@@ -3481,6 +3481,20 @@ Bei einer Story mit 5 Lint-Iterationen liest jeder Iterations-Aufruf die `SKILL.
 
 Cache ist optional aktivierbar via Claude-Code-Hook. Wenn der Hook nicht eingerichtet ist: alles funktioniert weiter, nur ohne Caching-Vorteil und ohne Cost-Aggregat im Sprint-Review (`meta.json.token_tracking` bleibt leer). Kein Hard-Block — Operator kann Caching jederzeit nachruesten.
 
+### N.3 Ist-Messung mit ccusage (BOO-189)
+
+Die Token-Schaetzung pro Story (`meta.json.token_tracking`, N.2) beantwortet *was wir erwarten*. Fuer die Frage *was es tatsaechlich gekostet hat* misst ein **Capture-Hook** den Ist-Verbrauch aus den lokalen Claude-Code-JSONL-Logs — gemessene Groesse statt Vermutung. Beide Sichten stehen damit nebeneinander: **Schaetzung** (`meta.json`, deterministisch, pro Story) und **Messung** (ccusage, ex post, pro Tag/Lauf).
+
+**Tool.** [ccusage](https://github.com/ryoppippi/ccusage) (MIT) liest die lokalen Claude-Code-Logs und rechnet Token + Kosten aus; Aufruf `npx --yes ccusage@latest daily`. Keine Netzwerk-Abhaengigkeit zu Anthropic — reine lokale Log-Auswertung.
+
+**Verdrahtung.** Ein Setup-Template stellt das Capture-Script `.claude/hooks/ccusage-capture.sh` bereit. Drei Skills rufen es zum Abschluss auf — `/implement` (`/implement <story-id>`), `/sprint-run` (`/sprint-run <sprint>`), `/sprint-review` (`/sprint-review <sprint>`) — jeweils als letzter Schritt. Output: ein Token-/Kosten-Snapshot, angehaengt an **`docs/financials/sprint-costs.md`**.
+
+**Verhaeltnis zur Schaetzung.** Der ccusage-Ist-Wert **ergaenzt** das `token_tracking` aus den Story-`meta.json`, er ersetzt es nicht. Das Pricing liest gegen `bootstrap/references/model-tiers.json` (dieselbe SSoT wie das Schaetz-Aggregat in N.1), sodass Max-Pro-Schattenpreis (Abo-Seat) und API-Echtkosten aus demselben Katalog stammen.
+
+**Soft-Gate.** Fehlt ccusage/npx oder existiert kein Log, **warnt** der Hook nur — er bricht **keinen** Skill ab. Konsistent zum Designentscheid Leichtgewicht (N.2-Caching-Hook): Token-Sichtbarkeit ist Mehrwert, kein Hard-Block.
+
+**Bekannte Grenze — Sub-Agent-Tracking.** ccusage attribuiert Token, die in **Sub-Agents** (Task-Tool) verbraucht werden, **nicht sauber** — siehe Issues [#313](https://github.com/ryoppippi/ccusage/issues/313), [#806](https://github.com/ryoppippi/ccusage/issues/806), [#950](https://github.com/ryoppippi/ccusage/issues/950). In stark sub-agent-getriebenen Laeufen (z.B. `/implement` mit parallelen Subagents, agentic Mode) kann der ausgewiesene Verbrauch unvollstaendig sein oder dem Parent zugeschlagen werden. Fuer eine vollstaendige Attribution bleibt das `meta.json`-`token_tracking` (das pro Skill-Invocation gefuehrt wird) die feinere Quelle; ccusage liefert das Tages-/Lauf-Aggregat als Gegencheck.
+
 ## Anhang O: Privacy by Design (BOO-69) — DPO als Framework-Bundle-Skill
 
 ![Privacy-Pipeline — DPO + security-architect, drei Modi (ASSESS / REVIEW / AUDIT) entlang der Skill-Kette](docs/assets/boo-69-privacy-pipeline.png)

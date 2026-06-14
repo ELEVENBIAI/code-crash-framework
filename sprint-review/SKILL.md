@@ -19,7 +19,7 @@ metadata:
 
 Periodisches Audit des Gesamtsystems plus Learning-Loop-Eintrag. Der Skill schliesst den Learning-Loop indem er am Ende die Lessons-Learned erfasst (Level L1/L2/L3, je nach Projekt-Konfiguration).
 
-## Workflow (9 Schritte)
+## Workflow (10 Schritte)
 
 ### Schritt 0: Environment laden
 
@@ -387,6 +387,22 @@ Zusaetzlich zu L2:
 - Tabellen: `sprints`, `events`, `metrics`, `experiments` (Schema siehe `bootstrap/references/learning-loop.md`)
 
 Skill fragt optional nach zusaetzlichen Metriken (z.B. `avg_story_time_days`, `api_cost_total`).
+
+### Schritt 9: Kosten-Snapshot (BOO-189)
+
+Zum Review-Abschluss einen **Ist-Verbrauch** aus den lokalen Claude-Code-Logs erfassen — als gemessene
+Groesse, komplementaer zum geschaetzten `token_tracking`-Cost-Aggregat aus Schritt 2b:
+
+- Aufruf: `bash .claude/hooks/ccusage-capture.sh "/sprint-review <sprint>"` (Capture-Template aus dem Setup,
+  intern `npx --yes ccusage@latest daily`). Haengt einen Token-/Kosten-Snapshot an
+  `docs/financials/sprint-costs.md` an.
+- **Soft-Gate:** schlaegt der Aufruf fehl (ccusage/npx nicht installiert, kein Log), **nur warnen** und das
+  Review **nicht abbrechen** — der Report bleibt gueltig.
+- **Komplementaer zur Schaetzung:** der Ist-Wert ergaenzt das aggregierte `token_tracking` der Story-`meta.json`
+  (Schritt 2b), ersetzt es nicht — Schaetzung (`meta.json`) vs. Messung (ccusage) nebeneinander.
+- **Bekannte Grenze:** ccusage attribuiert Sub-Agent-Token (Task-Tool) nicht sauber (Issues #313/#806/#950) —
+  in stark sub-agent-getriebenen Laeufen ist der ausgewiesene Verbrauch evtl. unvollstaendig bzw. dem Parent
+  zugeschlagen.
 
 ### Abschluss
 

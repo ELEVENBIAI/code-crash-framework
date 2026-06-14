@@ -1924,6 +1924,71 @@ never_remove:
 
 ---
 
+## hooks/ccusage-capture.sh (BOO-189 — Token-/Kosten-Snapshot)
+
+**Capture-Hook seit BOO-189 — KEIN Quality-Gate, sondern eine Messung:** Eigenstaendiges Bash-Skript unter `.claude/hooks/ccusage-capture.sh`, das an Sprint-/Story-Grenzen einen Snapshot des Token-/Kosten-Verbrauchs an `docs/financials/sprint-costs.md` **anhaengt**. Es blockiert nichts und entscheidet nichts — es persistiert eine Ist-Messgroesse, damit der Token-Verbrauch eine belegte Zahl ist statt einer Vermutung. Datenquelle ist [`ccusage`](https://github.com/ryoppippi/ccusage) (MIT), das die lokalen Claude-Code-JSONL-Logs auswertet; Aufruf per `npx --yes ccusage@latest`.
+
+> [!important] Schrader Code Crash — Token sind Budget
+> Token-Verbrauch ist die reale Kostengroesse einer KI-gestuetzten Pipeline. „Wir glauben, das war guenstig" ist keine Zahl. Der Capture-Hook macht den Verbrauch pro Sprint/Story zu einer persistierten, nachpruefbaren Messung — die Grundlage fuer jede Budget- oder ROI-Aussage.
+
+**Wann aufgerufen:** als **Abschluss-Schritt** von `/sprint-run`, `/implement` und `/sprint-review` (die Verdrahtung in diesen Skills ist eine eigene Story). Manuell: `bash .claude/hooks/ccusage-capture.sh "<label>"` — z.B. `"/sprint-run sprint-2"`. Das Label landet als Snapshot-Ueberschrift in der Datei.
+
+**Bei Max-/Pro-Account** liefert ccusage den Token-Verbrauch als Schattenpreis (was die gleiche Nutzung per API gekostet haette); bei **API-Nutzung** echte Kosten in Projekt-Waehrung. Beides wird unveraendert als Textblock uebernommen.
+
+> [!warning] Sub-Agent-Token werden evtl. nicht sauber attribuiert
+> ccusage attribuiert Token von Sub-Agents (Task-Tool) derzeit nicht zuverlaessig dem ausloesenden Lauf zu — siehe ccusage-Issues #313, #806, #950. Snapshots aus Sub-Agent-lastigen Laeufen koennen den Verbrauch daher unter- oder fehlattribuieren. Die Zahl ist eine **Naeherung**, kein Cent-genauer Audit. (Ausfuehrliche Doku: HANDBUCH/README.)
+
+**Voraussetzungen:** `npx` (Node) muss verfuegbar sein — `npx --yes ccusage@latest` zieht das Tool bei Bedarf transient. Kein globales Install noetig, keine Projekt-Dependency. Fehlt `npx`, schreibt der Hook einen Hinweis-Snapshot statt zu failen.
+
+**bash-only, kein jq:** Der Hook parst **nichts**. Er nimmt die **Textausgabe** von `ccusage daily` und haengt sie verbatim in einem Code-Fence an die Markdown-Datei — bewusst kein `--json` + `jq`/`yq`. Begruendung wie bei den uebrigen Hooks: sprachneutral, dependency-frei, kein JSON-Parser im Bash-Hook. Was ccusage anzeigt, steht im Snapshot.
+
+**Komplementaer zu `meta.json.token_tracking`** (implement/SKILL.md, BOO-84): Das `token_tracking`-Schema ist die **strukturierte Story-Schaetzung** pro Iteration/Skill-Aufruf, vom `/implement`-Lauf selbst befuellt (Pricing aus `bootstrap/references/model-tiers.json`). ccusage ist die **Ist-Messung aus den Session-Logs** — unabhaengig erhoben, ueber alle Laeufe einer Session hinweg. Die beiden ergaenzen sich: `meta.json` = was die Pipeline pro Story zu verbrauchen meint, `sprint-costs.md` = was ccusage in den Logs tatsaechlich gemessen hat.
+
+```bash
+#!/usr/bin/env bash
+# .claude/hooks/ccusage-capture.sh — Token-/Kosten-Snapshot nach Sprint/Story (BOO-189)
+# DE: Haengt einen ccusage-Snapshot an docs/financials/sprint-costs.md an.
+# EN: Appends a ccusage snapshot to docs/financials/sprint-costs.md.
+# Aufruf: bash .claude/hooks/ccusage-capture.sh "<label>"   z.B. "/sprint-run sprint-2"
+# bash-only: ccusage-Textausgabe wird verbatim angehaengt — KEIN jq/yq, kein JSON-Parsing.
+# Limitation: Sub-Agent-Token (Task-Tool) evtl. nicht sauber attribuiert — ccusage #313/#806/#950.
+set -euo pipefail
+
+LABEL="${1:-manual}"
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+OUT="$ROOT/docs/financials/sprint-costs.md"
+mkdir -p "$(dirname "$OUT")"
+
+# Datei mit Header anlegen, falls noch nicht vorhanden (idempotent).
+if [[ ! -f "$OUT" ]]; then
+  printf '# Sprint-Kosten — Token-Verbrauch (ccusage, BOO-189)\n\n> Persistierte Snapshots des Token-/Kosten-Verbrauchs. Sub-Agent-Token werden von ccusage evtl. nicht sauber attribuiert (Issues #313/#806/#950).\n' > "$OUT"
+fi
+
+TS="$(date -u +%Y-%m-%dT%H:%MZ)"
+
+# ccusage-Textausgabe holen (kein --json, kein Parsing). Bei Fehler: Hinweis statt Hard-Fail.
+if command -v npx >/dev/null 2>&1; then
+  SNAP="$(npx --yes ccusage@latest daily --since "$(date -u +%Y%m%d)" 2>/dev/null || echo '(ccusage-Aufruf fehlgeschlagen)')"
+else
+  SNAP="(npx/ccusage nicht installiert — npm i -g ccusage oder npx ccusage@latest)"
+fi
+
+# Snapshot verbatim als Code-Fence anhaengen.
+{
+  printf '\n## %s — %s\n\n```\n%s\n```\n' "$TS" "$LABEL" "$SNAP"
+} >> "$OUT"
+
+echo "[ccusage] Snapshot angehaengt: $OUT ($LABEL)"
+```
+
+**Anti-Patterns:**
+- KEIN `--json` + `jq`/`yq` — die Textausgabe wird verbatim angehaengt, bewusst kein Parser im Hook.
+- KEINE globale ccusage-Installation als Projekt-Dependency erzwingen — `npx --yes ccusage@latest` zieht es transient.
+- KEIN Hard-Fail, wenn `npx`/ccusage fehlt — Hinweis-Snapshot statt Abbruch, der Hook darf einen Lauf nie blockieren.
+- KEINE Interpretation der Sub-Agent-Zahlen als exakt — Naeherung (ccusage #313/#806/#950).
+
+---
+
 ## hooks/pre-edit-bodyguard.sh (BOO-86 — Layer-0 Edit-Bodyguard)
 
 **Layer-0-Gate seit BOO-86:** Ein Claude-Code-**PreToolUse-Hook** auf `Edit|Write`, der

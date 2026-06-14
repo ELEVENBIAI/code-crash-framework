@@ -20,7 +20,7 @@ metadata:
 
 Systematically implement a user story from the Linear backlog. 8 steps + governance validation — none may be skipped.
 
-## Workflow (9 steps)
+## Workflow (10 steps)
 
 ### Step 0: Load environment
 
@@ -1033,6 +1033,22 @@ After that: **Fill in `## Summary` in the spec file** (`specs/PREFIX-XXX.md`).
 No jargon — explain as if to someone who doesn't know the system.
 3 paragraphs: (1) what was the problem? (2) what was built / how does it work? (3) what changes because of it?
 Then commit: `git commit -m "docs: specs/PREFIX-XXX.md summary added"`
+
+### Step 9: Cost snapshot (BOO-189)
+
+After story completion, capture the **actual consumption** from the local Claude Code logs — measured
+instead of estimated:
+
+- Call: `bash .claude/hooks/ccusage-capture.sh "/implement <story-id>"` (capture template from setup,
+  internally `npx --yes ccusage@latest daily`). Appends a token/cost snapshot to
+  `docs/financials/sprint-costs.md`.
+- **Soft gate:** if the call fails (ccusage/npx not installed, no log), **only warn** and **do not abort**
+  the story — the closing table from step 8 stays valid.
+- **Complementary to the estimate:** this actual value complements the `token_tracking` in `meta.json`
+  (step 6f-bis); it does not replace it.
+- **Known limitation:** ccusage does not attribute sub-agent tokens (Task tool) cleanly (issues
+  #313/#806/#950) — in heavily sub-agent-driven runs the reported consumption may be incomplete or
+  charged to the parent.
 
 ## Change checklist (mandatory after every code change)
 

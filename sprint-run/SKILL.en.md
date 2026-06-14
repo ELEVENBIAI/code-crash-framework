@@ -31,7 +31,7 @@ token boundary, gate-block pause).
 > **N** stories as a sprint and calls `/implement` per story. Whoever wants to implement a single
 > story uses `/implement` directly.
 
-## Workflow (steps 0–7)
+## Workflow (steps 0–8)
 
 ### Step 0: Load environment + sprint context
 
@@ -194,6 +194,22 @@ Final table:
 
 Plus: total token consumption (% of budget), gate-block pauses, remaining backlog stories,
 reference to the `/sprint-review` result.
+
+### Step 8: Cost snapshot (BOO-189)
+
+At sprint close, capture the **actual consumption** from the local Claude Code logs — as a measured
+quantity, not a guess:
+
+- Call: `bash .claude/hooks/ccusage-capture.sh "/sprint-run <sprint>"` (capture template from setup,
+  internally `npx --yes ccusage@latest daily`). Appends a token/cost snapshot to
+  `docs/financials/sprint-costs.md`.
+- **Soft gate:** if the call fails (ccusage/npx not installed, no log), **only warn** and **do not abort**
+  the sprint close — the report from step 7 stays valid.
+- **Complementary to the estimate:** this actual value complements the `token_tracking` from the story
+  `meta.json` (step 4.5b / `/sprint-review`); it does not replace it.
+- **Known limitation:** ccusage does not attribute sub-agent tokens (Task tool) cleanly (issues
+  #313/#806/#950) — in heavily sub-agent-driven runs the reported consumption may be incomplete or
+  charged to the parent.
 
 ## Daemon mode
 

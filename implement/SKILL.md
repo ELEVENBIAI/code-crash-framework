@@ -19,7 +19,7 @@ metadata:
 
 User Story aus dem Linear-Backlog systematisch umsetzen. 8 Schritte + Governance-Validation, keiner darf uebersprungen werden.
 
-## Workflow (9 Schritte)
+## Workflow (10 Schritte)
 
 ### Schritt 0: Environment laden
 
@@ -1100,6 +1100,22 @@ Danach: **`## Zusammenfassung` im Spec-File befuellen** (`specs/CLAW-XXX.md`).
 Kein Fachjargon — so erklaert als wuerde man es einem Laien erzaehlen der das System nicht kennt.
 3 Absaetze: (1) Was war das Problem? (2) Was wurde gebaut / wie funktioniert es? (3) Was aendert sich dadurch?
 Dann committen: `git commit -m "docs: specs/CLAW-XXX.md Zusammenfassung ergaenzt"`
+
+### Schritt 9: Kosten-Snapshot (BOO-189)
+
+Nach Story-Abschluss einen **Ist-Verbrauch** aus den lokalen Claude-Code-Logs erfassen — gemessen statt
+geschaetzt:
+
+- Aufruf: `bash .claude/hooks/ccusage-capture.sh "/implement <story-id>"` (Capture-Template aus dem Setup,
+  intern `npx --yes ccusage@latest daily`). Haengt einen Token-/Kosten-Snapshot an
+  `docs/financials/sprint-costs.md` an.
+- **Soft-Gate:** schlaegt der Aufruf fehl (ccusage/npx nicht installiert, kein Log), **nur warnen** und die
+  Story **nicht abbrechen** — die Ergebnis-Tabelle aus Schritt 8 bleibt gueltig.
+- **Komplementaer zur Schaetzung:** dieser Ist-Wert ergaenzt das `token_tracking` der `meta.json`
+  (Schritt 6f-bis), ersetzt es nicht.
+- **Bekannte Grenze:** ccusage attribuiert Sub-Agent-Token (Task-Tool) nicht sauber (Issues #313/#806/#950) —
+  in stark sub-agent-getriebenen Laeufen ist der ausgewiesene Verbrauch evtl. unvollstaendig bzw. dem Parent
+  zugeschlagen.
 
 ## Aenderungs-Checkliste (PFLICHT nach jeder Code-Aenderung)
 
