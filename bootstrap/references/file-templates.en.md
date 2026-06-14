@@ -4129,3 +4129,46 @@ Placement: `.claude/personal-data-paths.json` (analogous to sensitive-paths.json
 | `{{OPERATOR_NAME}}` | GitHub handle or name of the responsible reviewer (may be identical to `sensitive-paths.json`) |
 
 **Note:** The pattern list is a minimal default. The operator extends with project-specific personal-data paths (e.g. `src/auth/**` for PII-handling auth, `webhooks/stripe/**` for payment data, `crm/**` for customer data). On overlap with `sensitive-paths.json` (e.g. `**/*pii*` appears in both): both gates trigger — first `review-ok`, then `privacy-ok`. Double confirmation is intentional because security and privacy check different disciplines.
+
+---
+
+## .claude/settings.local.json (BOO-203 — Bash auto-allow for sprint-run gates)
+
+Created by `/bootstrap` when the operator wants to use the autonomous sprint run (`/sprint-run` 2.0.0 with the `/goal` engine). Placement: `.claude/settings.local.json` (local, **non**-committed operator settings — belongs in `.gitignore`).
+
+**Purpose:** `/sprint-run` checks this allowlist as the **first of the three safety prerequisites** before the `/goal` call. `/goal` and its native subagents run the quality gates unattended — without the allowlist every gate execution blocks on a permission prompt. The entries follow the real Claude Code format: `permissions.allow` is a list of `Bash(<pattern>)` tools with prefix match (`:*` = arbitrary arguments).
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Bash(semgrep:*)",
+      "Bash(npx semgrep:*)",
+      "Bash(eslint:*)",
+      "Bash(npx eslint:*)",
+      "Bash(pytest:*)",
+      "Bash(python -m pytest:*)",
+      "Bash(ruff:*)",
+      "Bash(gh run watch:*)",
+      "Bash(gh run view:*)",
+      "Bash(gh run list:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git worktree:*)",
+      "Bash(git merge:*)",
+      "Bash(git branch:*)"
+    ]
+  }
+}
+```
+
+**Safety notes:**
+
+- **NO secrets** in this file — it contains only Bash pattern allowlists, no tokens/keys.
+- **Deliberately narrow:** Only the gate and git-mechanic commands from the sprint run. **No** `Bash(*)` wildcard — that would make the allowlist pointless and is an anti-pattern.
+- **`git push`** is included because the story subagent must push the feature branch (remote CI). The merge to `main` runs via `git merge` / PR — `main` stays protected by the pre-flight checks (clean tree) and the gate assertion.
+- **Local, not committed:** `settings.local.json` is operator-specific (allowlist tolerance can vary per machine) and belongs in `.gitignore`. The committed `.claude/settings.json` carries only the project-wide hooks (spec-gate, doc-version-sync, pre-edit-bodyguard).
+- **Stack adaptation:** Python-only projects can drop the ESLint lines, Node-only the `pytest`/`ruff` lines. The `semgrep`, `gh run` and `git` lines are mandatory across stacks.

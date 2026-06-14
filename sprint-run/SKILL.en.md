@@ -2,200 +2,199 @@
 name: sprint-run
 recommended_model: sonnet  # BOO-84 — tier mapping in bootstrap/references/model-tiers.json
 description: |
-  Sprint orchestrator: runs an entire sprint fully automatically. Selects stories from the
-  prioritized backlog, calls `/implement` per story in daemon mode (own `git worktree`
-  + branch), updates the Linear status, waits for green remote CI, merges, cleans up the
-  worktree, and automatically triggers `/sprint-review` at the 80% token boundary. Pure
-  orchestrator — `/implement`, `/backlog`, `/sprint-review` remain unchanged.
+  Sprint configurator with /goal engine: prepares an entire sprint (pre-flight, specs,
+  worktrees per story, subagent definitions, token budget) and hands execution over to the
+  native termination engine `/goal`. `/goal` orchestrates the stories in parallel as native
+  subagents (worktree-isolated) and runs until the termination phrase is satisfied (all issues
+  done, all quality gates green, sprint journal written). `/sprint-run` writes no product code
+  and does not change the orchestrated skills — it configures the sprint and calls `/goal`.
   Use when the operator says "run the sprint", "drive the sprint", "automation-cycle"
-  or "/sprint-run". Also usable by the automation daemon (without human-in-the-loop).
-version: 1.2.0
+  or "/sprint-run".
+version: 2.0.0
 metadata:
   hermes:
     category: governance
-    tags: [orchestration, sprint-automation, execution-isolation, token-boundary, gate-block-safety]
+    tags: [orchestration, sprint-automation, goal-engine, execution-isolation, token-boundary, gate-block-safety]
     requires_toolsets: [terminal, git, linear]
-    related_skills: [backlog, implement, sprint-review, ideation]
+    related_skills: [backlog, implement, sprint-review, ideation, goal, quality-gate-audit]
 ---
 
 # Sprint-Run
 
-Orchestrates a complete sprint: from story selection out of the prioritized backlog,
-through the fully automatic implementation of each story (`/implement` in daemon mode, each in its
-own `git worktree`), to sprint completion (`/sprint-review`). `/sprint-run` writes
-**no** product code of its own and does not change the orchestrated skills — it **chains**
-them and takes over the sprint mechanics (ordering, worktrees, Linear status, CI wait,
-token boundary, gate-block pause).
+Prepares a complete sprint and hands execution over to the native termination engine **`/goal`**.
+`/sprint-run` is a **configurator + `/goal` wrapper**: it loads context, checks the pre-flight
+gates, creates a `git worktree` per story, generates the `.claude/agents/` definitions from the
+subagent sections of the specs, plans the token budget — and then calls `/goal` with a
+**termination phrase**. `/goal` orchestrates the stories as native subagents in parallel
+(worktree-isolated) and runs until the phrase is satisfied.
 
-> **Distinction from `/implement`:** `/implement` implements **one** story. `/sprint-run` runs
-> **N** stories as a sprint and calls `/implement` per story. Whoever wants to implement a single
-> story uses `/implement` directly.
+`/sprint-run` writes **no** product code of its own and does not change the orchestrated skills.
+Story parallelization is done by **native subagents**, termination by **`/goal`** — no longer by
+a skill-owned container/hybrid driver.
 
-## Workflow (steps 0–8)
+> **Distinction from `/implement`:** `/implement` implements **one** story. `/sprint-run`
+> configures **N** stories as a sprint and lets `/goal` execute them. Whoever wants to implement a
+> single story uses `/implement` directly.
 
-### Step 0: Load environment + sprint context
+> **Breaking change (2.0.0, ADR-4):** Up to 1.x `/sprint-run` was a hybrid container orchestrator
+> with its own daemon loop. From 2.0.0 the container logic (Dockerfile, `devcontainer.json`,
+> volume mount, lazy build), the hybrid driver and the `/implement`-as-container-simulation loop
+> are **gone** — replaced by native subagents under `/goal`. See section
+> [„What is removed"](#what-is-removed-adr-4).
+
+## `/goal` as termination engine
+
+`/goal` is the **native Anthropic termination engine** (documented in the skill [`goal/`](../goal/SKILL.en.md)).
+It takes a **termination phrase**, orchestrates native subagents and runs until an evaluator sees
+the phrase as satisfied. `/sprint-run` gives `/goal` two things: the **prepared environment**
+(worktrees, agent definitions, budget) and the **phrase** that defines sprint end by machine. The
+loop mechanic (worker fixes → gate again → evaluator checks) belongs to `/goal`, no longer to
+`/sprint-run`.
+
+## Workflow
+
+### Phase A — Preparation (configurator)
+
+#### Step 0: Load environment + sprint context
 
 - Read `.claude/environment.json`: `thresholds.token_warn_threshold`, `token_hard_threshold`
   (default 70/80), `tools_available.{git,gh,linear}`, paths.
 - Read `CONVENTIONS.md`: `backlog_adapter` (Linear/GitHub/none), `governance_mode`,
   `execution_isolation`, `worktree_strategy`.
-- Detect mode: interactive (default) vs. daemon (`/sprint-run --auto` or webhook) —
-  in daemon mode the operator approval in step 3 is dropped (analogous to `/implement` step 4).
 - Fallback: if `environment.json` is missing, continue with defaults and warn (soft).
 
-### Step 1: Sprint pre-flight ⛔ HARD GATE
+#### Step 1: Sprint pre-flight ⛔ HARD GATE
 
-Exactly once per sprint — the daemon must **not** start with an unclean sprint.
-Check and, on violation, STOP with a concrete remediation hint:
+Exactly once per sprint — `/goal` must **not** be started on an unclean sprint. Check and, on
+violation, STOP with a concrete remediation hint:
 
 - **Backlog prioritized?** `/backlog` delivers an ordered candidate list (status `Todo`/`Backlog`,
   ordered by priority). Empty → STOP.
 - **Specs complete?** For **every** candidate story `specs/<ISSUE>.md` exists (spec gate),
-  is Schrader-complete (Insight, Constraints, Success Criteria, Desired Outcome) and
-  carries the `Execution Isolation` block (`execution_mode`, `worktree_strategy`, `write_scopes`).
-  If something is missing → remove the story from the sprint or STOP (daemon: skip story + log it).
+  is Schrader-complete (Insight, Constraints, Success Criteria, Desired Outcome) and carries the
+  `Execution Isolation` block (`execution_mode`, `worktree_strategy`, `write_scopes`) **plus a
+  subagent section** (from which the agent definition in step 4 is generated). If something is
+  missing → remove the story from the sprint or STOP.
 - **Governance gates green?** `governance_mode` from CONVENTIONS; active gates (sensitive-paths,
-  personal-data) are configured and the daemon knows the pause behavior (step 4.4).
-- **Tooling ready?** `git worktree` available, `gh` authenticated (for remote CI wait),
+  personal-data) are configured and the pause behavior (sensitive-path approval) is wired.
+- **Tooling ready?** `git worktree` available, `gh` authenticated (for remote CI gates),
   working tree on `main` clean.
-- **Quality gates wired?** (BOO-183) Call `/quality-gate-audit --trigger pre-sprint` — it checks
-  whether the declared gates (Semgrep wiring, coverage, slopsquatting, Layer-0 bodyguard) are
-  actually wired rather than only nominally configured. Engine: `quality-gate-audit/scripts/gate-checks.sh`,
-  exit `0` = all `wired`/accepted-override, exit `1` = at least one gate `blind`.
-  **At least one gate `blind` → STOP** with a pointer to the remediation hint in the audit report
-  (`docs/audits/YYYY-MM-DD-quality-gate-audit.md`). Override only deliberately:
-  `/quality-gate-audit --override-gate <name> --reason "..."` (transient) or report frontmatter
-  `override_blind: true` + `reason` (persistent). In daemon mode (`--auto`) without override → abort.
+- **Quality gates wired?** (BOO-183, **PRESERVED**) Call `/quality-gate-audit --trigger pre-sprint`
+  — it checks whether the declared gates (Semgrep wiring, coverage, slopsquatting, Layer-0
+  bodyguard) are actually wired rather than only nominally configured. Engine:
+  `quality-gate-audit/scripts/gate-checks.sh`, exit `0` = all `wired`/accepted-override, exit `1` =
+  at least one gate `blind`. **At least one gate `blind` → STOP** with a pointer to the remediation
+  hint in the audit report (`docs/audits/YYYY-MM-DD-quality-gate-audit.md`). Override only
+  deliberately: `/quality-gate-audit --override-gate <name> --reason "..."` (transient) or report
+  frontmatter `override_blind: true` + `reason` (persistent).
 
-> This gate is the prerequisite for the loop afterwards to run without follow-up questions.
+> This gate is the prerequisite for `/goal` to run without follow-up questions afterwards.
 > Details: [references/orchestration-checklist.en.md](references/orchestration-checklist.en.md).
 > Cross-link: the pre-sprint trigger is defined in the [quality-gate-audit](../quality-gate-audit/SKILL.en.md) skill.
 
-### Step 2: Plan the sprint token budget (BOO-38/40)
+#### Step 2: Three safety prerequisites (pre-/goal checks) ⛔
+
+Before `/goal` is called, three safety prerequisites **must** be met. Each is a hard check — if one
+is missing, `/goal` is **not** started:
+
+1. **Bash permission auto-allow for gate commands.** So that `/goal` and its subagents can run the
+   quality gates unattended, `.claude/settings.local.json` must carry an **allowlist**
+   (`permissions.allow`) with the gate commands: `semgrep`, `eslint`, `pytest`, `gh run`, `git`.
+   `/bootstrap` creates the template (see `bootstrap/references/file-templates.md`, block
+   ".claude/settings.local.json (BOO-203)"). Missing allowlist → STOP with a pointer to the
+   template (otherwise every gate execution blocks on a permission prompt).
+2. **Worktree as safety boundary.** The skill checks `execution_isolation=worktree` (from
+   CONVENTIONS) **before** the `/goal` call. If the isolation is **not** `worktree` → **abort**.
+   Native subagents may only write in parallel in worktree-isolated working trees; without this
+   boundary their changes collide.
+3. **Layer-0 bodyguard active.** The skill checks via self-audit that the `pre-edit-bodyguard` hook
+   is wired (entry in `.claude/settings.json` `hooks` + file present). If the bodyguard is **not
+   live** → the skill **pauses** with "Bodyguard not active" and does not run `/goal`.
+
+> The three prerequisites replace the former container boundaries (1.x): worktree instead of
+> container volume, allowlist instead of container permissions, bodyguard instead of container
+> sandbox.
+
+#### Step 3: Plan the sprint token budget (BOO-38/40, **PRESERVED**)
 
 - Sprint = **80% of the context window** of the model used (token box instead of time box,
   HANDBUCH Appendix G). No burndown, no velocity.
 - Project the sum of the `token_estimate` of all candidate stories against the 80% budget.
   Move stories that blow the budget to the next sprint (hint, no abort).
-- Determine the order: dependencies (`blockedBy`) first, then priority.
+- Determine order/dependencies: `blockedBy` first, then priority — as a hint for `/goal` (which
+  stories must run sequentially instead of in parallel).
 - Result: ordered sprint list + projected budget. Details:
   [references/token-boundary.en.md](references/token-boundary.en.md).
 
-### Step 3: Sprint plan + operator approval
+#### Step 4: Generate worktrees + subagent definitions
 
-- Show the plan: stories in order, each `token_estimate` + `execution_mode`, total budget,
-  `daemon_fail_policy` (stop|continue).
-- **Wait for operator approval** (human-in-the-loop).
-- **Daemon mode (`--auto`): skip this step** — analogous to `/implement` step 4.
-
-### Step 4: Daemon loop per story
-
-For each story in the sprint order:
+Per story of the planned sprint list:
 
 | # | Action |
 |---|--------|
-| 4.1 | Set **Linear → In Progress** (adapter from CONVENTIONS; with `none` log locally). |
-| 4.2 | **Create worktree:** `git worktree add ../wt-<ISSUE> -b feat/boo-<n>-<slug>` (own branch per story). |
-| 4.3 | Start **`/implement` in daemon mode** in the worktree as a **subprocess** — model + mode resolved (BOO-170, see below): `claude -p "/implement <ISSUE>" --model "$(python3 <skill-dir>/scripts/resolve-model.py implement --repo-root .)" --permission-mode dontAsk`. Step-4 approval skipped; operator `--model` override takes precedence. All `/implement` gates remain active. |
-| 4.4 | **Gate-block pause** (see below) — on sensitive-paths/personal-data STOP: pause, notify operator, **never** bridge automatically. |
-| 4.5 | **Remote CI wait (BOO-148):** `/implement` step 6h (`gh run watch --exit-status`). Red → max 3 fix iterations, otherwise escalation. |
-| 4.5b | **Post-story gate assertion** (see below) — read the story run's `meta.json`; an unjustified `skipped_gates` entry **or** a missing `meta.json` → story fail. Merge only on green assertion. |
-| 4.6 | **Merge only on green CI** → `main`; then `git worktree remove ../wt-<ISSUE>` + clean up branch. |
-| 4.7 | **Linear → Done** (with AC evidence comment). On error: story back (`In Progress → Backlog`) + apply `daemon_fail_policy`. |
-| 4.8 | **Token check:** current consumption against the 80% boundary. Exceeded → leave loop → step 6. |
+| 4.1 | **Create worktree:** `git worktree add ../wt-<ISSUE> -b feat/boo-<n>-<slug>` (own branch per story, safety boundary from step 2.2). |
+| 4.2 | **Generate subagent definition:** from the **subagent section** of the spec create a `.claude/agents/<story>-<agent>.md` (role, worktree path, `write_scopes`, story ID, gate list). `/goal` reads this file when spawning the story worker subagent. |
+| 4.3 | **Linear → In Progress** (adapter from CONVENTIONS; with `none` log locally) — optional, `/goal` can also set this per story. |
 
-### Step 4.3: Model/mode routing (BOO-170)
+Result of phase A: per story a worktree + an agent definition, a token budget, the checked safety
+prerequisites. Details: [references/worktree-flow.en.md](references/worktree-flow.en.md).
 
-So that every story runs on the **recommended model** and in **unattended mode**, the daemon starts
-`/implement` as its **own subprocess** with resolved flags — not inline in the loop's model:
+### Phase B — `/goal` call
 
-```bash
-MODEL="$(python3 <skill-dir>/scripts/resolve-model.py implement --repo-root .)"
-claude -p "/implement <ISSUE>" --model "$MODEL" --permission-mode dontAsk
+#### Step 5: Start `/goal` with a termination phrase
+
+The skill calls the native termination engine `/goal` with a **termination phrase** that defines
+sprint end by machine. Example:
+
+```
+/goal "Sprint <id> closed: all Linear issues status:done, all quality gates green
+(Semgrep, ESLint, Coverage>=80%, GitHub Actions), journal/sprint-<date>.md written,
+no open subagent tasks"
 ```
 
-- **Model:** `scripts/resolve-model.py <skill>` resolves the chain `<skill>/SKILL.md recommended_model`
-  (tier) → `bootstrap/references/model-tiers.json current_version` (version) — existing SSoT, no new
-  config field. Fallback: `sonnet`. Example: `implement` → `claude-opus-4-7` (BOO-170: product code on
-  the best model).
-- **Permission mode:** constant **`dontAsk`** + allowlist in the daemon (unattended). `bypassPermissions`
-  only in true isolation (container/VM). Matches HANDBUCH §6 row "Execute, unattended".
-- **Override hierarchy preserved:** an explicit `--model` given to the daemon (or `CLAUDE.md`
-  `model_overrides`) beats the skill default; the decision is logged in `meta.json` (`model_used`,
-  `override_origin`).
-- **Known limit — `implement` is multi-tier:** `implement` routes internally to haiku (iteration loops)
-  and opus (security findings, step 6e). A single `--model` per subprocess does **not** capture this —
-  it sets the top-level model (opus, for the code core). The finer loop/findings split requires
-  implement-**internal** subagent routing (`model:` per subagent) and is a **follow-up story**.
-- **Effort:** no CLI flag — stays a session/`/config` setting (not enforceable per story).
-- **Daemon only (`--auto`):** this routing applies to the unattended run. **Interactively** the loop
-  runs in your session's model/mode; there the §6 mapping is a **recommendation** (Shift+Tab), not a
-  constraint — Claude Code cannot switch the running loop's model from within a skill.
+Phrase library (curated, tested phrases): [references/goal-termination-phrases.en.md](references/goal-termination-phrases.en.md).
 
-### Step 4.4: Gate-block behavior ⛔ (security-critical)
+#### Step 6: `/goal` orchestrates (belongs to `/goal`, not `/sprint-run`)
 
-If `/implement` triggers a **sensitive-paths gate** (step 5.5) or **personal-data gate**
-(step 5.5b), the following **always** applies:
+From here `/goal` takes over execution:
 
-1. The daemon **pauses** immediately (no merge, no continue).
-2. Operator notify with **story ID + reason** (which path, which gate).
-3. Resume **only** after explicit `review-ok` (technical) or `privacy-ok` (legal, GDPR Art. 25).
-4. **No** automatic bypass, **no** timeout resume. Even in `--auto` mode the
-   daemon stops here.
+- **Native subagents in parallel per story** (worktree-isolated, agent definition from step 4.2).
+  `parallel_story_limit` from CONVENTIONS bounds the concurrent workers.
+- **Gate-failure recovery:** If a quality gate fails, the worker agent fixes it and calls the gate
+  again; the evaluator sees "not yet satisfied" → loop until green. (This loop mechanic, which was
+  the daemon loop in 1.x, now belongs to `/goal`.)
+- **Approval need (sensitive path):** If a story touches a sensitive path or personal data, `/goal`
+  **pauses**, the operator answers (`review-ok` / `privacy-ok`, also remote). **No** automatic
+  bypass, **no** timeout resume. Protocol:
+  [references/gate-block-handling.en.md](references/gate-block-handling.en.md).
+- **Post-story gate assertion:** Before merging a story, `/goal` reads its
+  `journal/reports/local/<run>/meta.json` and verifies by machine that no mandatory gate was
+  **silently** skipped. Ruleset unchanged:
+  [references/gate-assertion.en.md](references/gate-assertion.en.md).
+- **Token boundary (BOO-38/40, PRESERVED):** The 80% token boundary is part of the termination
+  logic — on reaching it `/goal` terminates the sprint even if stories are still open (they remain
+  in the backlog). Details: [references/token-boundary.en.md](references/token-boundary.en.md).
 
-Details: [references/gate-block-handling.en.md](references/gate-block-handling.en.md).
+### Phase C — Completion
 
-### Step 4.5b: Post-story gate assertion ⛔ (machine verification)
+#### Step 7: Aggregate the sprint journal
 
-In step 6f-bis `/implement` writes a `journal/reports/local/<run>/meta.json` (BOO-36/84)
-containing, among others, `skipped_gates`, `change_type`, `override_audit`. `/sprint-run` reads it
-**after every story run** and verifies that no mandatory gate was **silently** skipped — the machine
-complement to prompt-driven gate execution (layer 1) and to the remote CI gate (layer 2).
+After termination by `/goal`, `/sprint-run` (or `/sprint-review`) aggregates the
+`journal/reports/local/*/meta.json` of the story runs into `journal/sprint-<date>.md` (metrics,
+learning loop). Optionally prepend an `/insights` meta block.
 
-**Rule:** every entry in `skipped_gates` must be **legitimate**, otherwise → story fail (back to
-`Backlog`) + operator notify (story ID + which gate). **If `meta.json` is missing entirely → fail** (no
-"silently green"). Merge (step 4.6) only after a green assertion.
-
-| Finding | Legitimate? | Action |
-|---|---|---|
-| `skipped_gates` empty | ✅ | continue |
-| Skip covered by `change_type` (non-code 5.7: workflow/config/infrastructure/content) | ✅ | continue |
-| Skip with an entry in `override_audit` (e.g. coverage override with justification) | ✅ | continue |
-| Skip without coverage/override | ❌ | **story fail** → Backlog + notify |
-| `meta.json` missing | ❌ | **story fail** |
-| Non-code story: 6c/6d/6e without evidence | ❌ | **story fail** |
-
-Details: [references/gate-assertion.en.md](references/gate-assertion.en.md).
-
-### Step 5: Error handling
-
-- **`/implement` fails:** story back to `Backlog`, remove the worktree per policy
-  or keep it for diagnosis. `daemon_fail_policy`: `stop` (default — halt sprint,
-  notify operator) or `continue` (next story).
-- **CI stays red** after 3 iterations: no merge, story stays `In Progress`, escalation
-  to operator with log excerpt (`gh run view --log-failed`).
-- **Worktree conflict / dirty `main`:** STOP — never merge with an unclean tree.
-
-### Step 6: Sprint boundary → `/sprint-review`
-
-Trigger (one is enough): 80% token boundary reached · backlog empty · `stop-on-fail` triggered.
-
-- Trigger `/sprint-review` — aggregates `journal/reports/local/*/meta.json` of the story runs
-  into `journal/sprint-<date>.md` (metrics, learning loop).
-- On token boundary: operator hint **"Sprint boundary reached"**.
-
-### Step 7: Sprint report (mandatory output)
+#### Step 8: Sprint report (mandatory output)
 
 Final table:
 
-| Story | Status | Token | CI | Worktree |
+| Story | Status | Token | Gates | Worktree |
 |---|---|---|---|---|
 | BOO-XX | Done / Failed / Skipped | ~Xk | green/red | cleaned up |
 
-Plus: total token consumption (% of budget), gate-block pauses, remaining backlog stories,
+Plus: total token consumption (% of budget), `/goal` approval pauses, remaining backlog stories,
 reference to the `/sprint-review` result.
 
-### Step 8: Cost snapshot (BOO-189)
+#### Step 9: Cost snapshot (BOO-189, **PRESERVED**)
 
 At sprint close, capture the **actual consumption** from the local Claude Code logs — as a measured
 quantity, not a guess:
@@ -203,40 +202,45 @@ quantity, not a guess:
 - Call: `bash .claude/hooks/ccusage-capture.sh "/sprint-run <sprint>"` (capture template from setup,
   internally `npx --yes ccusage@latest daily`). Appends a token/cost snapshot to
   `docs/financials/sprint-costs.md`.
-- **Soft gate:** if the call fails (ccusage/npx not installed, no log), **only warn** and **do not abort**
-  the sprint close — the report from step 7 stays valid.
-- **Complementary to the estimate:** this actual value complements the `token_tracking` from the story
-  `meta.json` (step 4.5b / `/sprint-review`); it does not replace it.
+- **Soft gate:** if the call fails (ccusage/npx not installed, no log), **only warn** and **do not
+  abort** the sprint close — the report from step 8 stays valid.
+- **Complementary to the estimate:** this actual value complements the `token_tracking` from the
+  story `meta.json`; it does not replace it.
 - **Known limitation:** ccusage does not attribute sub-agent tokens (Task tool) cleanly (issues
-  #313/#806/#950) — in heavily sub-agent-driven runs the reported consumption may be incomplete or
-  charged to the parent.
+  #313/#806/#950) — in heavily sub-agent-driven `/goal` runs the reported consumption may be
+  incomplete or charged to the parent.
 
-## Daemon mode
+## What is removed (ADR-4)
 
-**Default vs. `--auto` — both execute.** In the interactive default run, `/sprint-run` shows
-the sprint plan in step 3 and waits **once** for approval; **afterwards** the loop (step 4) runs
-through without further intermediate questions. `--auto` (webhook/daemon) skips **only** this one
-approval — otherwise identical. There is **no** pure check mode; both actually execute the sprint.
+With 2.0.0 the following mechanisms from 1.x are **removed** — they are replaced by native
+subagents under `/goal` and must **no longer** be wired:
 
-Like `/implement`, `/sprint-run` knows a daemon mode (`--auto` / webhook): the
-**operator approval in step 3 is skipped**, the loop runs without intermediate questions —
-**except** at gate blocks (step 4.4), which **always** stop. All `/implement` gates
-(spec gate, quality gates, CI loop) remain active in every story, and step 4.5b verifies
-**by machine** against `meta.json` after every run that no gate was silently skipped.
+| Removed (1.x) | Replacement (2.0.0) |
+|---|---|
+| Dockerfile + `devcontainer.json` for the sprint-run purpose | Worktree as safety boundary (step 2.2) |
+| Container lifecycle / lazy container bootstrap | `/goal` spawns native subagents on demand |
+| Hybrid driver approval mechanic | `/goal` pause on sensitive path (step 6) |
+| Container volume mount | `git worktree` per story |
+| `/implement`-in-daemon-mode per story as container simulation | native subagents under `/goal` |
+| Skill-owned daemon loop (`--auto`) | termination loop belongs to `/goal` |
 
-> **Claude Code mode (don't confuse):** The "plan" in step 3 is the **skill's sprint plan**,
-> **not** the Claude Code plan mode — that one is read-only and would block the execution.
-> Recommendation: supervised → `acceptEdits`, unattended (`--auto`) → `dontAsk` +
-> allowlist; never plan mode for execution. Details: HANDBUCH §6 "Claude Code mode".
+> In 2.0.0 there is **no** container and **no** skill-owned daemon loop anymore. `/sprint-run`
+> configures and hands over; the execution loop lives in `/goal`.
+
+## E2E validation
+
+A real autonomous sprint cannot be run within the skill implementation. The **manual operator
+validation protocol** (1-story sprint with `/goal`, incl. gate-failure recovery) lives in
+[references/goal-e2e-protocol.en.md](references/goal-e2e-protocol.en.md).
 
 ## Integration with other skills
 
 | Upstream | What is delivered | Downstream | What we deliver |
 |----------|--------------------|------------|------------------|
-| `ideation` | Stories + specs + ADD | `implement` (per story) | story ID, worktree, daemon trigger |
+| `ideation` | Stories + specs (incl. subagent section) | `goal` | termination phrase, worktrees, agent definitions, budget |
 | `backlog` | Prioritized sprint list | `sprint-review` (sprint end) | aggregated story metrics (meta.json) |
 
-Chain: `intent → ideation → backlog → sprint-run → ( implement )* → sprint-review`.
+Chain: `intent → ideation → backlog → sprint-run → /goal ( native subagents )* → sprint-review`.
 
 ## Trigger phrases
 
@@ -251,24 +255,26 @@ Fields (in `.claude/environment.json` or `CONVENTIONS.md`, plus per story in the
 
 | Field | Meaning | Default |
 |---|---|---|
-| `token_hard_threshold` | Sprint boundary in % of the context window | `80` |
-| `daemon_fail_policy` | Behavior on story error: `stop` / `continue` | `stop` |
+| `token_hard_threshold` | Sprint boundary in % of the context window (part of `/goal` termination) | `80` |
+| `execution_isolation` | Must be `worktree` (safety prerequisite step 2.2) | `worktree` |
 | `worktree_strategy` | Isolation per story | `git-worktree` |
-| `parallel_story_limit` | Max. parallel story worktrees (1 = sequential) | `1` |
+| `parallel_story_limit` | Max. parallel story subagents under `/goal` (1 = sequential) | `1` |
 
 ## File structure
 
 ```
 sprint-run/
-├── SKILL.md                                  ← Skill definition (1.1.0)
+├── SKILL.md                                  ← Skill definition (2.0.0)
 ├── SKILL.en.md                               ← English mirror
-├── README.md                                 ← German README (Version: 1.1.0)
+├── README.md                                 ← German README (Version: 2.0.0)
 ├── README.en.md                              ← English README
 ├── overview.excalidraw / .png                ← Skill overview sketch (+ .en)
 └── references/
-    ├── orchestration-checklist.md            ← Sprint pre-flight + loop checks (+ .en.md)
-    ├── gate-block-handling.md                ← Pause/resume protocol (+ .en.md)
+    ├── orchestration-checklist.md            ← Sprint pre-flight + pre-/goal checks (+ .en.md)
+    ├── goal-termination-phrases.md           ← Termination phrase library (+ .en.md)
+    ├── goal-e2e-protocol.md                  ← Manual 1-story E2E protocol (+ .en.md)
+    ├── gate-block-handling.md                ← /goal pause/resume on sensitive path (+ .en.md)
     ├── gate-assertion.md                     ← Post-story gate assertion (meta.json) (+ .en.md)
     ├── worktree-flow.md                      ← Worktree per story: add → merge → remove (+ .en.md)
-    └── token-boundary.md                     ← 80% boundary logic + sprint budget (+ .en.md)
+    └── token-boundary.md                     ← 80% boundary as part of /goal termination (+ .en.md)
 ```

@@ -1,5 +1,8 @@
 # Runbook: /sprint-run — run a whole sprint fully automatically
 
+> [!warning] Deprecated since v0.11.0 — see ADR-4 (sprint-run with `/goal`)
+> This runbook describes the **daemon-loop model** (`/implement` per story), valid up to v0.10.x. As of **v0.11.0 (BOO-203, build-vs-buy pivot)**, `/sprint-run` is a **configurator + `/goal` wrapper** (native termination engine instead of an in-house loop). The authoritative sources are now: skill [`sprint-run`](../../sprint-run/SKILL.en.md) (v2.0.0), [`goal/README.en.md`](../../goal/README.en.md) and **HANDBUCH Appendix AD/AH**. The following remains a historical reference until the runbook is rewritten.
+
 > For operators who no longer want to steer a sprint story by story: `/sprint-run` picks stories from the prioritized backlog, implements each via `/implement` in daemon mode (its own `git worktree` + branch), maintains Linear, waits for green CI, merges, cleans up and closes with `/sprint-review`. DE: [`sprint-run.md`](sprint-run.md).
 
 ## When this runbook?

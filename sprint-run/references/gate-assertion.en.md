@@ -1,8 +1,9 @@
 # Gate assertion — post-story verification against meta.json
 
-Reference for `/sprint-run` step 4.5b. Machine verification that `/implement` executed all
-mandatory gates per story (or skipped them only legitimately) — the safeguard against a
-**silently** skipped lint/test/security check.
+Reference for `/sprint-run` step 6 (execution by `/goal`). Machine verification that `/implement`
+executed all mandatory gates per story (or skipped them only legitimately) — the safeguard against a
+**silently** skipped lint/test/security check. Since 2.0.0 (ADR-4) `/goal` runs this assertion
+before each story merge (the ruleset itself is unchanged).
 
 ## Source: meta.json (BOO-36/84)
 
@@ -120,13 +121,14 @@ PASS   # only then merge (step 4.6)
 
 - Story back to `Backlog` (In Progress → Backlog).
 - Operator notify: story ID + which gate + reason.
-- No merge. `daemon_fail_policy` (`stop` | `continue`) determines whether the sprint halts.
+- No merge. `/goal` sets the story termination to "not satisfied"; the other stories keep running
+  independently (or `/goal` terminates if this was the only open story).
 
 ## Classifying the three layers
 
 - **Layer 1** — `/implement` gates (step 6): prompt-driven.
 - **Layer 2** — remote CI gate before merge (BOO-148): mechanical.
-- **4.5b is the machine bridge:** verifies layer 1 against the machine output (`meta.json`),
-  **before** layer 2 merges. Does not change `/implement` — only reads its `meta.json`.
+- **The gate assertion is the machine bridge:** `/goal` verifies layer 1 against the machine output
+  (`meta.json`), **before** layer 2 merges. Does not change `/implement` — only reads its `meta.json`.
 
 Sketch: `docs/sprint-run-flow.png` + `docs/story-breakdown.png` (HANDBUCH Appendix AD).

@@ -25,7 +25,7 @@
 10. [Tailoring Governance to Your Project](#10-tailoring-governance-to-your-project)
 11. [Daily Usage — A Typical Workflow](#11-daily-usage--a-typical-workflow)
 12. [FAQ](#12-faq) — incl. Claude Agent SDK migration
-13. [Appendices — signpost](#13-appendices--signpost) — A through AF at a glance
+13. [Appendices — signpost](#13-appendices--signpost) — A through AJ at a glance
 
 ---
 
@@ -613,23 +613,25 @@ On `no` the skill stops, the operator runs `/architecture-review`, then `/ideati
 4. Schema-chain check: flags conflicts (two stories targeting same `schemaVersion`)
 5. Shows hygiene suggestions (orphaned refs, obsolete issues)
 
-### `/sprint-run` — Sprint orchestrator (a whole sprint, fully automatic)
+### `/sprint-run` — Sprint configurator with /goal engine (a whole sprint, fully automatic)
 
 ![Sprint-Run skill](sprint-run/overview.en.png)
 
 **When:** You want to run a whole sprint fully automatically instead of calling `/implement` story by story.
 
 **What happens:**
-1. Picks stories from the prioritized backlog
-2. Implements each story via `/implement` in daemon mode — its own `git worktree` + branch per story
-3. Maintains Linear status (Backlog → In Progress → Done), waits for green remote CI, merges, removes the worktree
-4. Stops at the 80% token boundary and triggers `/sprint-review`
+1. Picks stories from the prioritized backlog and prepares the sprint (specs, quality-gate audit, `git worktree` + `.claude/agents/<story>.md` per story, 80% token budget)
+2. Hands execution to the **Anthropic-native** engine `/goal "<termination phrase>"`
+3. `/goal` orchestrates the stories in parallel as native subagents (worktree-isolated), fixes red gates until green, pauses on sensitive/personal-data gates for approval
+4. Terminates on satisfying the phrase or at the 80% token boundary; then `/sprint-run` aggregates `journal/sprint-<date>.md` + ccusage snapshot and triggers `/sprint-review`
 
-**Distinction:** `/implement` = one story. `/sprint-run` = N stories (a whole sprint). `/sprint-run` is a pure orchestrator — `/implement`, `/backlog`, `/sprint-review` stay unchanged.
+**Distinction:** `/implement` = one story. `/sprint-run` = N stories (a whole sprint). `/sprint-run` is a **configurator + `/goal` wrapper** — `/implement`, `/backlog`, `/sprint-review` stay unchanged, and the framework does not rebuild the termination loop (build-vs-buy, Appendix AG).
 
-**Gate blocks** (sensitive-paths / personal-data) pause the daemon and are **never** bypassed automatically — resume only after `review-ok` / `privacy-ok`.
+**Gate blocks** (sensitive-paths / personal-data) pause `/goal` and are **never** bypassed automatically — resume only after `review-ok` / `privacy-ok`.
 
-> Full chapter with all diagrams (daemon loop, story breakdown, agent interaction, GitHub integration, gate-block handling): **Appendix AD**.
+> Up to v0.10.x `/sprint-run` ran its own hybrid-container daemon loop; from v0.11.0 this model is **superseded** in favour of the native `/goal` engine (ADR-4).
+
+> Full chapter with all diagrams (configurator flow, story breakdown, agent interaction, GitHub integration, gate-block handling): **Appendix AD**. Engine details: **Appendix AH**. Doctrine: **Appendix AG**.
 
 ### `/breakfix` — When something is broken
 
@@ -2229,7 +2231,7 @@ Two further runbooks cover concrete setup tasks:
 
 ---
 
-The handbook has 32 appendices (A–Z + AA through AF). They are a **reference and deep-dive layer** — you don't need to read them front to back. This table tells you **when which appendix is relevant**. A–M are the foundations/tooling layer, N–AF the themes from v0.2.0 onward (waves J–BI): efficiency, privacy, deployment, scaling, verification, edit bodyguard, contribute-back, ubiquitous language, VPS/cloud team runbook, customer onboarding, SonarCloud setup, Linear MCP on VPS, knowledge onboarding, sprint orchestrator, slopsquatting wordlist maintenance, quality-gate audit.
+The handbook has 36 appendices (A–Z + AA through AJ). They are a **reference and deep-dive layer** — you don't need to read them front to back. This table tells you **when which appendix is relevant**. A–M are the foundations/tooling layer, N–AJ the themes from v0.2.0 onward (waves J–BI, Sprint 3): efficiency, privacy, deployment, scaling, verification, edit bodyguard, contribute-back, ubiquitous language, VPS/cloud team runbook, customer onboarding, SonarCloud setup, Linear MCP on VPS, knowledge onboarding, sprint configurator, slopsquatting wordlist maintenance, quality-gate audit, build-vs-buy doctrine, /goal engine, doc consistency, release convention.
 
 | Appendix | Topic | When relevant |
 |----------|-------|---------------|
@@ -2262,9 +2264,13 @@ The handbook has 32 appendices (A–Z + AA through AF). They are a **reference a
 | **AA** | SonarCloud setup runbook (two scenarios) | set up external SonarQube Cloud (D.5 = yes) |
 | **AB** | Linear MCP on a headless VPS | connect the Linear MCP via OAuth/SSH tunnel on a VPS + token setup |
 | **AC** | Knowledge onboarding | route existing docs into governance artefacts |
-| **AD** | /sprint-run — sprint orchestrator | work the backlog in daemon mode, worktree per story, token boundary |
+| **AD** | /sprint-run — sprint configurator with /goal engine | prepare the sprint (specs, worktrees, token budget) and hand over to the native `/goal` engine; hybrid-container model superseded (ADR-4) |
 | **AE** | Slopsquatting wordlist maintenance | keep the wordlist current + methodologically correct — weekly auto-refresh, quarterly methodology review, 90-day freshness gate |
 | **AF** | Quality-gate audit (`/quality-gate-audit`) | check whether the gates are actually wired — three triggers, four gates, status `wired`/`nominal`/`blind`, sprint STOP on `blind` |
+| **AG** | Build-vs-buy doctrine | the framework delivers only what Anthropic does not ship natively — three categories (substitutable / complementary / USP), operative rule per story |
+| **AH** | Cloud engine /goal | native termination engine — sprint vs. story termination, the evaluator only reads the transcript, three safety preconditions |
+| **AI** | Doc consistency and cross-linking | on every doc change pull along DE+EN/skill files/HANDBUCH/CONVENTIONS/index/sketches/vault/cross-links/glossary + drift gate green; mandatory acceptance block from Sprint 3 |
+| **AJ** | Release convention (sprint notes + major) | one release note per sprint (Sprint 3→v0.11.0, 5→v0.12.0, 6→v0.13.0), major v1.0 after Sprint 6; release note = mandatory DoD item from Sprint 3 |
 
 ---
 
@@ -4879,15 +4885,16 @@ From `docs/how-we-document.en.md` §4 — order in existing-project onboarding:
 
 Integrated with `/dpo` (when legal-compliance category meets personal-data signal → DPO suggestion), `/intent` (extracted intent statements land in `intents/INTENT-XX.md`) and `/pitch` (demo-storyboard-pitch category).
 
-## Appendix AD: /sprint-run — sprint orchestrator (BOO-157)
+## Appendix AD: /sprint-run — sprint configurator with /goal engine (BOO-157, refactored BOO-203)
 
-> Complements §6 (skill overview) and Appendix G (sprint sizing). `/sprint-run` runs a whole sprint fully automatically by chaining the existing skills — it does not change them. Source: `sprint-run/SKILL.md` + `sprint-run/references/`. Operator README (intro + diagrams): [`sprint-run/README.en.md`](sprint-run/README.en.md).
+> Complements §6 (skill overview), Appendix G (sprint sizing), Appendix AG (build-vs-buy) and Appendix AH (`/goal`). `/sprint-run` prepares a sprint and hands execution to the **Anthropic-native** engine `/goal`. Source: `sprint-run/SKILL.md` (v2.0.0) + `sprint-run/references/` + [`goal/README.en.md`](goal/README.en.md). Operator README (intro + diagrams): [`sprint-run/README.en.md`](sprint-run/README.en.md).
+
+> [!info] Superseded — hybrid-container model replaced (ADR-4)
+> Up to **v0.10.x** `/sprint-run` ran its own **hybrid-container daemon loop** (Dockerfile / `devcontainer.json` / container lifecycle / lazy bootstrap / hybrid-driver approval, one story after another). From **v0.11.0** this model is **superseded**: `/sprint-run` shrinks to a **configurator + `/goal` wrapper**, and the execution loop belongs to the native engine `/goal`. Build-vs-buy (Appendix AG): **buy over build** — the framework does not rebuild a termination loop that Anthropic ships natively. Rationale and before/after: ADR-4 (sprint-run with `/goal`).
 
 ### What is /sprint-run?
 
-`/implement` ships **one** story. `/sprint-run` runs **N** stories as a sprint: it picks stories from the prioritized backlog, calls `/implement` per story in daemon mode, maintains Linear status, waits for green remote CI, merges, removes worktrees and closes the sprint with `/sprint-review`. Pure orchestrator — `/implement`, `/backlog`, `/sprint-review` stay unchanged.
-
-![Sprint-run flow — the daemon loop from /sprint-run to /sprint-review](sprint-run/docs/sprint-run-flow.en.png)
+`/implement` ships **one** story. `/sprint-run` runs **N** stories as a sprint — but **no longer itself**: it is a **configurator + wrapper** that prepares the sprint and then calls the native engine `/goal` with a machine-checkable **termination phrase**. `/goal` orchestrates the stories in parallel as native subagents (worktree-isolated) and terminates when the evaluator sees the phrase satisfied. Pure configurator — `/implement`, `/backlog`, `/sprint-review` stay unchanged, and the framework does not rebuild the loop itself.
 
 ### When to use it?
 
@@ -4897,72 +4904,86 @@ Preconditions, checked in the **sprint pre-flight** (step 1, HARD GATE):
 - every candidate story has a complete spec (`specs/<ISSUE>.md`, Schrader-complete, with `Execution Isolation` block)
 - governance gates green (`governance_mode`, sensitive-paths/personal-data configured)
 - `git worktree` available, `gh` authenticated, `main` clean
+- **quality-gate audit (pre-sprint)** green — no gate `blind` (Appendix AF)
 
-If a check is red, the story is dropped from the sprint (daemon: skipped + logged) or the run stops.
+If a check is red, the story is dropped from the sprint or the run stops.
 
-### Step-by-step (daemon loop)
+### Three safety preconditions for the /goal call
 
-Per story, in sprint order:
+Before `/sprint-run` hands over to `/goal`, three boundaries must be live — they replace the former container boundaries (ADR-4: worktree instead of container volume, allowlist instead of container permissions, bodyguard instead of container sandbox):
 
-| # | Action |
-|---|--------|
-| 4.1 | Linear → In Progress |
-| 4.2 | `git worktree add ../wt-<ISSUE> -b feat/boo-<n>-<slug>` |
-| 4.3 | `/implement` in daemon mode (step-4 approval skipped, all gates active) |
-| 4.4 | Gate-block pause (below) on sensitive/personal-data hit |
-| 4.5 | Remote-CI wait (`gh run watch --exit-status`, BOO-148) — red → max 3 fix iterations |
-| 4.5b | **Post-story gate assertion** — read `meta.json`; an unjustified `skipped_gates` entry or a missing `meta.json` → story fail |
-| 4.6 | Merge **only** on green CI **and** green assertion → `main`; `git worktree remove` |
-| 4.7 | Linear → Done (with AC evidence); on failure story back + `daemon_fail_policy` |
-| 4.8 | Token check against the 80% boundary |
+| # | Precondition | If not met |
+|---|---|---|
+| 1 | **Bash auto-allow** — `.claude/settings.local.json` carries an allowlist with the gate commands (`semgrep`, `eslint`, `pytest`, `gh run`, `git`) so `/goal` and its subagents run the gates unattended | `/goal` hangs on permission prompts |
+| 2 | **`execution_isolation=worktree`** — native subagents only write collision-free in parallel when worktree-isolated | `/sprint-run` **aborts** before the `/goal` call |
+| 3 | **Layer-0 bodyguard active** — `pre-edit-bodyguard` hook (PreToolUse on `Edit|Write`) blocks secrets/sensitive paths before writing | `/sprint-run` **pauses** and does not call `/goal` |
+
+### Step-by-step (configurator + /goal wrapper)
+
+| # | Phase | Action |
+|---|-------|--------|
+| 1 | **Preparation** | load specs, quality-gate audit (pre-sprint, Appendix AF), worktrees per story (`git worktree add ../wt-<ISSUE> -b feat/boo-<n>-<slug>`), generate `.claude/agents/<story>.md` per story, project the 80% token budget |
+| 2 | **Engine call** | start the native engine: `/goal "<termination phrase>"` (sprint phrase from `sprint-run/references/goal-termination-phrases.en.md`) |
+| 3 | **Execution (belongs to /goal)** | `/goal` orchestrates the stories in parallel as native subagents (worktree-isolated), runs the gate-failure loop (red gate → worker fixes → recheck) until green, pauses on sensitive/personal-data gates for approval |
+| 4 | **Aggregation** | write `journal/sprint-{date}.md` + append ccusage snapshot (Appendix N) |
+
+![Sprint-run flow — configurator prepares, /goal terminates](sprint-run/docs/sprint-run-flow.en.png)
+
+### Termination phrase instead of a step list
+
+`/goal` terminates against a **machine-checkable** phrase — each clause describes an objectively observable state (issue status, gate exit codes, file present), not "sprint done":
+
+```
+/goal "Sprint <id> closed: all Linear issues status:done, all quality gates green
+(Semgrep, ESLint, coverage>=80%, GitHub Actions), journal/sprint-<date>.md written,
+no open subagent tasks"
+```
+
+The curated phrase library per phase lives in `sprint-run/references/goal-termination-phrases.en.md` (+ `.md`). More on the engine: **Appendix AH**.
 
 ![Story breakdown — one story from worktree to cleanup](sprint-run/docs/story-breakdown.en.png)
 
 ### Agent interaction
 
-`/sprint-run` calls: `/backlog` (story selection, once per sprint), `/implement` (per story, in daemon mode) and `/sprint-review` (at sprint end). It writes no product code itself and does not change the orchestrated skills. Chain: `intent → ideation → backlog → sprint-run → ( implement )* → sprint-review`.
+`/sprint-run` calls: `/backlog` (story selection, once per sprint) for preparation and then **`/goal`** (native engine) for execution; `/sprint-review` closes the sprint. It writes no product code itself and does not rebuild the termination loop. Chain: `intent → ideation → backlog → sprint-run → /goal ( native subagents )* → sprint-review`.
 
 ![Agent interaction — who calls whom, which artefacts flow](sprint-run/docs/agent-interaction.en.png)
 
 ### Gate-block behaviour
 
-If `/implement` triggers a **sensitive-paths gate** (step 5.5) or **personal-data gate** (step 5.5b), the daemon pauses immediately, notifies the operator (story ID + reason) and resumes **only** after explicit `review-ok` (technical) or `privacy-ok` (legal, GDPR Art. 25). **No** automatic bypass, **no** timeout resume — even in `--auto` mode.
+If a subagent triggers a **sensitive-paths gate** (step 5.5) or **personal-data gate** (step 5.5b), `/goal` pauses immediately, notifies the operator (story ID + reason) and resumes **only** after explicit `review-ok` (technical) or `privacy-ok` (legal, GDPR Art. 25). **No** automatic bypass, **no** timeout resume. Approval pauses belong in the gate-block protocol, **not** in the termination phrase — otherwise `/goal` never terminates.
 
 ![Gate-block handling — state machine running → paused → resumed](sprint-run/docs/gate-block-handling.en.png)
 
-### Gate assertion (step 4.5b)
-
-After every `/implement` run, `/sprint-run` reads the story run's `meta.json` (written by `/implement` step 6f-bis, BOO-36/84) and verifies **by machine** that no mandatory gate was silently skipped. A `skipped_gates` entry is legitimate only if it is covered by `change_type` (non-code 5.7) **or** documented in `override_audit`; otherwise — or if `meta.json` is missing — the story falls back to `Backlog` (operator notify). Merge (4.6) only after a green assertion. This safeguards prompt-driven gate execution against the machine output. Details: `sprint-run/references/gate-assertion.md`.
-
 ### Token-boundary logic
 
-A sprint is **80% of the context window** (token box, not time box, Appendix G). `/sprint-run` projects the sum of `token_estimate` against the budget before the run and checks cumulative usage after each story. At ≥ `token_hard_threshold` (default 80) the daemon leaves the loop, triggers `/sprint-review` and reports **"sprint boundary reached"**. Remaining stories stay in the backlog for the next sprint.
+A sprint is **80% of the context window** (token box, not time box, Appendix G). `/sprint-run` projects the sum of `token_estimate` against the budget before the run; the 80% boundary enters the `/goal` phrase as an explicit terminator, so the engine terminates on reaching it and the configurator then triggers `/sprint-review`. Remaining stories stay in the backlog for the next sprint.
 
 ### GitHub integration
 
-Each story gets a branch `feat/boo-<n>-<slug>` in its own worktree. `/implement` commits and pushes there, optionally via PR (`gh pr create`); the remote CI run is awaited with `gh run watch --exit-status` (BOO-148). **Merge only on green CI** — if CI stays red after three fix iterations, the daemon escalates and does not merge.
+Each story gets a branch `feat/boo-<n>-<slug>` in its own worktree. The `/goal` subagents commit and push there, optionally via PR (`gh pr create`); the remote CI run is awaited with `gh run watch --exit-status` (BOO-148). **Merge only on green CI** — if CI stays red, the phrase does not terminate and nothing is merged.
 
 ![GitHub integration — story → branch → PR → CI → merge](sprint-run/docs/github-integration.en.png)
 
-### Error handling
+### Gate assertion
 
-- **`/implement` fails:** story back to `Backlog`; `daemon_fail_policy` = `stop` (default, halt sprint + notify) or `continue` (next story).
-- **Unjustified gate skip / missing `meta.json` (step 4.5b):** story back to Backlog + operator notify; no merge.
-- **CI stays red** after 3 iterations: no merge, story stays `In Progress`, escalation with log excerpt.
-- **Dirty `main` / worktree conflict:** STOP — never merge with an unclean tree.
+After every story run, the aggregation reads the story run's `meta.json` (written by `/implement` step 6f-bis, BOO-36/84) and verifies **by machine** that no mandatory gate was silently skipped. A `skipped_gates` entry is legitimate only if it is covered by `change_type` (non-code 5.7) **or** documented in `override_audit`; otherwise — or if `meta.json` is missing — the story falls back to `Backlog` (operator notify). The termination phrase explicitly requires "`meta.json` without an unjustified `skipped_gates`" so the evaluator does not see the story as done prematurely. Details: `sprint-run/references/gate-assertion.md`.
 
 ### Configuration
 
 | Field | Meaning | Default |
 |---|---|---|
 | `token_hard_threshold` | sprint boundary in % of the context window | `80` |
-| `daemon_fail_policy` | behaviour on story failure: `stop` / `continue` | `stop` |
-| `worktree_strategy` | isolation per story | `git-worktree` |
-| `parallel_story_limit` | max. parallel story worktrees (1 = sequential) | `1` |
+| `worktree_strategy` | isolation per story (precondition 2) | `git-worktree` |
+| `parallel_story_limit` | max. parallel story subagents (1 = sequential) | `1` |
+
+### What is dropped (vs. hybrid-container model)
+
+`Dockerfile` / `devcontainer.json` / container lifecycle / lazy bootstrap / hybrid-driver approval — all removed without replacement. The three native boundaries (worktree isolation, bash allowlist, Layer-0 bodyguard) replace the container sandbox. (The **opt-in container profile** for uniform tool versions on a team VPS is untouched by this — that is a bootstrap option, Appendix Y, **not** the sprint-run loop.)
 
 ### References
 
-`sprint-run/SKILL.md` · `sprint-run/references/{orchestration-checklist,gate-block-handling,worktree-flow,token-boundary}.md` · runbook `docs/runbooks/sprint-run.md` · Appendix G (sprint sizing) · BOO-148 (remote-CI loop) · BOO-157.
+`sprint-run/SKILL.md` (v2.0.0) · [`goal/README.en.md`](goal/README.en.md) · `sprint-run/references/{orchestration-checklist,gate-block-handling,worktree-flow,token-boundary,goal-termination-phrases,goal-e2e-protocol}.md` · runbook `docs/runbooks/sprint-run.md` · Appendix G (sprint sizing) · Appendix AG (build-vs-buy) · Appendix AH (`/goal` engine) · BOO-148 (remote-CI loop) · BOO-157 · BOO-203 (refactor).
 
 ---
 
@@ -5125,6 +5146,134 @@ Body — summary as a status table per gate:
 
 ---
 
+## Appendix AG: Build-vs-buy doctrine — the framework delivers what Anthropic does not ship natively (BOO-198)
+
+> Complements §6 (skill overview) and Appendix M (Schrader decoder). Source: ADR-1 (build-vs-buy). This doctrine governs **what** the framework builds at all — and since the `/sprint-run` refactor (Appendix AD, ADR-4) it is the reason the termination loop is **no longer** home-built.
+
+### The guiding question
+
+Anthropic ships new native capabilities into Claude Code continuously. Every capability the framework builds itself is code someone has to maintain, document and guard against native changes. The doctrine is therefore: **the framework delivers only what Anthropic does not ship natively.** Otherwise **buy over build** applies — use the native capability and document its embedding, do not rebuild it.
+
+### Three categories per component
+
+| Category | Meaning | Consequence | Example |
+|---|---|---|---|
+| **Substitutable** | A native capability (now) covers the logic | **Remove or thin out** the home-build, switch to native | sprint-run hybrid-container loop → `/goal` (Appendix AD/AH, ADR-4) |
+| **Complementary** | Native capability and framework part run **in parallel**, complementing each other | **Keep both**, document the clear boundary | native status line + worker-equivalent report |
+| **USP / no native counterpart** | There is **no** native equivalent — genuine framework value | **Keep** and make visible in the pitch | quality-gate self-audit (Appendix AF), sensitive-paths layer, slopsquatting wordlist (Appendix AE) |
+
+### Operative rule
+
+**Every new story justifies why the framework builds the logic instead of using native.** If the component falls into "substitutable", a home-build must be justified or dropped; if it falls into "USP", it belongs in the pitch. This keeps the framework lightweight (design principle) and prevents drift into rebuilding what the platform already provides.
+
+### References
+
+ADR-1 (build-vs-buy) · Appendix AD (`/sprint-run` as a buy example) · Appendix AH (`/goal`) · Appendix M (Schrader decoder) · BOO-198.
+
+---
+
+## Appendix AH: Cloud engine /goal — native termination engine (BOO-210)
+
+> Complements Appendix AD (`/sprint-run`) and Appendix AG (build-vs-buy). Source: [`goal/README.en.md`](goal/README.en.md) (+ `.md`), `sprint-run/references/goal-termination-phrases.en.md`. `/goal` is **Anthropic-native** — documented here, not built by the framework.
+
+### What /goal is
+
+`/goal` is Claude Code's native **termination loop with evaluator**. It takes a machine-checkable **termination phrase** (all issues *Done*, all gates green, journal written), orchestrates native subagents and runs turn after turn — lets workers fix red gates, rechecks — until the evaluator sees the phrase satisfied or a limit (token budget) is reached.
+
+> [!info] Not a framework skill
+> There is **no** `goal/SKILL.md`, no own code, no own version. The `goal/` folder **only documents** how the native engine is used in the Code-Crash workflow (build-vs-buy, Appendix AG).
+
+### Two uses: sprint vs. story termination
+
+| Use | Who calls | Phrase describes | Source |
+|---|---|---|---|
+| **Sprint termination** | `/sprint-run` (the rule case) | the **sprint end**: all Linear issues `status:done`, all gates green, `journal/sprint-<date>.md` written | Appendix AD, step 2 |
+| **Story termination** | directly in `/implement` for long stories | the **story end**: Linear `status:done`, gates green, merged to `main`, `meta.json` without an unjustified `skipped_gates` | `sprint-run/references/goal-e2e-protocol.md` |
+
+### Limits
+
+- **The evaluator only reads the transcript.** `/goal` evaluates the phrase against the **conversation trace** — it makes **no Bash calls of its own** to, say, re-run a gate. Gate results must therefore stand as **observable facts in the transcript** (a worker subagent runs the gate, the result appears in the trace). A phrase whose satisfaction cannot be read off the transcript does not terminate reliably.
+- **No manual steps in the phrase.** Approval pauses ("operator has reviewed") belong in the gate-block protocol, not in the termination phrase — otherwise `/goal` never terminates.
+- **Preparation is not `/goal`'s job.** Specs, worktrees and agent files are delivered by `/sprint-run` (Appendix AD).
+
+### Preconditions
+
+The same three safety boundaries that `/sprint-run` checks before the `/goal` call (Appendix AD): **bash auto-allow** (`.claude/settings.local.json`), **`execution_isolation=worktree`** (else abort) and **Layer-0 bodyguard active** (else pause). They replace the former container boundaries (ADR-4: worktree instead of container volume, allowlist instead of container permissions, bodyguard instead of container sandbox).
+
+### References
+
+[`goal/README.en.md`](goal/README.en.md) (+ `.md`) · `sprint-run/references/goal-termination-phrases.en.md` (+ `.md`) · `sprint-run/references/goal-e2e-protocol.md` · Appendix AD (`/sprint-run`) · Appendix AG (build-vs-buy) · ADR-4 (sprint-run with `/goal`) · BOO-210.
+
+---
+
+## Appendix AI: Doc consistency and cross-linking (BOO-214)
+
+> Complements §7 (artefacts) and Appendix C (glossary). Source: SSoT checklist [`docs/standards/doku-consistency-checklist.en.md`](docs/standards/doku-consistency-checklist.en.md) (+ `.md`) and story template [`docs/templates/story-template.en.md`](docs/templates/story-template.en.md) (+ `.md`). Makes the *docs-in-sync* principle (see [`docs/how-we-document.md`](docs/how-we-document.md)) operative — a checkable list instead of hoped-for discipline.
+
+### The guiding idea
+
+A doc change is never just one file. When **one** spot is touched, the dependent spots must be pulled along — otherwise the docs drift apart and the SSoT decays into contradictory islands. The standard forces: on every doc-changing story you deliberately check **DE+EN**, the **skill files**, the **HANDBUCH**, **CONVENTIONS**, the **doc index**, **sketches**, the **vault docs**, the **cross-links** and the **glossary** — and `docs_drift_check.py` must be **green**.
+
+### The nine consistency axes + the gate
+
+| Axis | What gets pulled along |
+|---|---|
+| **Bilingual DE+EN** | every new/changed doc file has its EN mirror (`.en.md`) or EN anchor, content-equivalent (identifiers/paths/BOO numbers verbatim) |
+| **Skill files in sync** | `SKILL.md`/`SKILL.en.md` **and** `README.md`/`README.en.md` together; `version:` == `**Version:**` in DE **and** EN |
+| **HANDBUCH section** | new mechanic recorded in the HANDBUCH (§ or appendix), DE and EN aligned |
+| **CONVENTIONS.md** | extended on a new convention (tool/adapter contract, branching, naming) |
+| **Doc index + README skills table** | new doc linked in `docs/INDEX.md`; new skill in the README skills table (`({skill}/)`, enforced by the drift check) |
+| **Sketches** | Excalidraw pair DE+EN (`<name>-overview.excalidraw` + `.png` **and** the `.en` variant), render-loop verified |
+| **Vault docs** | on a skill reference, `03 Bereiche/Skills/<skill>.md` (+ `.en`) updated in SecondBrain |
+| **Cross-links** | references to affected ADRs / skills / runbooks set (both ways where sensible) |
+| **Glossary terms** | new terms explained in **Appendix C** + `docs/glossar.md` (+ `.en.md`) |
+| **docs-drift check green** *(gate)* | `python3 .github/scripts/docs_drift_check.py` with **rc=0** — the machine gate that spot-enforces the remaining points |
+
+### Operative rule — mandatory acceptance block from Sprint 3
+
+From **Sprint 3** **every doc-changing story** copies the acceptance block from the SSoT checklist into its acceptance criteria. Not every story touches every point — non-applicable points are marked `n/a` with a short reason instead of being silently skipped. The story template ([`docs/templates/story-template.en.md`](docs/templates/story-template.en.md)) already embeds the block. As long as the drift gate is red, the story is **not** done.
+
+### References
+
+[`docs/standards/doku-consistency-checklist.en.md`](docs/standards/doku-consistency-checklist.en.md) (+ `.md`, SSoT) · [`docs/templates/story-template.en.md`](docs/templates/story-template.en.md) (+ `.md`) · [`docs/how-we-document.md`](docs/how-we-document.md) (doc map) · `.github/scripts/docs_drift_check.py` (gate) · Appendix C (glossary) · Appendix AJ (release convention) · BOO-214.
+
+---
+
+## Appendix AJ: Release convention — sprint notes + major release (BOO-216)
+
+> Complements Appendix AI (doc consistency). Source: release index [`docs/releases/_index.en.md`](docs/releases/_index.en.md) (+ `.md`) and the templates [`docs/releases/_template-sprint.en.md`](docs/releases/_template-sprint.en.md) / [`docs/releases/_template-major.en.md`](docs/releases/_template-major.en.md) (each + `.md`). The granular wave list stays in the [`README.md`](README.md) — this convention does not duplicate it.
+
+### Three release levels
+
+| Level | File | Granularity |
+|---|---|---|
+| **Wave** (granular) | `wave-<x>-<theme>.md` (+ `.en.md`) | a single change/update — source in the repo, full list in the README |
+| **Version** (rollup) | `v<MAJOR.MINOR.PATCH>-overview.md` | bundles a version's waves — body of the GitHub release |
+| **Sprint / major** (from Sprint 3) | `docs/releases/sprint-N.md` (+ `.en.md`) or major note | sprint rollup note (minor tag) or major marketing/migration note (v1.0) |
+
+### One sprint note per sprint + SemVer correlation
+
+From **Sprint 3** **one** rollup release note (`docs/releases/sprint-N.md` + `.en.md`) is written **per sprint** and tagged on a **minor version**; the individual wave notes remain the granular source. After **Sprint 6** the **major release v1.0** follows — the marketing/enterprise-pitch note.
+
+| Sprint | Version | Note template |
+|---|---|---|
+| Sprint 3 | **v0.11.0** | [`_template-sprint.en.md`](docs/releases/_template-sprint.en.md) |
+| Sprint 5 | **v0.12.0** | [`_template-sprint.en.md`](docs/releases/_template-sprint.en.md) |
+| Sprint 6 | **v0.13.0** | [`_template-sprint.en.md`](docs/releases/_template-sprint.en.md) |
+| after Sprint 6 | **v1.0.0** | [`_template-major.en.md`](docs/releases/_template-major.en.md) |
+
+Patches (`vX.Y.Z`) within a sprint for follow-ups. Workflow (tag → `gh release create --notes-file …`) as described in the [`README.md`](README.md).
+
+### Mandatory DoD item
+
+The sprint release note is **a mandatory Definition-of-Done item of every sprint from Sprint 3** — a sprint is only complete once its `sprint-N.md` (+ `.en.md`) is written from the template and linked in the index ([`docs/releases/_index.en.md`](docs/releases/_index.en.md)).
+
+### References
+
+[`docs/releases/_index.en.md`](docs/releases/_index.en.md) (+ `.md`, index) · [`docs/releases/_template-sprint.en.md`](docs/releases/_template-sprint.en.md) (+ `.md`) · [`docs/releases/_template-major.en.md`](docs/releases/_template-major.en.md) (+ `.md`) · [`README.md`](README.md) (convention + full wave list) · Appendix AI (doc consistency) · BOO-216.
+
+---
+
 *This handbook is part of the INTENTRON.*
 *GitHub: github.com/vibercoder79/intentron*
-*Last updated: 2026-06-03 (v0.3.0–v0.6.2: security/governance wave, onboarding fix + docs sync — BOO-86 through BOO-97; incl. Layer-0 edit bodyguard, dpo control catalogue, CONTEXT.md ubiquitous language, raw-pii-guard, Appendix Y VPS/cloud team runbook, quickstart with self-install/self-update prompts; Appendix Z customer-onboarding checklists + artifact map — BOO-108; 2026-06-03 bootstrap-UX hardening BOO-114–129 / waves AT–AV — pre-flight gate, tool-install guidance, guided stack discovery + TypeScript-first, gh prerequisite + GitHub-connect runbook, intent in Minimum, project-specific MCP question, Sonar merge warning + Appendix AA SonarCloud runbook, branching-standard ADR + sketch, lightweight SecondBrain session-start, design-story ADR; 2026-06-03 Wave AW docs hardening BOO-130–136 — consolidated `docs/how-we-document.md`, plain-language glossary, GitHub Issues as recommended backlog default, Appendix AB Linear-MCP-on-VPS runbook, canonical `DEVELOPER_ONBOARDING.md` filename, GitHub Pro/Team note, SECURITY.md next-step; 2026-06-03 Wave AX knowledge-onboarding BOO-137 — new bundle skill `knowledge-onboarding` (routing rubric SSoT + manifest + anti-fabrication), Appendix AC; 2026-06-05 Wave BH knowledge-onboarding v1.1.0 — 5 explainer sketches DE+EN embedded in README/SKILL; 2026-06-05 Wave BI `/sprint-run` BOO-157 — new orchestrator skill (backlog → implement in daemon mode → sprint-review, worktree per story, 80% token boundary, gate-block pause), §6 entry + Appendix AD with 5 Owlist sketches; 2026-06-06 Wave BK `/sprint-run` BOO-165 — step 4.5b post-story gate assertion (`meta.json` verification), sketches sprint-run-flow + story-breakdown updated, sprint-run v1.1.0)*
+*Last updated: 2026-06-03 (v0.3.0–v0.6.2: security/governance wave, onboarding fix + docs sync — BOO-86 through BOO-97; incl. Layer-0 edit bodyguard, dpo control catalogue, CONTEXT.md ubiquitous language, raw-pii-guard, Appendix Y VPS/cloud team runbook, quickstart with self-install/self-update prompts; Appendix Z customer-onboarding checklists + artifact map — BOO-108; 2026-06-03 bootstrap-UX hardening BOO-114–129 / waves AT–AV — pre-flight gate, tool-install guidance, guided stack discovery + TypeScript-first, gh prerequisite + GitHub-connect runbook, intent in Minimum, project-specific MCP question, Sonar merge warning + Appendix AA SonarCloud runbook, branching-standard ADR + sketch, lightweight SecondBrain session-start, design-story ADR; 2026-06-03 Wave AW docs hardening BOO-130–136 — consolidated `docs/how-we-document.md`, plain-language glossary, GitHub Issues as recommended backlog default, Appendix AB Linear-MCP-on-VPS runbook, canonical `DEVELOPER_ONBOARDING.md` filename, GitHub Pro/Team note, SECURITY.md next-step; 2026-06-03 Wave AX knowledge-onboarding BOO-137 — new bundle skill `knowledge-onboarding` (routing rubric SSoT + manifest + anti-fabrication), Appendix AC; 2026-06-05 Wave BH knowledge-onboarding v1.1.0 — 5 explainer sketches DE+EN embedded in README/SKILL; 2026-06-05 Wave BI `/sprint-run` BOO-157 — new orchestrator skill (backlog → implement in daemon mode → sprint-review, worktree per story, 80% token boundary, gate-block pause), §6 entry + Appendix AD with 5 Owlist sketches; 2026-06-06 Wave BK `/sprint-run` BOO-165 — step 4.5b post-story gate assertion (`meta.json` verification), sketches sprint-run-flow + story-breakdown updated, sprint-run v1.1.0; 2026-06-14 Sprint 3 build-vs-buy pivot BOO-198/203/210/212 — `/sprint-run` refactored from hybrid-container daemon loop to configurator + native `/goal` engine (Appendix AD rewritten, sprint-run v2.0.0, ADR-4), new Appendix AG (build-vs-buy doctrine, ADR-1) + Appendix AH (`/goal` engine), hybrid-container model marked superseded (§6 + Appendix AD))*

@@ -69,3 +69,6 @@ The framework's 15 top-level skills. Each links to its `README.md`; the English 
 | [sprint-review](../sprint-review/README.md) | Periodic audit for architecture health, tech debt, and backlog hygiene plus a learning-loop entry. | DE+EN |
 | [sprint-run](../sprint-run/README.md) | Sprint orchestrator: runs an entire sprint automatically across worktrees, CI, and merge. | DE+EN |
 | [visualize](../visualize/README.md) | Generates architecture diagrams in Miro from the project's architecture docs. | DE+EN |
+
+> [!info] Anthropic-native, not a skill
+> [`goal/`](../goal/README.en.md) (`README.md` + `README.en.md`, DE+EN) documents the **Anthropic-native** termination engine [`/goal`](../goal/README.en.md) — sprint engine behind `/sprint-run`, story engine for long `/implement` runs. Not a framework skill (no `SKILL.md`), hence not counted in the skill table above (build-vs-buy, ADR-1).

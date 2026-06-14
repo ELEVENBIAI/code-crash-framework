@@ -1,5 +1,8 @@
 # Runbook: /sprint-run — einen ganzen Sprint vollautomatisch fahren
 
+> [!warning] Veraltet seit v0.11.0 — siehe ADR-4 (Sprint-Run mit `/goal`)
+> Dieses Runbook beschreibt das **Daemon-Loop-Modell** (`/implement` pro Story), gültig bis v0.10.x. Ab **v0.11.0 (BOO-203, Build-vs-Buy-Pivot)** ist `/sprint-run` ein **Konfigurator + `/goal`-Wrapper** (native Termination-Engine statt Eigenbau-Loop). Maßgeblich sind jetzt: Skill [`sprint-run`](../../sprint-run/SKILL.md) (v2.0.0), [`goal/README.md`](../../goal/README.md) und **HANDBUCH Anhang AD/AH**. Das Folgende bleibt historische Referenz, bis das Runbook neu geschrieben ist.
+
 > Für Operatoren, die einen Sprint nicht mehr Story für Story von Hand steuern wollen: `/sprint-run` wählt Stories aus dem priorisierten Backlog, setzt jede per `/implement` im Daemon-Modus um (eigener `git worktree` + Branch), pflegt Linear, wartet auf grüne CI, merged, räumt auf und schließt mit `/sprint-review` ab. EN: [`sprint-run.en.md`](sprint-run.en.md).
 
 ## Wann dieses Runbook?

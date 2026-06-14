@@ -1,9 +1,10 @@
-# Gate-Block Handling — pause/resume protocol
+# Gate-block handling — /goal pause/resume on sensitive path
 
-Reference for `/sprint-run` step 4.4. Security-critical: the daemon must
-**never** bridge governance gates automatically.
+Reference for `/sprint-run` step 6 (execution by `/goal`). Security-critical: `/goal` must
+**never** bridge governance gates automatically. Since 2.0.0 (ADR-4) this pause belongs to `/goal`,
+no longer to a skill-owned daemon loop.
 
-## Which gates pause the daemon?
+## Which gates pause `/goal`?
 
 | Gate | Source (`/implement`) | Trigger | Approval token |
 |---|---|---|---|
@@ -15,26 +16,26 @@ Both can strike at the same time — then first `review-ok` (technical), then `p
 
 ## Protocol
 
-1. **Pause.** `/implement` stops at its gate. `/sprint-run` does **not** continue —
-   no merge, no worktree cleanup, no next story.
-2. **Notify.** Operator hint with **story ID**, **gate type** and **concrete path/reason**.
-   In daemon mode: persistent note (e.g. Linear comment) instead of just console output.
-3. **Wait.** The daemon stays blocked until the operator delivers the matching approval
+1. **Pause.** `/implement` (in the story subagent) stops at its gate. `/goal` does **not** continue
+   for this story — no merge, no worktree cleanup. Other stories can keep running.
+2. **Notify.** Operator hint with **story ID**, **gate type** and **concrete path/reason** —
+   a persistent note (e.g. Linear comment) so the operator can answer remotely too.
+3. **Wait.** `/goal` keeps this story blocked until the operator delivers the matching approval
    token. **No** timeout resume.
 4. **Resume.** After approval `/implement` records the block in the spec file (`## Human Review`
-   or `## Privacy Review`) and continues; `/sprint-run` resumes the loop.
+   or `## Privacy Review`) and continues; `/goal` resumes the story subagent.
 5. **Abort (optional).** If the operator does not want to approve: story back to `Backlog`,
-   remove worktree, next story per `daemon_fail_policy`.
+   remove worktree.
 
 ## Prohibitions
 
-- ❌ No automatic bypass of a gate — not even in `--auto` mode.
+- ❌ No automatic bypass of a gate.
 - ❌ No timeout-based auto-resume.
 - ❌ No approval "in advance" for upcoming stories — each approval applies to exactly one block.
 
 ## State machine
 
-```
+```text
 running ──(gate hit)──▶ paused ──(review-ok / privacy-ok)──▶ resumed ──▶ running
                           │
                           └──(operator rejects)──▶ aborted (story → Backlog)

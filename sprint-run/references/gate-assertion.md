@@ -1,8 +1,9 @@
 # Gate-Assertion — Post-Story-Verifikation gegen meta.json
 
-Referenz zu `/sprint-run` Schritt 4.5b. Maschinelle Verifikation, dass `/implement` pro Story alle
-Pflicht-Gates ausgefuehrt (oder nur legitim uebersprungen) hat — die Absicherung gegen einen
-**still** uebersprungenen Lint-/Test-/Security-Check.
+Referenz zu `/sprint-run` Schritt 6 (Ausfuehrung durch `/goal`). Maschinelle Verifikation, dass
+`/implement` pro Story alle Pflicht-Gates ausgefuehrt (oder nur legitim uebersprungen) hat — die
+Absicherung gegen einen **still** uebersprungenen Lint-/Test-/Security-Check. Seit 2.0.0 (ADR-4)
+fuehrt `/goal` diese Assertion vor jedem Story-Merge aus (das Regelwerk selbst ist unveraendert).
 
 ## Quelle: meta.json (BOO-36/84)
 
@@ -122,13 +123,15 @@ PASS   # erst dann Merge (Schritt 4.6)
 
 - Story zurueck auf `Backlog` (In Progress → Backlog).
 - Operator-Notify: Story-ID + welches Gate + Grund.
-- Kein Merge. `daemon_fail_policy` (`stop` | `continue`) bestimmt, ob der Sprint anhaelt.
+- Kein Merge. `/goal` setzt die Story-Termination auf „nicht erfuellt"; die uebrigen Stories
+  laufen unabhaengig weiter (bzw. `/goal` terminiert, wenn nur diese eine Story offen war).
 
 ## Einordnung der drei Ebenen
 
 - **Ebene 1** — `/implement`-Gates (Schritt 6): prompt-getrieben.
 - **Ebene 2** — Remote-CI-Gate vor Merge (BOO-148): mechanisch.
-- **4.5b ist die maschinelle Bruecke:** verifiziert Ebene 1 gegen den Maschinen-Output (`meta.json`),
-  **bevor** Ebene 2 merged. Aendert `/implement` nicht — liest nur dessen `meta.json`.
+- **Die Gate-Assertion ist die maschinelle Bruecke:** `/goal` verifiziert Ebene 1 gegen den
+  Maschinen-Output (`meta.json`), **bevor** Ebene 2 merged. Aendert `/implement` nicht — liest nur
+  dessen `meta.json`.
 
 Sketch: `docs/sprint-run-flow.png` + `docs/story-breakdown.png` (HANDBUCH Anhang AD).

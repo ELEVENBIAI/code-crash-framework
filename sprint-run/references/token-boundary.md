@@ -1,7 +1,8 @@
 # Token-Boundary — 80%-Logik + Sprint-Budget
 
-Referenz zu `/sprint-run` Schritt 2 (Budget-Planung) und Schritt 6 (Sprint-Boundary).
-Grundlage: HANDBUCH Anhang G (Sprint-Sizing-Mechanik, BOO-38/39/40).
+Referenz zu `/sprint-run` Schritt 3 (Budget-Planung) und der `/goal`-Termination (die
+80%-Boundary ist seit 2.0.0 Teil der Termination-Logik von `/goal`, nicht mehr eines skill-eigenen
+Loops). Grundlage: HANDBUCH Anhang G (Sprint-Sizing-Mechanik, BOO-38/39/40).
 
 ## Prinzip: Token-Box statt Zeit-Box
 
@@ -14,7 +15,7 @@ Intent-Erfuellung gemessen, nicht ueber Token-Verbrauch.
 | `token_warn_threshold` | Default `70` | Soft-Warnung: Sprint neigt sich dem Ende |
 | `token_hard_threshold` | Default `80` | **Hard Stop**: Sprint-Boundary → `/sprint-review` |
 
-## Budget-Planung (Schritt 2)
+## Budget-Planung (Schritt 3)
 
 1. Context-Window des Modells bestimmen (z.B. 200k).
 2. Sprint-Budget = 80 % davon (z.B. 160k).
@@ -23,14 +24,16 @@ Intent-Erfuellung gemessen, nicht ueber Token-Verbrauch.
    Abbruch**. Keine Story wird heimlich gekuerzt.
 5. Reihenfolge: `blockedBy` zuerst, dann Prioritaet.
 
-## Boundary-Check (Schritt 4.8 / 6)
+## Boundary-Check (Teil der `/goal`-Termination)
 
-Nach jeder Story (und grob waehrend laufender Implementierung) den kumulierten Verbrauch gegen
-`token_hard_threshold` projizieren:
+`/goal` projiziert den kumulierten Verbrauch laufend gegen `token_hard_threshold`. Die Boundary ist
+**Teil der Termination-Phrase/-Logik** — `/goal` terminiert den Sprint auch dann, wenn die
+inhaltliche Phrase noch nicht erfuellt ist:
 
-- **< 80 %:** naechste Story.
-- **≥ 80 %:** Loop verlassen → Schritt 6: `/sprint-review` triggern, Operator-Hinweis
-  **"Sprint-Boundary erreicht"**. Verbleibende Stories bleiben im Backlog fuer den naechsten Sprint.
+- **< 80 %:** weiterlaufen (naechste/parallele Stories).
+- **≥ 80 %:** `/goal` terminiert → `/sprint-run` aggregiert das Journal und triggert
+  `/sprint-review`, Operator-Hinweis **"Sprint-Boundary erreicht"**. Verbleibende Stories bleiben
+  im Backlog fuer den naechsten Sprint.
 
 > Die Boundary ist **konservativ**: lieber eine Story frueher stoppen als mitten in einer Story
 > ins Kontext-Limit laufen. Eine angefangene, nicht fertig getestete Story ist teurer als eine

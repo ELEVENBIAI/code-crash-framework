@@ -245,6 +245,14 @@ New or changed documentation has its own Definition of Done, layered on top of t
 
 **Touchpoint quartet** — per "Done", keep these four in sync: **HANDBOOK/doc · release note · spec · Linear**. This was lived practice; BOO-180 makes it an explicit convention.
 
+### Documentation consistency standard from Sprint 3 (BOO-214)
+
+From **Sprint 3** every doc-changing story carries a **mandatory acceptance block** — the reproducible checklist that pulls along DE+EN, skill files, HANDBUCH, CONVENTIONS, the doc index, sketches, vault docs, cross-links and the glossary, with a green `docs_drift_check.py` as the machine gate. The single source of truth is [`docs/standards/doku-consistency-checklist.md`](docs/standards/doku-consistency-checklist.md) (+ `.en`); the ready-to-copy block lives in [`docs/templates/story-template.md`](docs/templates/story-template.md) (+ `.en`). Non-applicable points are marked `n/a — <reason>`, not deleted. See HANDBUCH Appendix AI.
+
+### Release convention — sprint notes + major (BOO-216)
+
+From **Sprint 3** each sprint ships **one** rollup release note (`docs/releases/sprint-N.md` + `.en`) tagged on a minor version (Sprint 3 → v0.11.0, 5 → v0.12.0, 6 → v0.13.0); after Sprint 6 the **major release v1.0** follows. The granular wave notes remain the source. Templates: [`docs/releases/_template-sprint.md`](docs/releases/_template-sprint.md) / [`docs/releases/_template-major.md`](docs/releases/_template-major.md); chronological overview: [`docs/releases/_index.md`](docs/releases/_index.md). The sprint release note is a **mandatory DoD item of every sprint from Sprint 3**. See HANDBUCH Appendix AJ.
+
 ### Audit-Trail (BOO-19)
 
 Every `/implement` run writes a `## Session-Referenz` block into the spec file (commit-SHA + session-ID + log path + audit-trace.sh command). `bootstrap/scripts/audit-trace.sh` reads the spec and reconstructs the conversation log. Tool-agnostic bash.

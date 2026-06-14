@@ -2,17 +2,18 @@
 
 > 🌐 **Sprache:** Deutsch (diese Datei) · [🇬🇧 English version](README.en.md)
 
-# Sprint-Run — Sprint-Orchestrator fuer vollautomatische Sprint-Ausfuehrung
+# Sprint-Run — Sprint-Konfigurator mit /goal-Engine
 
-> Faehrt einen **ganzen Sprint** ohne manuelle Story-by-Story-Steuerung: waehlt Stories aus dem
-> priorisierten Backlog, setzt jede per `/implement` um (jede in ihrem eigenen Arbeitsordner),
-> pflegt den Linear-Status, wartet auf gruene Tests, fuehrt zusammen, raeumt auf — und beendet
-> den Sprint automatisch, wenn das Token-Budget erreicht ist. **Reiner Orchestrator:** er ruft
-> die bestehenden Skills nur auf und veraendert sie nicht.
+> Bereitet einen **ganzen Sprint** vor (Pre-Flight, Specs, Worktrees pro Story,
+> Subagent-Definitionen, Token-Budget) und uebergibt die Ausfuehrung an die native
+> Termination-Engine **`/goal`**. `/goal` orchestriert die Stories parallel als native Subagents
+> (jede in ihrem eigenen Arbeitsordner) und laeuft, bis die Termination-Phrase erfuellt ist:
+> alle Issues *Done*, alle Quality-Gates gruen, Sprint-Journal geschrieben. **Reiner
+> Konfigurator + Wrapper:** `/sprint-run` ruft die bestehenden Skills nur auf und veraendert sie nicht.
 
-**Version:** 1.2.0 · **Befehl:** `/sprint-run`
+**Version:** 2.0.0 · **Befehl:** `/sprint-run`
 
-![Sprint-Run — Ueberblick: Backlog -> Pre-Flight -> Daemon-Loop pro Story -> 80%-Boundary -> /sprint-review](overview.png)
+![Sprint-Run — Ueberblick: Backlog -> Pre-Flight -> Vorbereitung -> /goal (native Subagents pro Story) -> 80%-Boundary -> /sprint-review](overview.png)
 
 *Ein Sprint auf einen Blick. Volles Kapitel mit allen Diagrammen: HANDBUCH [Anhang AD](../HANDBUCH.md). Excalidraw-Quelle: [`overview.excalidraw`](overview.excalidraw).*
 
@@ -25,56 +26,89 @@ aufrufen, eine Story auswaehlen, warten, die naechste starten, in Linear den Sta
 Branches und Arbeitsordner selbst verwalten. Das ist stupide und fehleranfaellig.
 
 `/sprint-run` automatisiert genau diese Mechanik. Es ist ein **Dirigent**, kein Solist: es schreibt
-selbst keinen Produktcode, sondern verkettet die Skills, die es schon gibt —
+selbst keinen Produktcode, sondern **bereitet den Sprint vor** und uebergibt die Ausfuehrung an die
+native Termination-Engine **`/goal`** —
 
 - **`/backlog`** waehlt und priorisiert die Stories,
-- **`/implement`** setzt **eine** Story komplett um (Code, Tests, Linter, Commit, Push),
+- **`/sprint-run`** bereitet vor: Pre-Flight, Worktrees pro Story, Subagent-Definitionen, Budget,
+- **`/goal`** orchestriert die Stories parallel als native Subagents und laeuft, bis die
+  Termination-Phrase erfuellt ist,
 - **`/sprint-review`** schliesst den Sprint mit Lessons und Metriken ab.
 
-`/sprint-run` ruft diese drei in der richtigen Reihenfolge auf, kuemmert sich um Arbeitsordner,
-Linear-Status, das Warten auf die Tests und das Sprint-Ende. `/implement`, `/backlog` und
-`/sprint-review` bleiben dabei **unveraendert**.
+`/implement` (eine Story), `/backlog`, `/goal` und `/sprint-review` bleiben dabei **unveraendert**.
 
-> **Faustregel:** `/implement` = **eine** Story. `/sprint-run` = **ein ganzer Sprint** (viele Stories).
-> Wer nur eine einzelne Story bauen will, nimmt `/implement` direkt.
+> **Faustregel:** `/implement` = **eine** Story. `/sprint-run` = **ein ganzer Sprint** (viele Stories,
+> ausgefuehrt von `/goal`). Wer nur eine einzelne Story bauen will, nimmt `/implement` direkt.
+>
+> **Breaking Change 2.0.0 (ADR-4):** Bis 1.x war `/sprint-run` ein Hybrid-Container-Orchestrator mit
+> eigenem Daemon-Loop. Ab 2.0.0 sind Container (Dockerfile, `devcontainer.json`, Volume-Mount,
+> Lazy-Build), Hybrid-Driver und der skill-eigene Daemon-Loop **entfallen** — ersetzt durch native
+> Subagents unter `/goal`. Siehe „Was entfaellt" weiter unten.
 
 ---
 
-## Zwei Modi — beide führen den Sprint aus
+## `/goal` als Termination-Engine
 
-| Aufruf | Was passiert |
-|---|---|
-| `/sprint-run` | Plant den Sprint, zeigt dir den Plan und **wartet einmal auf dein OK** — und faehrt dann den **ganzen** Sprint durch (Stories umsetzen, testen, **nach `main` mergen**). |
-| `/sprint-run --auto` | **Identisch, nur ohne** das eine OK — fuer unbeaufsichtigte/Daemon-Laeufe. |
+`/goal` ist die **native Anthropic-Termination-Engine**. Sie nimmt eine **Termination-Phrase**
+entgegen — eine maschinell pruefbare Beschreibung des Sprint-Endes — orchestriert native Subagents
+und laeuft so lange, bis ein Evaluator die Phrase als erfuellt sieht.
 
-Beide setzen den Sprint **echt um** (inkl. Merge). Es gibt **keinen** reinen „Nur-Pruefen"-Modus — willst du nur sehen, was kaeme, starte `/sprint-run`, lies den Plan und brich **vor** der Freigabe ab. Nach der Freigabe laeuft der Loop ohne weitere Zwischenfragen (ausser an Sicherheits-Gate-Blocks).
+`/sprint-run` liefert `/goal` zwei Dinge: die **vorbereitete Umgebung** (Worktrees,
+Agent-Definitionen, Budget) und die **Phrase**, z. B.:
 
-> **Nicht verwechseln:** Der hier gezeigte **Plan** ist der **Sprint-Plan des Skills** (Story-Liste + Budget), **nicht** der Claude-Code-Planungsmodus. Letzterer ist read-only und wuerde die Umsetzung sogar **blockieren** — zum Ausfuehren von `/sprint-run` also **nicht** Plan Mode nutzen.
->
-> **Claude-Code-Modus (Empfehlung):** beaufsichtigt am Mac → `acceptEdits`; unbeaufsichtigt (`--auto`, VPS/Daemon) → `dontAsk` + Allowlist (`bypassPermissions` nur isoliert). Details: HANDBUCH §6 „Claude-Code-Modus".
->
-> **Mac zuklappen, Lauf laeuft weiter?** Fuer unbeaufsichtigte Laeufe auf der VPS den Sprint in `tmux` starten — dann ueberlebt er einen SSH-/Verbindungsabbruch. Anleitung: [Sprint unbeaufsichtigt per tmux](../docs/runbooks/sprint-unattended-tmux.md). Ein vollausfuehrbarer Daemon ist dafuer **nicht** noetig.
+```
+/goal "Sprint <id> closed: alle Linear-Issues status:done, alle Quality-Gates grün
+(Semgrep, ESLint, Coverage>=80%, GitHub Actions), journal/sprint-<date>.md geschrieben,
+keine offenen Subagent-Tasks"
+```
+
+Die Ausfuehrungs-Schleife (Worker fixt ein rotes Gate → Gate erneut → Evaluator prueft → Loop bis
+gruen) gehoert **`/goal`**, nicht mehr `/sprint-run`. Eine kuratierte Phrasen-Bibliothek liegt in
+[`references/goal-termination-phrases.md`](references/goal-termination-phrases.md).
+
+---
+
+## Drei Sicherheits-Voraussetzungen (vor dem `/goal`-Aufruf)
+
+Bevor `/sprint-run` `/goal` startet, **muessen** drei Voraussetzungen erfuellt sein — sonst wird
+`/goal` nicht aufgerufen:
+
+1. **Bash-Permission auto-allow.** `.claude/settings.local.json` traegt eine **Allowlist** mit den
+   Gate-Commands (`semgrep`, `eslint`, `pytest`, `gh run`, `git`), damit `/goal` und seine Subagents
+   die Quality-Gates unbeaufsichtigt fahren, ohne an einem Permission-Prompt haengenzubleiben. Das
+   Template legt `/bootstrap` an.
+2. **Worktree als Sicherheits-Boundary.** `execution_isolation` muss `worktree` sein — sonst
+   **Abbruch**. Native Subagents schreiben nur in Worktree-isolierten Arbeitsbaeumen kollisionsfrei
+   parallel.
+3. **Layer-0 Bodyguard aktiv.** Ist der `pre-edit-bodyguard`-Hook nicht live, **pausiert** der Skill
+   mit „Bodyguard nicht aktiv" und ruft `/goal` nicht auf.
+
+Diese drei ersetzen die frueheren Container-Boundaries: Worktree statt Container-Volume, Allowlist
+statt Container-Permissions, Bodyguard statt Container-Sandbox.
 
 ---
 
 ## So laeuft ein Sprint
 
-![Sprint-Run-Flow — der Daemon-Loop von /sprint-run bis /sprint-review](docs/sprint-run-flow.png)
+![Sprint-Run-Flow — Vorbereitung von /sprint-run, Ausfuehrung durch /goal bis /sprint-review](docs/sprint-run-flow.png)
 
 *Excalidraw-Quelle: [`docs/sprint-run-flow.excalidraw`](docs/sprint-run-flow.excalidraw).*
 
 1. **Vorbereitung & Pre-Flight.** `/sprint-run` liest die Projekt-Einstellungen und prueft einmalig:
-   Ist der Backlog priorisiert? Hat jede Story eine vollstaendige Spec? Sind die Governance-Gates
-   aktiv? Ist das Werkzeug bereit? Wenn nein → Stopp mit klarem Hinweis.
-2. **Budget planen.** Ein Sprint ist **80 % des Context-Windows** (eine „Token-Box", keine Zeit-Box).
+   Ist der Backlog priorisiert? Hat jede Story eine vollstaendige Spec (inkl. Subagent-Sektion)?
+   Sind die Governance-Gates aktiv? Ist das Werkzeug bereit? Wenn nein → Stopp mit klarem Hinweis.
+2. **Sicherheits-Voraussetzungen pruefen.** Allowlist da? `execution_isolation=worktree`? Bodyguard
+   live? Fehlt eines → `/goal` wird nicht gestartet.
+3. **Budget planen.** Ein Sprint ist **80 % des Context-Windows** (eine „Token-Box", keine Zeit-Box).
    Stories werden in eine Reihenfolge gebracht; was nicht ins Budget passt, wandert in den naechsten Sprint.
-3. **Plan & Freigabe.** Der Plan wird gezeigt und vom Operator freigegeben. Im **Daemon-Modus**
-   (`/sprint-run --auto`) entfaellt diese Freigabe — der Lauf laeuft dann ohne Zwischenfragen.
-4. **Daemon-Loop pro Story:** Linear auf *In Progress* → eigenen Arbeitsordner anlegen →
-   `/implement` laufen lassen → auf gruene Tests warten → **Gate-Assertion** (s. u.) → zusammenfuehren →
-   Linear auf *Done* → Arbeitsordner aufraeumen → naechste Story.
-5. **Sprint-Ende.** Bei 80 % Token (oder leerem Backlog) stoppt der Loop und ruft `/sprint-review` auf.
-6. **Report.** Abschlusstabelle: welche Stories *Done* / *Failed* / *Skipped*, Token-Verbrauch, Test-Status.
+4. **Vorbereiten.** Pro Story einen eigenen Arbeitsordner (`git worktree`) anlegen und aus der
+   Subagent-Sektion der Spec eine `.claude/agents/<story>-<agent>.md` generieren.
+5. **`/goal` aufrufen.** Mit der Termination-Phrase. Ab hier orchestriert `/goal` die Stories
+   parallel als native Subagents: Gates fahren, bei rotem Gate fixen + erneut pruefen, bei
+   Sensitive-Path pausieren (Operator antwortet, auch Remote), **Gate-Assertion** vor Merge.
+6. **Sprint-Ende.** Bei 80 % Token (oder leerem Backlog / erfuellter Phrase) terminiert `/goal`.
+   `/sprint-run` aggregiert das Sprint-Journal und ruft `/sprint-review`.
+7. **Report.** Abschlusstabelle: welche Stories *Done* / *Failed* / *Skipped*, Token-Verbrauch, Gate-Status.
 
 ---
 
@@ -85,9 +119,11 @@ Beide setzen den Sprint **echt um** (inkl. Merge). Es gibt **keinen** reinen „
 *Excalidraw-Quelle: [`docs/story-breakdown.excalidraw`](docs/story-breakdown.excalidraw).*
 
 Jede Story durchlaeuft denselben Lebenszyklus — in einem **eigenen Arbeitsordner** (`git worktree`),
-damit sich parallele Stories nicht in die Quere kommen: Arbeitsordner anlegen → `/implement`
-(Daemon) → lokale Tests/Linter → Push → Remote-Tests („CI") → **Gate-Assertion** → Merge nach `main`
-→ Arbeitsordner entfernen. Schlaegt etwas fehl, wandert die Story zurueck in den Backlog.
+damit sich parallele Subagents nicht in die Quere kommen: `/sprint-run` legt den Arbeitsordner an
+und generiert die Subagent-Definition; `/goal` spawnt den Story-Subagent → lokale Tests/Linter →
+Push → Remote-Tests („CI") → **Gate-Assertion** → Merge nach `main` → Arbeitsordner entfernen.
+Schlaegt etwas fehl, fixt der Worker-Agent und faehrt das Gate erneut; bleibt es rot, wandert die
+Story zurueck in den Backlog.
 
 ---
 
@@ -97,17 +133,36 @@ damit sich parallele Stories nicht in die Quere kommen: Arbeitsordner anlegen �
 
 *Excalidraw-Quelle: [`docs/gate-block-handling.excalidraw`](docs/gate-block-handling.excalidraw).*
 
-`/sprint-run` setzt Qualitaet und Governance auf drei Ebenen durch:
+Qualitaet und Governance werden auf drei Ebenen durchgesetzt — `/sprint-run` prueft sie vor dem
+Aufruf, `/goal` setzt sie waehrend der Ausfuehrung durch:
 
 1. **Gate-Block-Pause.** Beruehrt eine Story sensible Pfade (`sensitive-paths`) oder personenbezogene
-   Daten (`personal-data`), **pausiert** der Daemon und benachrichtigt den Operator. Weiter geht es
-   nur nach ausdruecklicher Freigabe (`review-ok` / `privacy-ok`). **Kein** automatischer Bypass,
-   **kein** Timeout-Resume — auch im `--auto`-Modus.
-2. **Gate-Assertion (Schritt 4.5b).** Nach jedem `/implement`-Lauf prueft `/sprint-run` **maschinell**
-   anhand der `meta.json`, dass kein Pflicht-Gate (Linter, Tests, Security, Coverage) **still**
-   uebersprungen wurde. Ein unbegruendeter Skip → Story zurueck in den Backlog.
+   Daten (`personal-data`), **pausiert** `/goal` und benachrichtigt den Operator. Weiter geht es
+   nur nach ausdruecklicher Freigabe (`review-ok` / `privacy-ok`, auch Remote). **Kein** automatischer
+   Bypass, **kein** Timeout-Resume.
+2. **Gate-Assertion.** Vor dem Merge einer Story prueft `/goal` **maschinell** anhand der
+   `meta.json`, dass kein Pflicht-Gate (Linter, Tests, Security, Coverage) **still** uebersprungen
+   wurde. Ein unbegruendeter Skip → Story zurueck in den Backlog. Regelwerk:
+   [`references/gate-assertion.md`](references/gate-assertion.md).
 3. **Remote-CI-Gate.** Zusammengefuehrt wird **nur** bei gruenen GitHub-Tests. Bleiben sie rot,
-   versucht `/implement` bis zu drei Fixes, sonst wird eskaliert — **kein** Merge auf Rot.
+   fixt der Worker-Agent und fahrt das Gate erneut — **kein** Merge auf Rot.
+
+---
+
+## Was entfaellt (ADR-4)
+
+Mit 2.0.0 **entfallen** folgende Mechanismen aus 1.x — sie sind durch native Subagents unter `/goal`
+ersetzt:
+
+| Entfaellt (1.x) | Ersatz (2.0.0) |
+|---|---|
+| Dockerfile + `devcontainer.json` | Worktree als Sicherheits-Boundary |
+| Container-Lifecycle / Lazy-Bootstrap | `/goal` spawnt native Subagents on demand |
+| Hybrid-Driver-Approval-Mechanik | `/goal`-Pause bei Sensitive-Path |
+| `/implement`-im-Daemon-Modus als Container-Simulation | native Subagents unter `/goal` |
+| Skill-eigener Daemon-Loop (`--auto`) | Termination-Loop gehoert `/goal` |
+
+In 2.0.0 gibt es **keinen** Container und **keinen** skill-eigenen Daemon-Loop mehr.
 
 ---
 
@@ -117,8 +172,8 @@ damit sich parallele Stories nicht in die Quere kommen: Arbeitsordner anlegen �
 |---|---|---|
 | Umfang | **eine** Story | **N** Stories (ganzer Sprint) |
 | Arbeitsordner | laeuft im aktuellen Baum | eigener `git worktree` + Branch pro Story |
-| Sprint-Ende | — | 80%-Token-Boundary → `/sprint-review` |
-| Aufruf | direkt | orchestriert `/implement` pro Story |
+| Ausfuehrung | direkt | konfiguriert + uebergibt an `/goal` (native Subagents) |
+| Sprint-Ende | — | 80%-Token-Boundary / erfuellte Phrase → `/sprint-review` |
 
 ---
 
@@ -129,11 +184,14 @@ In Klartext — drei Dinge muessen vorhanden sein:
 - **Git, das „worktree" kann.** Moderne Git-Versionen koennen das von Haus aus. `/sprint-run` legt
   pro Story einen eigenen Arbeitsordner an, damit sich parallele Stories nicht stoeren. (Pruefen mit
   `git worktree -h`.)
-- **GitHub-CLI angemeldet** (`gh auth login`). Damit der Daemon nach dem Push auf das Ergebnis der
-  GitHub-Tests warten kann, bevor er zusammenfuehrt.
-- **Die drei gesteuerten Skills sind installiert:** `/backlog` (waehlt Stories), `/implement`
-  (setzt eine Story um) und `/sprint-review` (schliesst den Sprint ab). `/sprint-run` ruft sie nur
-  auf — ohne sie tut es nichts.
+- **GitHub-CLI angemeldet** (`gh auth login`). Damit `/goal` nach dem Push auf das Ergebnis der
+  GitHub-Tests warten kann, bevor es zusammenfuehrt.
+- **Die gesteuerten Skills sind installiert:** `/backlog` (waehlt Stories), `/goal` (fuehrt die
+  Stories aus), `/implement` (setzt eine Story um), `/quality-gate-audit` (Pre-Sprint-Gate) und
+  `/sprint-review` (schliesst den Sprint ab). `/sprint-run` ruft sie nur auf — ohne sie tut es nichts.
+- **`.claude/settings.local.json` mit Gate-Allowlist** (von `/bootstrap` angelegt) und
+  `execution_isolation=worktree` in `CONVENTIONS.md` — beides ist Voraussetzung fuer den
+  `/goal`-Aufruf (siehe „Drei Sicherheits-Voraussetzungen").
 
 ---
 
@@ -160,10 +218,10 @@ cd /tmp && rm -rf intentron
 
 | Feld | Bedeutung | Default |
 |---|---|---|
-| `token_hard_threshold` | Sprint-Boundary in % des Context-Windows | `80` |
-| `daemon_fail_policy` | Verhalten bei Story-Fehler: `stop` / `continue` | `stop` |
+| `token_hard_threshold` | Sprint-Boundary in % des Context-Windows (Teil der `/goal`-Termination) | `80` |
+| `execution_isolation` | Muss `worktree` sein (Sicherheits-Voraussetzung) | `worktree` |
 | `worktree_strategy` | Isolation pro Story | `git-worktree` |
-| `parallel_story_limit` | max. parallele Story-Arbeitsordner (1 = sequentiell) | `1` |
+| `parallel_story_limit` | max. parallele Story-Subagents unter `/goal` (1 = sequentiell) | `1` |
 
 ---
 
@@ -182,10 +240,11 @@ cd /tmp && rm -rf intentron
   und GitHub-Integration: [`docs/agent-interaction.png`](docs/agent-interaction.png) ·
   [`docs/github-integration.png`](docs/github-integration.png)).
 - **Runbook (Schritt-fuer-Schritt mit Beispiel-Session):** [`docs/runbooks/sprint-run.md`](../docs/runbooks/sprint-run.md).
-- **Gesteuerte Skills:** [`/backlog`](../backlog/README.md) · [`/implement`](../implement/README.md) · [`/sprint-review`](../sprint-review/README.md).
+- **Gesteuerte Skills:** [`/backlog`](../backlog/README.md) · [`/goal`](../goal/README.md) · [`/implement`](../implement/README.md) · [`/quality-gate-audit`](../quality-gate-audit/README.md) · [`/sprint-review`](../sprint-review/README.md).
 - **Skill-Definition (Workflow im Detail):** [`SKILL.md`](SKILL.md) · **Referenzen:** [`references/`](references/).
+- **Manuelles E2E-Validierungs-Protokoll:** [`references/goal-e2e-protocol.md`](references/goal-e2e-protocol.md).
 
-Kette: `intent → ideation → backlog → sprint-run → ( implement )* → sprint-review`.
+Kette: `intent → ideation → backlog → sprint-run → /goal ( native Subagents )* → sprint-review`.
 
 ---
 
@@ -198,9 +257,11 @@ sprint-run/
 ├── overview.excalidraw / .png (+ .en)        ← Skill-Overview-Sketch
 ├── docs/                                      ← weitere Sketches (Flow, Story, Agent, GitHub, Gate-Block)
 └── references/
-    ├── orchestration-checklist.md  (+ .en.md)  ← Sprint-Pre-Flight + Loop-Checks
-    ├── gate-block-handling.md      (+ .en.md)  ← Pause/Resume-Protokoll
-    ├── gate-assertion.md           (+ .en.md)  ← Post-Story-Gate-Assertion (meta.json)
-    ├── worktree-flow.md            (+ .en.md)  ← Arbeitsordner pro Story
-    └── token-boundary.md           (+ .en.md)  ← 80%-Boundary-Logik
+    ├── orchestration-checklist.md   (+ .en.md)  ← Sprint-Pre-Flight + Pre-/goal-Checks
+    ├── goal-termination-phrases.md  (+ .en.md)  ← Termination-Phrasen-Bibliothek
+    ├── goal-e2e-protocol.md         (+ .en.md)  ← Manuelles 1-Story-E2E-Protokoll
+    ├── gate-block-handling.md       (+ .en.md)  ← /goal-Pause/Resume bei Sensitive-Path
+    ├── gate-assertion.md            (+ .en.md)  ← Post-Story-Gate-Assertion (meta.json)
+    ├── worktree-flow.md             (+ .en.md)  ← Arbeitsordner pro Story
+    └── token-boundary.md            (+ .en.md)  ← 80%-Boundary als Teil der /goal-Termination
 ```

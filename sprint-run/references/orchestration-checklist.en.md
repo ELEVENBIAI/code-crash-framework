@@ -1,7 +1,8 @@
-# Orchestration Checklist — sprint pre-flight + loop checks
+# Orchestration checklist — sprint pre-flight + pre-/goal checks
 
-Reference for `/sprint-run` step 1 (sprint pre-flight, HARD GATE) and step 4 (daemon loop).
-The sprint may only start once **all** pre-flight points are green.
+Reference for `/sprint-run` step 1 (sprint pre-flight, HARD GATE), step 2 (three safety
+prerequisites) and step 4 (preparation per story). `/goal` may only be started once **all**
+pre-flight points **and** all three safety prerequisites are green.
 
 ## Sprint pre-flight (step 1) ⛔
 
@@ -9,35 +10,48 @@ The sprint may only start once **all** pre-flight points are green.
 |---|---|---|
 | Backlog prioritized | `/backlog` delivers ordered candidates (`Todo`/`Backlog`, order) | STOP — run `/backlog` first |
 | Spec per story | `specs/<ISSUE>.md` exists (spec gate) | remove story from sprint / STOP |
-| Schrader-complete | Insight, Constraints, Success Criteria, Desired Outcome each ≥20 characters | remove story from sprint |
-| Execution-Isolation block | Spec carries `execution_mode`, `worktree_strategy`, `write_scopes` | remove story from sprint |
+| Schrader-complete | Insight, Constraints, Success Criteria, Desired Outcome each ≥20 chars | remove story from sprint |
+| Execution-Isolation block | spec carries `execution_mode`, `worktree_strategy`, `write_scopes` | remove story from sprint |
+| Subagent section | spec carries a subagent section (source of the agent definition, step 4.2) | remove story from sprint |
 | Governance gates | `governance_mode` from CONVENTIONS; sensitive-paths/personal-data configured | clarify pause behavior |
-| Tooling | `git worktree` there, `gh` authenticated, `main` clean | STOP |
+| Quality gates wired | `/quality-gate-audit --trigger pre-sprint` exit 0 (BOO-183) | STOP — audit report remediation |
+| Tooling | `git worktree` present, `gh` authenticated, `main` clean | STOP |
 
-> The pre-flight is the condition for the loop afterwards to run without follow-up questions.
-> In daemon mode (`--auto`) stories that violate a pre-flight point are
-> **skipped and logged** — they do not block the whole sprint.
+> The pre-flight is the condition for `/goal` to run without follow-up questions afterwards.
 
-## Loop checks per story (step 4)
+## Three safety prerequisites (step 2) ⛔
 
-Before `/implement` (4.1–4.3):
-- [ ] Linear status set to `In Progress`
+Directly before the `/goal` call. If one is missing → `/goal` is **not** started.
+
+| Prerequisite | Pass criterion | On violation |
+|---|---|---|
+| Bash allowlist | `.claude/settings.local.json` has `permissions.allow` with `semgrep`/`eslint`/`pytest`/`gh run`/`git` | STOP — template from `bootstrap/references/file-templates.md` (BOO-203) |
+| Worktree boundary | `execution_isolation=worktree` (CONVENTIONS) | **abort** — native subagents need worktree isolation |
+| Layer-0 bodyguard | `pre-edit-bodyguard` hook in `.claude/settings.json` `hooks` + file present | **pause** — "Bodyguard not active" |
+
+## Preparation per story (step 4)
+
 - [ ] Worktree created: `git worktree add ../wt-<ISSUE> -b feat/boo-<n>-<slug>`
 - [ ] Working tree in the worktree clean
+- [ ] Subagent definition `.claude/agents/<story>-<agent>.md` generated from the spec subagent section
+- [ ] (optional) Linear status set to `In Progress`
 
-After `/implement` (4.5–4.7):
-- [ ] Remote CI green (`gh run watch --exit-status`) — otherwise max 3 fix iterations
-- [ ] Merge **only** on green CI
-- [ ] Worktree removed: `git worktree remove ../wt-<ISSUE>`
-- [ ] Linear status `Done` with AC evidence comment
+## What `/goal` takes over (no longer `/sprint-run`)
 
-Per iteration:
-- [ ] Token consumption checked against the 80% boundary (step 4.8)
+The following mechanic belongs to `/goal` since 2.0.0 (ADR-4), no longer to the skill:
 
-## Anti-pattern
+- Spawning the native subagents per story (in parallel, up to `parallel_story_limit`)
+- Gate-failure recovery (worker fixes → gate again → evaluator checks → loop until green)
+- Remote CI wait + merge only on green CI
+- Post-story gate assertion against `meta.json` (see `gate-assertion.en.md`)
+- Sensitive-path/personal-data pause (see `gate-block-handling.en.md`)
+- 80% token boundary as part of termination (see `token-boundary.en.md`)
 
-- **Taking a story without a spec into the sprint** — the spec gate halts `/implement` anyway, but
-  costs half a loop. Catch it in the pre-flight.
-- **Multiple stories in the same worktree** — collision risk; one worktree per story (level 2,
-  see `docs/kollisionsschutz-drei-ebenen.md`).
-- **Merge on red CI** — forbidden (BOO-148). No merge without a green remote run.
+## Anti-patterns
+
+- **Taking a story without spec/subagent section into the sprint** — `/goal` cannot spawn a story
+  subagent without an agent definition. Catch it in the pre-flight.
+- **Starting `/goal` without a checked `execution_isolation=worktree`** — collision risk between
+  parallel subagents (level 2, see `docs/kollisionsschutz-drei-ebenen.md`).
+- **Wiring a container/Dockerfile for the sprint-run purpose** — removed since 2.0.0 (ADR-4).
+- **Building a skill-owned daemon loop** — the execution loop now lives in `/goal`.

@@ -216,6 +216,7 @@ The framework is the skeleton. **You tailor the muscles** — the appendices tel
 | **[backlog](backlog/)** | `/backlog` | Sprint planning — which story now, which later, and why. Dependency-aware. |
 | **[implement](implement/)** | `/implement` | 8-step protocol: Agent pattern → Spec → Code → Governance validation → Commit. |
 | **[sprint-run](sprint-run/)** | `/sprint-run` | Sprint orchestrator — runs a whole sprint automatically: picks stories, runs `/implement` per story (worktree + branch), waits for green CI, merges, triggers `/sprint-review` at the 80% token boundary. |
+| **[goal](goal/)** | `/goal` | **Anthropic-native, documented in the framework ([goal/](goal/)).** Native termination engine — runs to a machine-checkable termination phrase. Sprint engine behind `/sprint-run`; story engine for long `/implement` runs. No SKILL.md — used, not rebuilt (build-vs-buy). |
 | **[quality-gate-audit](quality-gate-audit/)** | `/quality-gate-audit` | Checks whether the declared quality gates are actually *wired* — not just nominally configured. Four gates (Semgrep wiring, coverage, slopsquatting, Layer-0 bodyguard) classified `wired`/`nominal`/`blind` via signal tests. Hard hook in `/sprint-run` step 1; diagnoses, does not repair. |
 | **[slopsquatting-deep-refresh](slopsquatting-deep-refresh/)** | `/slopsquatting-deep-refresh` | Quarterly methodology review of the slopsquatting wordlist via `/research` — new advisory sources, changed feeds, threshold adjustments. Reviews the METHOD (weekly auto-workflow refreshes the DATA). Update recommendation, no auto-write. |
 | **[architecture-review](architecture-review/)** | `/architecture-review` | Reviews architecture dimensions — risks, tech debt, improvement potential. |
@@ -272,6 +273,14 @@ No spec, no commit. That's the difference between a prompt and a governance fram
 ### Quality-gate wiring — a configured gate is not yet a wired gate
 
 A quality gate can be *configured* and still be **blind**: a custom Semgrep rule directory that is never handed to the CLI via `--config` simply never runs. To prove a gate actually bites, bootstrap ships a **wiring canary** — a fixture file with a deliberate violation that produces a finding *only* when the gate is truly wired. For Semgrep this is `.semgrep/test-fixtures/wiring-canary.py` (tripwire literal `QGAUDIT-CANARY-TRIPWIRE`), matched by the custom rule `qgaudit-wiring-canary`; the fixture is excluded from the repo-wide scan via `.semgrepignore` and is read only by a targeted audit scan. A hit proves the wiring lives; silence proves the gate is blind. The pattern is transferable to other gates (slopsquatting, coverage, Layer-0). The upcoming **`quality-gate-audit`** skill (BOO-183) automates this check. Plain-language definitions of *slopsquatting*, *wiring canary* and the audit statuses *wired / nominal / blind* are in the [plain-language glossary](docs/glossar.en.md); the technical short form is in [HANDBUCH Appendix C](HANDBUCH.en.md), the full skill walkthrough in **Appendix AF**.
+
+### Build-vs-buy — the sprint run uses the native `/goal` engine (Sprint 3)
+
+From v0.11.0 `/sprint-run` no longer rebuilds its own termination loop. It shrinks to a **configurator + `/goal` wrapper**: it prepares the sprint (specs, worktrees, token budget, pre-sprint gate audit) and hands execution to the **Anthropic-native** [`/goal`](goal/) engine, which runs turn after turn until a machine-checkable termination phrase is met. This follows the **build-vs-buy doctrine** — the framework delivers only what Anthropic does not ship natively. Details: [HANDBUCH Appendix AG](HANDBUCH.en.md) (doctrine) + [Appendix AD](HANDBUCH.en.md) (`/sprint-run`) + [`goal/`](goal/).
+
+### Documentation consistency & release convention (Sprint 3)
+
+Every doc-changing story carries a **mandatory acceptance block** that pulls along DE+EN, skill files, HANDBUCH, CONVENTIONS, the doc index, sketches, vault docs, cross-links and the glossary — enforced by a green `docs_drift_check.py` gate. The single source is [`docs/standards/doku-consistency-checklist.md`](docs/standards/doku-consistency-checklist.md). Releases follow a fixed convention: **one sprint release note per sprint** (Sprint 3 → v0.11.0, 5 → v0.12.0, 6 → v0.13.0), a **major v1.0** after Sprint 6 — see the chronological [`docs/releases/_index.md`](docs/releases/_index.md).
 
 ---
 
@@ -576,6 +585,7 @@ Das Framework ist das Skelett. **Die Muskeln schneiderst du** — die Anhaenge z
 | **[backlog](backlog/)** | `/backlog` | Sprint Planning — welche Story jetzt, welche nach hinten, warum. Abhängigkeiten-aware. |
 | **[implement](implement/)** | `/implement` | 8-Schritte-Protokoll: Agent-Pattern → Spec → Code → Governance-Validation → Commit. |
 | **[sprint-run](sprint-run/)** | `/sprint-run` | Sprint-Orchestrator — fährt einen ganzen Sprint automatisch: wählt Stories, setzt jede per `/implement` um (Worktree + Branch), wartet auf grüne CI, merged, triggert am 80%-Token-Boundary `/sprint-review`. |
+| **[goal](goal/)** | `/goal` | **Anthropic-native, im Framework dokumentiert ([goal/](goal/)).** Native Termination-Engine — läuft bis zu einer maschinell prüfbaren Termination-Phrase. Sprint-Engine hinter `/sprint-run`; Story-Engine für lange `/implement`-Läufe. Kein SKILL.md — genutzt, nicht nachgebaut (Build-vs-Buy). |
 | **[quality-gate-audit](quality-gate-audit/)** | `/quality-gate-audit` | Prüft, ob die deklarierten Quality Gates wirklich *verdrahtet* sind — nicht nur nominell konfiguriert. Vier Gates (Semgrep-Wiring, Coverage, Slopsquatting, Layer-0-Bodyguard) per Signal-Test als `verdrahtet`/`nominell`/`blind` eingestuft. Hard-Hook in `/sprint-run` Schritt 1; diagnostiziert, repariert nicht. |
 | **[slopsquatting-deep-refresh](slopsquatting-deep-refresh/)** | `/slopsquatting-deep-refresh` | Quartals-Methodik-Review der Slopsquatting-Wordlist via `/research` — neue Advisory-Quellen, geänderte Feeds, Threshold-Anpassungen. Prüft das VERFAHREN (der wöchentliche Auto-Workflow refresht die DATEN). Update-Empfehlung, kein Auto-Write. |
 | **[architecture-review](architecture-review/)** | `/architecture-review` | Prüft Architektur-Dimensionen — Risiken, Tech Debt, Verbesserungspotential. |
@@ -632,6 +642,14 @@ Kein Spec, kein Commit. Das ist der Unterschied zwischen einem Prompt und einem 
 ### Quality-Gate-Wiring — ein konfiguriertes Gate ist noch kein verdrahtetes Gate
 
 Ein Quality-Gate kann *konfiguriert* und trotzdem **blind** sein: Ein Custom-Semgrep-Regelverzeichnis, das nie via `--config` an die CLI übergeben wird, läuft schlicht nie. Damit beweisbar ist, dass ein Gate wirklich greift, rollt der Bootstrap eine **Wiring-Canary** aus — eine Fixture-Datei mit einem absichtlichen Verstoss, die *nur dann* eine Meldung produziert, wenn das Gate wirklich verdrahtet ist. Bei Semgrep ist das `.semgrep/test-fixtures/wiring-canary.py` (Tripwire-Literal `QGAUDIT-CANARY-TRIPWIRE`), getroffen von der Custom-Rule `qgaudit-wiring-canary`; die Fixture ist via `.semgrepignore` aus dem Repo-weiten Scan ausgenommen und wird nur vom gezielten Audit-Scan gelesen. Ein Treffer beweist die lebende Verdrahtung; Stille beweist, dass das Gate blind ist. Das Pattern ist auf andere Gates übertragbar (Slopsquatting, Coverage, Layer-0). Der künftige **`quality-gate-audit`**-Skill (BOO-183) automatisiert diesen Check. Klartext-Definitionen von *Slopsquatting*, *Wiring-Canary* und den Audit-Status `verdrahtet` / `nominell` / `blind` stehen im [Klartext-Glossar](docs/glossar.md); die technische Kurzfassung in [HANDBUCH Anhang C](HANDBUCH.md), die vollständige Skill-Erklärung in **Anhang AF**.
+
+### Build-vs-Buy — der Sprint-Lauf nutzt die native `/goal`-Engine (Sprint 3)
+
+Ab v0.11.0 baut `/sprint-run` keine eigene Termination-Schleife mehr nach. Es schrumpft auf **Konfigurator + `/goal`-Wrapper**: Es bereitet den Sprint vor (Specs, Worktrees, Token-Budget, Pre-Sprint-Gate-Audit) und übergibt die Ausführung an die **Anthropic-native** [`/goal`](goal/)-Engine, die Turn für Turn läuft, bis eine maschinell prüfbare Termination-Phrase erfüllt ist. Das folgt der **Build-vs-Buy-Doktrin** — das Framework leistet nur, was Anthropic nicht nativ liefert. Details: [HANDBUCH Anhang AG](HANDBUCH.md) (Doktrin) + [Anhang AD](HANDBUCH.md) (`/sprint-run`) + [`goal/`](goal/).
+
+### Doku-Konsistenz & Release-Konvention (Sprint 3)
+
+Jede Doku-ändernde Story trägt einen **Pflicht-Akzeptanz-Block**, der DE+EN, Skill-Dateien, HANDBUCH, CONVENTIONS, den Doku-Index, Sketches, Vault-Doku, Cross-Links und das Glossar mitzieht — erzwungen durch ein grünes `docs_drift_check.py`-Gate. Die Quelle ist [`docs/standards/doku-consistency-checklist.md`](docs/standards/doku-consistency-checklist.md). Releases folgen einer festen Konvention: **pro Sprint eine Sprint-Release-Note** (Sprint 3 → v0.11.0, 5 → v0.12.0, 6 → v0.13.0), nach Sprint 6 ein **Major v1.0** — siehe den chronologischen [`docs/releases/_index.md`](docs/releases/_index.md).
 
 ---
 
