@@ -762,6 +762,8 @@ Einkommentieren ueber: sed -i '' 's/^  # - p\/owasp/  - p\/owasp/' .semgrep.yml
 
 Konsumiert vom Pre-Commit-Hook (Layer 2, siehe Phase 4.6) und der GitHub Action (Layer 3, siehe Phase 4.4c).
 
+**Custom-Rule-Verzeichnis + Wiring-Canary (BOO-185):** Zusätzlich rollt der Bootstrap das Verzeichnis `.semgrep/` aus — projekt-eigene Regeln, die CI (Layer 3) und Pre-Commit (Layer 2) via `--config .semgrep/` **zusätzlich** zu den Registry-Packs laden, sobald das Verzeichnis existiert. Darin liegt `.semgrep/custom-rules.yml` mit der Regel `qgaudit-wiring-canary` und die Fixture `.semgrep/test-fixtures/wiring-canary.py` (Tripwire-Literal `QGAUDIT-CANARY-TRIPWIRE`). `.semgrep/test-fixtures/` ist im `.semgrepignore` ausgeschlossen, damit die CI nicht dauerrot wird — der Canary wird nur vom gezielten Audit-Scan erfasst. **Verifikations-Praxis:** Ein konfiguriertes Custom-Rule-Verzeichnis ist erst dann nachweisbar aktiv, wenn `semgrep --config .semgrep/ .semgrep/test-fixtures/wiring-canary.py` die Canary-Regel meldet — bleibt der Scan stumm, ist das Gate blind (Anker für den `quality-gate-audit`-Skill, BOO-183). Inhalte aus `references/file-templates.md` §`.semgrep/custom-rules.yml`, §`.semgrep/test-fixtures/wiring-canary.py` und §`.semgrepignore`.
+
 ### 4.4c CI-Layer (Semgrep, BOO-4)
 
 Wenn `B.2 == ja` (GitHub-Repo angelegt), wird zusaetzlich `.github/workflows/semgrep.yml` aus `references/file-templates.md` §`.github/workflows/semgrep.yml (BOO-4 — Quality-Gate Layer 3)` angelegt.
@@ -1001,7 +1003,7 @@ Hooks:
 - Optional (bei Block C = ja, orphan-check = ja): `orphan-check.sh` — blockiert wenn neue `*.md` nicht im Hub §9 registriert
 - `pre-edit-bodyguard.sh` (BOO-86) — **Layer-0** PreToolUse-Hook auf `Edit|Write`: faengt Secrets/Unsafe-Patterns ab, BEVOR die KI sie schreibt (Default Warnung, `BODYGUARD_STRICT=1` = Hard-Block). Scaffold inkl. `bodyguard/patterns/*.yml` + `SOURCES.md`. Inhalt aus `references/file-templates.md` §`hooks/pre-edit-bodyguard.sh (BOO-86 — Layer-0 Edit-Bodyguard)`. Registriert in `settings.json` unter `matcher: Edit|Write|MultiEdit` (separater Matcher-Block, nicht im `Bash`-Block).
 - `pre-commit` (BOO-4) — Quality-Gate Layer 2: ESLint + Semgrep mit Manifest-Reader. Liest `.semgrep.yml` (BOO-3), extrahiert aktive Packs via `grep` + `sed`, baut `--config p/...`-Flags und ruft Semgrep CLI auf. Inhalt aus `references/file-templates.md` §`.git/hooks/pre-commit (BOO-4 — Quality-Gate Layer 2)`. Pendant-CI-Layer 3 (`semgrep.yml`-Workflow) wird in Phase 4.4c angelegt — beide Layer lesen dasselbe Manifest.
-- `dependency-check.sh` (BOO-12) — Slopsquatting-Schutz: drittes Gate im Pre-Commit-Hook nach ESLint und Semgrep. Eigenstaendiges Bash-Skript unter `.claude/hooks/dependency-check.sh`, das nur lauft wenn `package.json`/`requirements.txt`/`pyproject.toml`/`Cargo.toml` im Diff der gestagten Files ist. Drei Stufen: Existenz-Check (404 -> BLOCK, Halluzination?), Age-Check (Paket <30 Tage alt -> Warnung, Typosquatter-Risiko), CVE-Check (`npm audit` / `pip-audit`, High/Critical -> BLOCK). Mit BOO-12 bekommt der `.git/hooks/pre-commit`-Hook aus BOO-4 einen vierten Aufruf am Ende: `bash .claude/hooks/dependency-check.sh`. Inhalt aus `references/file-templates.md` §`hooks/dependency-check.sh (BOO-12 — Slopsquatting-Schutz)`. Schrader Code Crash Kap. 3-4: 19,7 % der KI-empfohlenen Pakete existieren nicht.
+- `dependency-check.sh` (BOO-12) — Slopsquatting-Schutz: drittes Gate im Pre-Commit-Hook nach ESLint und Semgrep. Eigenstaendiges Bash-Skript unter `.claude/hooks/dependency-check.sh`, das nur lauft wenn `package.json`/`requirements.txt`/`pyproject.toml`/`Cargo.toml` im Diff der gestagten Files ist. Drei Stufen: Existenz-Check (404 -> BLOCK, Halluzination?), Age-Check (Paket <30 Tage alt -> Warnung, Typosquatter-Risiko), CVE-Check (`npm audit` / `pip-audit`, High/Critical -> BLOCK). Mit BOO-12 bekommt der `.git/hooks/pre-commit`-Hook aus BOO-4 einen vierten Aufruf am Ende: `bash .claude/hooks/dependency-check.sh`. Inhalt aus `references/file-templates.md` §`hooks/dependency-check.sh (BOO-12 — Slopsquatting-Schutz)`. Schrader Code Crash Kap. 3-4: 19,7 % der KI-empfohlenen Pakete existieren nicht. **Seit BOO-197** rollt der Bootstrap zusaetzlich eine projekt-lokale Slopsquatting-Wordlist (`.claude/hooks/slopsquatting/wordlist.txt`) als offline-faehige erste Schicht aus — der Hook prueft jede neue Dependency per `grep` gegen die Liste, bevor er die Live-Registry-Query (zweite Schicht) anstoesst; fehlt die Wordlist, greift nur die Registry-Query. Ein woechentlicher Workflow `.github/workflows/slopsquatting-refresh.yml` haelt die Liste aus oeffentlichen Advisory-Quellen (GHSA/OSV/OSSF) aktuell und oeffnet bei Aenderung einen PR. Templates: `references/file-templates.md` §`.claude/hooks/slopsquatting/wordlist.txt (BOO-197 — Slopsquatting-Wordlist)` + §`.github/workflows/slopsquatting-refresh.yml (BOO-197 — woechentlicher Wordlist-Refresh)`.
 - `coverage-check.sh` (BOO-15) — Diff-Coverage-Gate: misst Coverage nur auf NEU hinzugefuegten Zeilen (`git diff --cached -U0`) gegen `coverage/coverage-final.json` (c8) bzw. `coverage.json` (pytest-cov). Drei Schwellwerte: `>=80%` Pass, `60-80%` Warnung mit Operator-Freigabe, `<60%` BLOCK. Eigenstaendiges Bash-Skript unter `.claude/hooks/coverage-check.sh`. Wird **NICHT** im Pre-Commit-Hook aufgerufen — Tests dauern zu lange und wuerden das 10s-Budget des Hooks sprengen. Stattdessen ruft der `/implement`-Skill den Hook in Schritt 6a-quart auf, nachdem die Test-Suite mit Coverage-Output gelaufen ist. Inhalt aus `references/file-templates.md` §`hooks/coverage-check.sh (BOO-15 — Coverage-Gate >=80% fuer neuen Code)`. Schrader Code Crash Kap. 3 §Production Readiness — Gate 2: Testabdeckung >=80 % auf neuem Code, nicht Gesamt-Coverage.
 
 Registrierung:
@@ -1638,6 +1640,18 @@ Vor dem finalen Commit den **Proof** liefern, dass das Geruest komplett + funkti
 5. Ergebnis fliesst in die Abschluss-Tabelle (7.5).
 
 Manuelle Variante / Hintergrund: HANDBUCH Anhang T "Post-Install-Verifikation" (Checkliste Punkt fuer Punkt).
+
+### 7.3a Post-Install Quality-Gate-Audit (BOO-183)
+
+Als letzter Verifikations-Schritt vor dem finalen Commit: `/quality-gate-audit --trigger post-install`
+ausfuehren. Das erzeugt den **Baseline-Report** unter `docs/audits/YYYY-MM-DD-quality-gate-audit.md`
+und prueft, ob die gerade ausgerollten Gates (Semgrep-Wiring inkl. `.semgrep/`-Canary, Coverage,
+Slopsquatting-Wordlist, Layer-0-Bodyguard) tatsaechlich **verdrahtet** sind — nicht nur nominell
+konfiguriert. `verify-setup.sh` prueft, dass Dateien da sind; der Quality-Gate-Audit prueft, dass sie
+auch greifen (Signal-Test). Der Baseline-Report wird mit-committet (7.4); `docs/audits/` ist von der
+Doku-Drift-Pruefung ausgenommen. Steht ein Gate auf `blind`, vor dem ersten `/sprint-run` reparieren
+(der Pre-Sprint-Hard-Hook in `sprint-run` Schritt 1 wuerde sonst stoppen). Details: Skill
+[quality-gate-audit](../quality-gate-audit/SKILL.md).
 
 ### 7.4 Finaler Commit
 

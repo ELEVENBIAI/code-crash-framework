@@ -22,6 +22,14 @@
 - **Auditor** — a reviewer (cyber-security or code quality) who checks after the fact whether the framework was actually followed — without changing anything themselves. *Analogy:* the auditor who reads the books but does not do the bookkeeping. Dedicated entry runbook: [`audit-perspective.en.md`](runbooks/audit-perspective.en.md).
 - **Audit trail** — the unbroken chain that leads every change back to its documented intent and the work step that triggered it (commit → spec → session). *Analogy:* the document flow in accounting: every entry has a receipt.
 - **Audit artifact** — a piece of evidence the framework produces for an auditor to inspect (e.g. check reports, privacy audit, sprint metrics). *Analogy:* the stamped inspection records in the binder. What matters is durability: permanent in the repo, 30 days in CI, or only ephemeral on the working machine.
+- **Slopsquatting** — when an AI recommends a package that does not exist, and an attacker registers exactly that made-up name with malicious code. The framework counters this with a list of known fake/malicious packages (a *wordlist*) that is refreshed regularly. *Analogy:* a blacklist of fake suppliers — only worth anything when kept current.
+- **Wiring canary** — a small test file with a deliberate flaw that only produces a finding when the check is actually wired in. If it stays silent, the check is blind. *Analogy:* the canary in the coal mine — as long as it sings, the warning works.
+
+## Audit & control
+
+- **Threshold** — the limit at which a check counts as passed, warned or failed (e.g. test coverage: green from 80%, yellow from 60%; wordlist max. 90 days old; architecture docs max. 30 days behind the code). *Analogy:* the measuring stick with green, yellow and red marks.
+- **Audit status** `wired` / `nominal` / `blind` — how a check scores in the wiring check: *wired* = connected and fires, *nominal* = set up but never runs (false sense of safety), *blind* = claims to check but checks nothing. *Analogy:* a smoke detector that beeps (wired), one on the ceiling with no battery (nominal), and one that is merely painted on (blind).
+- **Sprint** vs. **cycle** — a *sprint* here is a unit of work that fits into the AI's token window (about 80% of it), not a fixed calendar period. *Cycles* (Linear's own time-boxing concept) are deliberately not enabled; the sprint assignment lives in `Sprints.md`. *Analogy:* we don't measure the leg of the journey in days, but in how much the AI can take in at once.
 
 ## Docs & control
 

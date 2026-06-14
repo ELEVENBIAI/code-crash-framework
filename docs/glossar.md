@@ -22,6 +22,14 @@
 - **Auditor** — eine prüfende Person (Cyber-Security oder Code-Qualität), die nachträglich kontrolliert, ob das Framework auch wirklich eingehalten wurde — ohne selbst etwas zu ändern. *Analogie:* die Wirtschaftsprüferin, die die Bücher liest, aber nicht mitbucht. Eigenes Einstiegs-Runbook: [`audit-perspective.md`](runbooks/audit-perspective.md).
 - **Audit-Trail** — die lückenlose Spur, die jede Änderung zurück auf ihre dokumentierte Absicht und den auslösenden Arbeitsschritt führt (Commit → Spec → Session). *Analogie:* der Belegfluss in der Buchhaltung: zu jeder Buchung gibt es einen Beleg.
 - **Audit-Artefakt** — ein vom Framework erzeugter Nachweis, den ein Auditor einsehen kann (z. B. Prüf-Reports, Datenschutz-Audit, Sprint-Metriken). *Analogie:* die abgestempelten Prüfprotokolle im Ordner. Wichtig ist die Haltbarkeit: dauerhaft im Repo, 30 Tage in der CI, oder nur flüchtig auf dem Arbeitsrechner.
+- **Slopsquatting** — wenn eine KI ein Paket empfiehlt, das gar nicht existiert, und ein Angreifer genau diesen erfundenen Namen mit Schadcode belegt. Das Framework hält dagegen eine Liste bekannter Fake-/Schad-Pakete (eine *Wordlist*), die regelmäßig aufgefrischt wird. *Analogie:* eine schwarze Liste gefälschter Lieferanten, die nur frisch gehalten etwas taugt.
+- **Wiring-Canary** ("Verdrahtungs-Kanarienvogel") — eine kleine Test-Datei mit einem absichtlichen Fehler, die nur dann eine Meldung auslöst, wenn die Prüfung wirklich angeschlossen ist. Bleibt es still, ist die Prüfung blind. *Analogie:* der Kanarienvogel im Bergwerk — solange er singt, funktioniert die Warnung.
+
+## Audit & Steuerung
+
+- **Schwellwert (Threshold)** — die Grenze, ab der eine Prüfung als bestanden, gewarnt oder durchgefallen gilt (z. B. Test-Abdeckung: ab 80 % grün, ab 60 % gelb; Wordlist max. 90 Tage alt; Architektur-Doku max. 30 Tage hinter dem Code). *Analogie:* die Messlatte mit grüner, gelber und roter Markierung.
+- **Audit-Status** `verdrahtet` / `nominell` / `blind` — wie eine Prüfung beim Verdrahtungs-Check abschneidet: *verdrahtet* = angeschlossen und feuert, *nominell* = zwar eingerichtet, läuft aber nie (trügerische Sicherheit), *blind* = behauptet zu prüfen, prüft nichts. *Analogie:* ein Rauchmelder, der piept (verdrahtet), einer ohne Batterie an der Decke (nominell) und einer, der nur aufgemalt ist (blind).
+- **Sprint** vs. **Cycle** — ein *Sprint* ist hier eine Arbeitseinheit, die in ein Token-Fenster der KI passt (ca. 80 % davon), kein fester Kalender-Zeitraum. *Cycles* (das Linear-eigene Zeittakt-Konzept) sind bewusst nicht aktiviert; die Sprint-Zuordnung steht in `Sprints.md`. *Analogie:* wir messen die Etappe nicht in Tagen, sondern darin, wie viel die KI am Stück überblicken kann.
 
 ## Doku & Steuerung
 

@@ -216,6 +216,8 @@ The framework is the skeleton. **You tailor the muscles** — the appendices tel
 | **[backlog](backlog/)** | `/backlog` | Sprint planning — which story now, which later, and why. Dependency-aware. |
 | **[implement](implement/)** | `/implement` | 8-step protocol: Agent pattern → Spec → Code → Governance validation → Commit. |
 | **[sprint-run](sprint-run/)** | `/sprint-run` | Sprint orchestrator — runs a whole sprint automatically: picks stories, runs `/implement` per story (worktree + branch), waits for green CI, merges, triggers `/sprint-review` at the 80% token boundary. |
+| **[quality-gate-audit](quality-gate-audit/)** | `/quality-gate-audit` | Checks whether the declared quality gates are actually *wired* — not just nominally configured. Four gates (Semgrep wiring, coverage, slopsquatting, Layer-0 bodyguard) classified `wired`/`nominal`/`blind` via signal tests. Hard hook in `/sprint-run` step 1; diagnoses, does not repair. |
+| **[slopsquatting-deep-refresh](slopsquatting-deep-refresh/)** | `/slopsquatting-deep-refresh` | Quarterly methodology review of the slopsquatting wordlist via `/research` — new advisory sources, changed feeds, threshold adjustments. Reviews the METHOD (weekly auto-workflow refreshes the DATA). Update recommendation, no auto-write. |
 | **[architecture-review](architecture-review/)** | `/architecture-review` | Reviews architecture dimensions — risks, tech debt, improvement potential. |
 | **[knowledge-onboarding](knowledge-onboarding/)** | `/knowledge-onboarding` | Routes existing project docs (GAP analyses, legal research, README/PLAN, design files, demo storyboards, handover, prompts) deterministically into the framework artefacts via routing rubric (SSoT, Tier 0/1/2/3) + persisted manifest with pinning. Post-bootstrap. |
 | **[sprint-review](sprint-review/)** | `/sprint-review` | Quarterly audit: architecture health, tech debt, backlog hygiene, learning loop. |
@@ -266,6 +268,10 @@ Governance gates run automatically on `git commit` / `git push` (and `git pull`)
 No spec, no commit. That's the difference between a prompt and a governance framework.
 
 > **Operating at scale:** running on a VPS, a team, or in a regulated industry? HANDBUCH appendices **P** (deployment scenarios), **R** (multi-operator coordination, 5–20+ operators), **S** (where do skills/tools/hooks belong) and **Q** (EU-sovereignty stack) cover the setup decisions; appendix **O** documents privacy-by-design.
+
+### Quality-gate wiring — a configured gate is not yet a wired gate
+
+A quality gate can be *configured* and still be **blind**: a custom Semgrep rule directory that is never handed to the CLI via `--config` simply never runs. To prove a gate actually bites, bootstrap ships a **wiring canary** — a fixture file with a deliberate violation that produces a finding *only* when the gate is truly wired. For Semgrep this is `.semgrep/test-fixtures/wiring-canary.py` (tripwire literal `QGAUDIT-CANARY-TRIPWIRE`), matched by the custom rule `qgaudit-wiring-canary`; the fixture is excluded from the repo-wide scan via `.semgrepignore` and is read only by a targeted audit scan. A hit proves the wiring lives; silence proves the gate is blind. The pattern is transferable to other gates (slopsquatting, coverage, Layer-0). The upcoming **`quality-gate-audit`** skill (BOO-183) automates this check. Plain-language definitions of *slopsquatting*, *wiring canary* and the audit statuses *wired / nominal / blind* are in the [plain-language glossary](docs/glossar.en.md); the technical short form is in [HANDBUCH Appendix C](HANDBUCH.en.md), the full skill walkthrough in **Appendix AF**.
 
 ---
 
@@ -564,6 +570,8 @@ Das Framework ist das Skelett. **Die Muskeln schneiderst du** — die Anhaenge z
 | **[backlog](backlog/)** | `/backlog` | Sprint Planning — welche Story jetzt, welche nach hinten, warum. Abhängigkeiten-aware. |
 | **[implement](implement/)** | `/implement` | 8-Schritte-Protokoll: Agent-Pattern → Spec → Code → Governance-Validation → Commit. |
 | **[sprint-run](sprint-run/)** | `/sprint-run` | Sprint-Orchestrator — fährt einen ganzen Sprint automatisch: wählt Stories, setzt jede per `/implement` um (Worktree + Branch), wartet auf grüne CI, merged, triggert am 80%-Token-Boundary `/sprint-review`. |
+| **[quality-gate-audit](quality-gate-audit/)** | `/quality-gate-audit` | Prüft, ob die deklarierten Quality Gates wirklich *verdrahtet* sind — nicht nur nominell konfiguriert. Vier Gates (Semgrep-Wiring, Coverage, Slopsquatting, Layer-0-Bodyguard) per Signal-Test als `verdrahtet`/`nominell`/`blind` eingestuft. Hard-Hook in `/sprint-run` Schritt 1; diagnostiziert, repariert nicht. |
+| **[slopsquatting-deep-refresh](slopsquatting-deep-refresh/)** | `/slopsquatting-deep-refresh` | Quartals-Methodik-Review der Slopsquatting-Wordlist via `/research` — neue Advisory-Quellen, geänderte Feeds, Threshold-Anpassungen. Prüft das VERFAHREN (der wöchentliche Auto-Workflow refresht die DATEN). Update-Empfehlung, kein Auto-Write. |
 | **[architecture-review](architecture-review/)** | `/architecture-review` | Prüft Architektur-Dimensionen — Risiken, Tech Debt, Verbesserungspotential. |
 | **[knowledge-onboarding](knowledge-onboarding/)** | `/knowledge-onboarding` | Routet Bestands-Doku (GAP-Analysen, Legal-Recherche, README/PLAN, Design-Files, Demo-Storyboards, Handover, Prompts) deterministisch in die Framework-Artefakte via Routing-Rubrik (SSoT, Tier 0/1/2/3) + persistiertes Manifest mit Pinning. Post-Bootstrap. |
 | **[sprint-review](sprint-review/)** | `/sprint-review` | Quartals-Audit: Architektur-Gesundheit, Tech Debt, Backlog-Hygiene, Learning-Loop. |
@@ -614,6 +622,10 @@ Governance-Gates laufen automatisch bei `git commit` / `git push` (und `git pull
 Kein Spec, kein Commit. Das ist der Unterschied zwischen einem Prompt und einem Governance-Framework.
 
 > **Im Team / auf VPS / reguliert?** HANDBUCH-Anhaenge **P** (Deployment-Szenarien), **R** (Multi-Operator-Koordination, 5–20+ Operatoren), **S** (wo gehoeren Skills/Tools/Hooks hin) und **Q** (EU-Souveraenitaets-Stack) decken die Setup-Entscheidungen ab; Anhang **O** dokumentiert Privacy-by-Design.
+
+### Quality-Gate-Wiring — ein konfiguriertes Gate ist noch kein verdrahtetes Gate
+
+Ein Quality-Gate kann *konfiguriert* und trotzdem **blind** sein: Ein Custom-Semgrep-Regelverzeichnis, das nie via `--config` an die CLI übergeben wird, läuft schlicht nie. Damit beweisbar ist, dass ein Gate wirklich greift, rollt der Bootstrap eine **Wiring-Canary** aus — eine Fixture-Datei mit einem absichtlichen Verstoss, die *nur dann* eine Meldung produziert, wenn das Gate wirklich verdrahtet ist. Bei Semgrep ist das `.semgrep/test-fixtures/wiring-canary.py` (Tripwire-Literal `QGAUDIT-CANARY-TRIPWIRE`), getroffen von der Custom-Rule `qgaudit-wiring-canary`; die Fixture ist via `.semgrepignore` aus dem Repo-weiten Scan ausgenommen und wird nur vom gezielten Audit-Scan gelesen. Ein Treffer beweist die lebende Verdrahtung; Stille beweist, dass das Gate blind ist. Das Pattern ist auf andere Gates übertragbar (Slopsquatting, Coverage, Layer-0). Der künftige **`quality-gate-audit`**-Skill (BOO-183) automatisiert diesen Check. Klartext-Definitionen von *Slopsquatting*, *Wiring-Canary* und den Audit-Status `verdrahtet` / `nominell` / `blind` stehen im [Klartext-Glossar](docs/glossar.md); die technische Kurzfassung in [HANDBUCH Anhang C](HANDBUCH.md), die vollständige Skill-Erklärung in **Anhang AF**.
 
 ---
 

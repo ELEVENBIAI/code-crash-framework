@@ -25,7 +25,7 @@
 10. [Tailoring Governance to Your Project](#10-tailoring-governance-to-your-project)
 11. [Daily Usage — A Typical Workflow](#11-daily-usage--a-typical-workflow)
 12. [FAQ](#12-faq) — incl. Claude Agent SDK migration
-13. [Appendices — signpost](#13-appendices--signpost) — A through AD at a glance
+13. [Appendices — signpost](#13-appendices--signpost) — A through AF at a glance
 
 ---
 
@@ -2229,7 +2229,7 @@ Two further runbooks cover concrete setup tasks:
 
 ---
 
-The handbook has 30 appendices (A–Z + AA through AD). They are a **reference and deep-dive layer** — you don't need to read them front to back. This table tells you **when which appendix is relevant**. A–M are the foundations/tooling layer, N–AD the themes from v0.2.0 onward (waves J–BI): efficiency, privacy, deployment, scaling, verification, edit bodyguard, contribute-back, ubiquitous language, VPS/cloud team runbook, customer onboarding, SonarCloud setup, Linear MCP on VPS, knowledge onboarding, sprint orchestrator.
+The handbook has 32 appendices (A–Z + AA through AF). They are a **reference and deep-dive layer** — you don't need to read them front to back. This table tells you **when which appendix is relevant**. A–M are the foundations/tooling layer, N–AF the themes from v0.2.0 onward (waves J–BI): efficiency, privacy, deployment, scaling, verification, edit bodyguard, contribute-back, ubiquitous language, VPS/cloud team runbook, customer onboarding, SonarCloud setup, Linear MCP on VPS, knowledge onboarding, sprint orchestrator, slopsquatting wordlist maintenance, quality-gate audit.
 
 | Appendix | Topic | When relevant |
 |----------|-------|---------------|
@@ -2263,6 +2263,8 @@ The handbook has 30 appendices (A–Z + AA through AD). They are a **reference a
 | **AB** | Linear MCP on a headless VPS | connect the Linear MCP via OAuth/SSH tunnel on a VPS + token setup |
 | **AC** | Knowledge onboarding | route existing docs into governance artefacts |
 | **AD** | /sprint-run — sprint orchestrator | work the backlog in daemon mode, worktree per story, token boundary |
+| **AE** | Slopsquatting wordlist maintenance | keep the wordlist current + methodologically correct — weekly auto-refresh, quarterly methodology review, 90-day freshness gate |
+| **AF** | Quality-gate audit (`/quality-gate-audit`) | check whether the gates are actually wired — three triggers, four gates, status `wired`/`nominal`/`blind`, sprint STOP on `blind` |
 
 ---
 
@@ -2325,6 +2327,12 @@ BOOTSTRAP SKILL:
 | **Daemon** | A process running continuously in the background |
 | **Vibe coding** | AI-assisted development where AI writes most of the code |
 | **Artifact** | File with a defined purpose in the governance framework (docs, hooks, specs, scripts) |
+| **Slopsquatting** | AI-specific supply-chain vector: an AI recommends a non-existent package, an attacker registers the name with malicious code. Countermeasure: project-local wordlist (`.claude/hooks/slopsquatting/wordlist.txt`, 90-day freshness). See **Appendix AE** + **AF** |
+| **Wordlist** | `.claude/hooks/slopsquatting/wordlist.txt` — list of known malicious/typosquatted packages in the schema `<ecosystem>:<package>`; read by the `dependency-check.sh` hook, counts as fresh ≤ 90 days |
+| **Wiring canary** | Fixture with a deliberate violation (`.semgrep/test-fixtures/wiring-canary.py`, rule `qgaudit-wiring-canary`) that only fires when the gate is truly wired. A hit = living wiring, silence = blind gate. See **Appendix AF** |
+| **Audit status** (`wired` / `nominal` / `blind`) | Result tiers of `quality-gate-audit` per gate: `wired` = present + registered + signal test fires; `nominal` = present but never executed (false sense of safety); `blind` = effectively checks nothing. See **Appendix AF** |
+| **Threshold** | Gate limit: coverage `COVERAGE_PASS=80`/`COVERAGE_WARN=60`, wordlist freshness 90 days, architecture-doc drift 30 days |
+| **Sprint vs. cycle** | Sprint = work box of ~80% of a token window (model-independent), not a calendar period; Linear *cycles* deliberately not enabled, sprint assignment via `Sprints.md`. See **Appendix G** |
 
 ---
 
@@ -4941,6 +4949,165 @@ Each story gets a branch `feat/boo-<n>-<slug>` in its own worktree. `/implement`
 ### References
 
 `sprint-run/SKILL.md` · `sprint-run/references/{orchestration-checklist,gate-block-handling,worktree-flow,token-boundary}.md` · runbook `docs/runbooks/sprint-run.md` · Appendix G (sprint sizing) · BOO-148 (remote-CI loop) · BOO-157.
+
+---
+
+## Appendix AE: Slopsquatting wordlist maintenance (BOO-197)
+
+> Complements §8 (guardrails) and §6 (skill overview). Schrader *Code Crash* ch. 3-4: **19.7% of AI-recommended packages do not exist** — slopsquatting is its own AI-specific supply-chain attack vector. The pre-commit hook `.claude/hooks/dependency-check.sh` (BOO-12) blocks newly added dependencies; its **first, offline-capable layer** is a project-local wordlist of known malicious/typosquatted packages. This appendix explains **how the wordlist is maintained** — automatically, manually, and how the `quality-gate-audit` gate (BOO-183) enforces its freshness.
+
+### What it's about
+
+The wordlist `.claude/hooks/slopsquatting/wordlist.txt` is only as good as its currency. A stale wordlist still blocks the old cases but misses new malicious packages — and a guard that goes blind unnoticed is more dangerous than none at all, because it implies safety. Maintenance therefore has two layers with different cadence and goal:
+
+| Layer | What is maintained | Cadence | How | Who decides |
+|-------|--------------------|---------|-----|-------------|
+| **1 — Data** | the *entries* of the wordlist | weekly, automatic | GitHub Actions workflow → PR | human merges the PR |
+| **2 — Methodology** | the *method* behind the wordlist (sources, filters, thresholds) | quarterly, manual | skill `/slopsquatting-deep-refresh` → `/research` → recommendation | operator implements (own story) |
+
+Layer 1 keeps the list current. Layer 2 checks whether the list is being kept current **correctly**. Neither ever writes **directly to `main`** — layer 1 via PR, layer 2 only as a recommendation.
+
+### Who maintains the wordlist
+
+- **Data layer (layer 1):** nobody manually in the normal case — the weekly workflow handles it. A human is only needed at the end: they **review and merge the PR the workflow opens**. This keeps a malicious-list diff always under human control (no auto-commit of a block entry that might, e.g., wrongly hit a project-own package).
+- **Methodology layer (layer 2):** the operator, once per quarter — driven by `/slopsquatting-deep-refresh`. Manual one-off exceptions (false positives, project-own packages) the operator maintains anytime in the override file (below).
+
+### How automatic — the weekly GitHub Actions refresh
+
+`.github/workflows/slopsquatting-refresh.yml` runs on cron (Monday 06:00 UTC) and on `workflow_dispatch`. Flow:
+
+1. Pulls known malicious packages from public advisory sources: **GitHub Advisory Database** (GHSA, GraphQL, classification `MALWARE` — uses only the built-in `GITHUB_TOKEN`), **OSV** (osv.dev, `MAL-` IDs), **OSSF package-analysis feed**, npm advisory JSON.
+2. Normalizes to the schema `<ecosystem>:<package-name>` (`ecosystem` = `npm | pypi | cargo`), deduplicates (`sort -u`), bash-only via `grep`/`sed` — **no** `yq`/`jq` as a mandatory dependency.
+3. Applies the override rules (below), merges with existing entries, updates the header field `# last_refreshed: YYYY-MM-DD`.
+4. On a change against the current wordlist: opens a **PR with a diff description**. No direct commit to `main`.
+
+If a source fails (endpoint down, token insufficient), the workflow logs a warning and continues with the remaining sources — the refresh does not hard-fail on a single source.
+
+### How manual — the quarterly review via `/slopsquatting-deep-refresh`
+
+The auto-refresh keeps the *data* fresh but not the *methodology*: sources can be deprecated, new feeds appear, the research state shifts, thresholds age. Once per quarter the operator therefore runs the skill [`slopsquatting-deep-refresh`](slopsquatting-deep-refresh/SKILL.en.md). It is a thin orchestrator: it loads the current state (wordlist + `last_refreshed`, override, source list from the workflow), runs `/research` (deep research) with a fixed quarterly prompt template, and checks four dimensions — **new data sources**, **changed/deprecated feeds**, **research state of the methodology**, **threshold candidates**. Output is a cited **update recommendation** plus an optional threshold proposal — **no auto-write**. A methodology change to the supply-chain gate is security-relevant and belongs as its own story through the pipeline (`/intent` → ... → `/implement`), not auto-committed (INTENTRON guiding principle: lightweight + pragmatic, no security compromises).
+
+### The 90-day freshness criterion
+
+The wordlist counts as **fresh** as long as its `last_refreshed` date (or the file mtime as fallback) is no older than **90 days**. This criterion is the anchor at which the `quality-gate-audit` gate enforces maintenance: if the weekly refresh workflow runs correctly, the wordlist is never older than a few days. If it grows older than 90 days, that is a hard signal that the auto-refresh **no longer bites** (workflow disabled, all sources dead, PR never merged) — and a reason for an ad-hoc `/slopsquatting-deep-refresh` run.
+
+### The override file `slopsquatting-override.yaml`
+
+`.claude/hooks/slopsquatting/slopsquatting-override.yaml` holds manual exceptions the refresh workflow respects:
+
+- **`never_add`** — entries the refresh **never adds**. For false positives and project-own packages with a similar name that would otherwise be wrongly blocked.
+- **`never_remove`** — entries the refresh **never removes**. For manually verified malicious packages that are (no longer) listed in any public source but should stay blocked.
+
+The workflow parses the override file bash-only (`grep`/`sed`, no `yq`): `never_add` entries are stripped from the fresh pull, `never_remove` entries are guaranteed re-added at the end. So the operator decision always overrides the automatic pull.
+
+### How `quality-gate-audit` (BOO-183) checks freshness
+
+The `quality-gate-audit` skill (BOO-183) automates the proof that a quality gate is not merely *configured* but actually **effective** — analogous to the wiring canary for Semgrep (§8, `qgaudit-wiring-canary`). For the slopsquatting guard it checks two things:
+
+1. **Existence** — does `.claude/hooks/slopsquatting/wordlist.txt` exist at all, and will the hook (`dependency-check.sh`) actually read it?
+2. **Freshness** — is `last_refreshed` (or the file mtime) younger than 90 days? A stale wordlist surfaces in the audit, because then the weekly refresh workflow is no longer running.
+
+So a slopsquatting guard gone blind is not silent: the audit gate makes it visible.
+
+### References
+
+`slopsquatting-deep-refresh/SKILL.en.md` · `slopsquatting-deep-refresh/references/quarterly-review-prompt.md` · `.claude/hooks/slopsquatting/wordlist.txt` · `.claude/hooks/slopsquatting/slopsquatting-override.yaml` · `.github/workflows/slopsquatting-refresh.yml` · `.claude/hooks/dependency-check.sh` · §8 (guardrails / wiring canary) · BOO-197 · BOO-183 (`quality-gate-audit`) · BOO-12 (`dependency-check.sh`).
+
+---
+
+## Appendix AF: Quality-gate audit — are the gates actually wired? (BOO-186)
+
+> Complements §8 (guardrails) and §6 (skill overview). A quality gate can be *configured* and still be **blind** — a custom Semgrep rule directory that is never handed to the CLI via `--config` simply never runs (ADR "Semgrep custom-rule wiring", 2026-06-11). The [`quality-gate-audit`](quality-gate-audit/SKILL.md) skill (BOO-183) closes exactly this gap between *configured* and *effective*: it **diagnoses** whether a project's declared gates actually hang in the executing path — it does **not repair**.
+
+> **Note on status literals:** the audit report uses the German enum values `verdrahtet` / `nominell` / `blind` as written by the engine. This appendix uses the English equivalents *wired* / *nominal* / *blind* for the prose; they map one-to-one.
+
+### What it's about
+
+The `quality-gate-audit` skill checks three things per gate — **existence** (file present), **registration** (hooked into the executing path) and **signal test** (fires on the targeted trigger) — and classifies the gate as *wired*, *nominal* or *blind*. It writes the result as an audit report to `docs/audits/`. It does **not** replace a gate run (security scan, coverage check) — it checks one level up: whether the gates can fire at all.
+
+### Boundary
+
+`/security-architect` and `/implement` **execute** gates. `/quality-gate-audit` verifies the **wiring** of those gates. A green security scan says "no finding"; the audit says "the scan was even connected". You need both.
+
+### The three triggers
+
+| Trigger | Who triggers it | Behaviour |
+|---------|-----------------|-----------|
+| `post-install` | last step in [`/bootstrap`](bootstrap/SKILL.md) | baseline report right after setup — establishes the wiring truth from the start. |
+| `pre-sprint` | **HARD HOOK** in [`/sprint-run`](sprint-run/SKILL.md) step 1 (Appendix AD) | all *wired* → sprint starts; ≥1 gate *blind* → **STOP**. In daemon mode (`--auto`) without override → abort. |
+| `post-update` | version marker `.claude/.last-framework-version` (in `.gitignore`) | mismatch against framework `version` → auto-trigger, then update the marker. `--force` as a manual fallback. |
+| `manual` | operator (`/quality-gate-audit`) | default, interactive run. |
+
+### The four gates
+
+| # | Gate | What is checked | Signal test |
+|---|------|-----------------|-------------|
+| 1 | **Semgrep wiring** | `.semgrep/`, canary fixture, CI workflow with `--config .semgrep/` | `semgrep` must report `qgaudit-wiring-canary` on the **wiring canary** (`.semgrep/test-fixtures/wiring-canary.py`). |
+| 2 | **Coverage** | `.claude/hooks/coverage-check.sh` (+ thresholds `COVERAGE_PASS=80`/`COVERAGE_WARN=60`) | thresholds present **and** hook registered (settings.json / pre-commit / implement chain). |
+| 3 | **Slopsquatting** | `.claude/hooks/slopsquatting/wordlist.txt`, `dependency-check.sh` | wordlist ≤ 90 days (Appendix AE) + referenced + known entry detected via `grep`. |
+| 4 | **Layer-0 bodyguard** | `.claude/hooks/pre-edit-bodyguard.sh`, `bodyguard/patterns/*.yml`, `settings.json` | synthetic AWS-key edit → hook blocks with exit 1 + `[BODYGUARD] BLOCKIERT`. |
+
+### Status reading aid — *wired* / *nominal* / *blind*
+
+| Status | Meaning | Repair path |
+|--------|---------|-------------|
+| `verdrahtet` (*wired*) | file present + registered + signal test fires. | nothing to do. |
+| `nominell` (*nominal*) | present, but registration/wiring missing — configured, **but never runs**. | hook the hook/config into the executing path (settings.json matcher, CI `--config`, implement chain). |
+| `blind` (*blind*) | claims to check, checks nothing (file missing/empty, layer hangs nowhere). | restore the missing artifact via `/bootstrap` (gate scaffold) or from the hook source. |
+
+The distinction **`nominal` vs. `blind` is the core of the audit**: `nominal` gives a *false sense of safety* (looks set up, never fires), `blind` is *openly broken*. Neither is wiring.
+
+### Override — when a blind gate is consciously accepted
+
+A `blind` finding can be overridden with a reason — never silently:
+
+- **transient:** `--override-gate <name>[,<name>...] --reason "..."` on invocation. `--reason` is **mandatory**. Applies to this run only.
+- **persistent:** report frontmatter `override_blind: true` + `reason`. Stays until removed.
+
+Every override lands in the audit trail (frontmatter `overrides`) and produces a **yellow warning** in the CLI output. So an accepted blind gate stays visible rather than hidden.
+
+### Escalation path on `blind`
+
+If the audit finds ≥1 gate `blind` **without** an override, the exit code is `1`. Consequence:
+
+1. **Sprint STOP:** the `pre-sprint` hard hook in `/sprint-run` step 1 (Appendix AD) does not let the sprint start. In daemon mode (`--auto`) the run aborts — no sprint sets off on a project with blind gates.
+2. **Repair:** under "next steps" the report lists, per blind gate, the concrete hint (which file is missing / which hook does not hang). Repair via `/bootstrap` (gate scaffold) or the respective hook source — the audit skill does **not** repair itself.
+3. **Re-audit:** run `/quality-gate-audit` again; once all gates are *wired*, the `pre-sprint` hook releases the sprint.
+4. **Proceed deliberately:** only via a justified override (above) — documented in the audit trail.
+
+### Example report (with interpretation)
+
+A baseline run (trigger `post-install`) against a cleanly wired project looks like this (abridged from [`docs/audits/2026-06-14-quality-gate-audit.md`](docs/audits/2026-06-14-quality-gate-audit.md)):
+
+```yaml
+---
+audit_id: 2026-06-14-001
+triggered_by: post-install
+framework_version: 1.0.0
+overrides: []
+summary:
+  verdrahtet: 4
+  nominell: 0
+  blind: 0
+---
+```
+
+Body — summary as a status table per gate:
+
+| Gate | Status |
+|------|--------|
+| semgrep | verdrahtet |
+| coverage | verdrahtet |
+| slopsquatting | verdrahtet |
+| bodyguard | verdrahtet |
+
+**Exit code:** 0 · **Active overrides:** none.
+
+**Interpretation:** all four gates fire in the signal test (e.g. Semgrep `rule fired: qgaudit-wiring-canary`, bodyguard `blocked: [BODYGUARD] BLOCKIERT (exit 1)`, slopsquatting `wordlist match: pypi:colourama`). `summary.blind: 0` means the `pre-sprint` hook releases this sprint. From the 2nd run onward the report shows, under "diff to the last check", which gate changed status — that surfaces a layer going *silently* blind. If it read e.g. `slopsquatting: verdrahtet → blind`, the wordlist would be over 90 days old (Appendix AE) and the weekly refresh workflow dead.
+
+### References
+
+[`quality-gate-audit/SKILL.md`](quality-gate-audit/SKILL.md) · [`quality-gate-audit/references/gate-catalog.md`](quality-gate-audit/references/gate-catalog.md) · [`docs/audits/2026-06-14-quality-gate-audit.md`](docs/audits/2026-06-14-quality-gate-audit.md) · [`sprint-run/SKILL.md`](sprint-run/SKILL.md) (pre-sprint hook, Appendix AD) · **Appendix AE** (slopsquatting wordlist freshness) · §8 (guardrails / wiring canary) · BOO-186 · BOO-183 (`quality-gate-audit`).
 
 ---
 

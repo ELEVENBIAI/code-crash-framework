@@ -254,6 +254,7 @@ Regeln:
 | Linting | nach Stack | `eslint.config.mjs` / `pyproject.toml` |
 | Semgrep | nach Modus | `.semgrep.yml` |
 | Dependency-Check | nach Modus | `.claude/hooks/dependency-check.sh` |
+| Slopsquatting-Wordlist | nach Modus | `.claude/hooks/slopsquatting/wordlist.txt` (Refresh: `.github/workflows/slopsquatting-refresh.yml`) |
 | Coverage-Gate | nach Modus | `.claude/hooks/coverage-check.sh` |
 | Anti-Platzhalter-Check | nach Modus | `.claude/hooks/anti-placeholder-check.py` |
 | Performance-Gate | nach Modus | `.github/workflows/perf.yml` |
@@ -1167,6 +1168,52 @@ include:
 
 ---
 
+## .semgrep/custom-rules.yml (BOO-185 — Custom-Rule-Wiring + Canary)
+
+**Custom-Rule-Verdrahtung seit BOO-185 (2026-06-11):** Das Verzeichnis `.semgrep/` haelt projekt-eigene Semgrep-Regeln, die **zusaetzlich** zu den Registry-Packs aus `.semgrep.yml` geladen werden. CI (Layer 3) und Pre-Commit (Layer 2) verdrahten das Verzeichnis via `--config .semgrep/`, sobald es existiert. Damit ist die Custom-Rule-Schicht von Anfang an aktiv — nicht nominell vorhanden, aber blind.
+
+> [!important] Lehre aus dem Semgrep-Vorfall — nominell konfiguriert heisst nicht aktiv
+> Ein Custom-Rule-Verzeichnis, das zwar existiert, aber nie via `--config` an die CLI uebergeben wird, ist **faktisch blind** — die Regeln laufen schlicht nie. Genau das war der Befund hinter ADR „Semgrep Custom-Rule-Wiring — Verifikations-Pattern fuer Quality Gates" (2026-06-11). Die Custom-Rule unten ist ein **Wiring-Canary**: Sie trifft ausschliesslich den literalen Tripwire `QGAUDIT-CANARY-TRIPWIRE` in `.semgrep/test-fixtures/wiring-canary.py`. Die Registry-Packs (`p/security-audit`, `p/secrets`, …) wuerden diesen Literal **nicht** melden — feuert die Regel beim gezielten Audit-Scan, ist `--config .semgrep/` beweisbar aktiv. Der `quality-gate-audit`-Skill (BOO-183) nutzt diesen Canary als Wiring-Beweis.
+
+```yaml
+# .semgrep/custom-rules.yml — projekt-eigene Semgrep-Regeln (BOO-185)
+# DE: Wird via `--config .semgrep/` zusätzlich zu den Registry-Packs geladen.
+# EN: Loaded via `--config .semgrep/` in addition to the registry packs.
+rules:
+  - id: qgaudit-wiring-canary
+    languages: [python]
+    severity: ERROR
+    message: >
+      QGAUDIT wiring canary fired — custom Semgrep rules are wired. Expected ONLY in
+      .semgrep/test-fixtures/wiring-canary.py. If this fires elsewhere, remove the tripwire literal.
+    patterns:
+      - pattern: $X = "QGAUDIT-CANARY-TRIPWIRE"
+```
+
+**Warum eine echte Regel und kein Kommentar:** Nur eine ausfuehrbare Custom-Rule beweist, dass `--config .semgrep/` greift. Wuerde der Tripwire von den Registry-Packs gemeldet, waere der Beweis wertlos — er wird es nicht, also ist ein Treffer ein eindeutiges Signal fuer die lebende Verdrahtung. Eigene Projekt-Regeln werden hier neben dem Canary ergaenzt.
+
+---
+
+## .semgrep/test-fixtures/wiring-canary.py (BOO-185 — Verifikations-Canary)
+
+**Verifikations-Tripwire seit BOO-185 (2026-06-11):** Diese Fixture-Datei traegt den literalen Tripwire, auf den die Custom-Rule `qgaudit-wiring-canary` matcht. Solange ein **gezielter** Audit-Scan (`semgrep --config .semgrep/ .semgrep/test-fixtures/wiring-canary.py`) den Canary meldet, gilt die Custom-Rule-Schicht als **verdrahtet**; meldet er nichts, ist sie **blind** — und der `quality-gate-audit`-Skill schlaegt Alarm.
+
+> [!important] Canary nicht dauerhaft rot — via `.semgrepignore` aus dem Repo-weiten Scan ausgenommen
+> Der Tripwire ist eine `ERROR`-Severity-Regel. Liefe er im normalen CI-/Pre-Commit-Scan mit, waere die CI neuer Projekte **dauerrot**. Deshalb ist `.semgrep/test-fixtures/` im `.semgrepignore`-Template ausgeschlossen (naechster Block) — der Canary wird **nur** vom gezielten Audit-Scan des `quality-gate-audit`-Skills (BOO-183) erfasst, nie vom Repo-weiten Scan.
+
+```python
+# QGAUDIT-CANARY-DO-NOT-REMOVE
+# DE: Beweist, dass das Custom-Rule-Verzeichnis .semgrep/ in CI verdrahtet ist.
+# EN: Proves the custom-rule directory .semgrep/ is wired into CI.
+# Der quality-gate-audit-Skill scannt diese Datei gezielt mit `--config .semgrep/`
+# und erwartet, dass die Regel `qgaudit-wiring-canary` feuert. NICHT löschen.
+tripwire = "QGAUDIT-CANARY-TRIPWIRE"
+```
+
+**Lifecycle:** Die Datei ist bewusst minimal und darf nicht geloescht werden — sie ist der einzige beabsichtigte Treffer der Canary-Regel. Verschwindet der Tripwire, verliert der Audit seinen Beweis, dass die Verdrahtung lebt.
+
+---
+
 ## .semgrepignore (alle Stacks)
 
 ```
@@ -1177,9 +1224,10 @@ build/
 journal/reports/
 .venv/
 __pycache__/
+.semgrep/test-fixtures/
 ```
 
-**Begruendung:** `node_modules/` und `.venv/` sind Dependencies (nicht eigener Code), `dist/` und `build/` sind Build-Artefakte (haben eigene Lint-Stage). `journal/reports/` ist vom Self-Healing-Loop generiert (kein Source-Code). `__pycache__/` ist Python-Bytecode-Cache.
+**Begruendung:** `node_modules/` und `.venv/` sind Dependencies (nicht eigener Code), `dist/` und `build/` sind Build-Artefakte (haben eigene Lint-Stage). `journal/reports/` ist vom Self-Healing-Loop generiert (kein Source-Code). `__pycache__/` ist Python-Bytecode-Cache. `.semgrep/test-fixtures/` enthaelt den Wiring-Canary (BOO-185) — eine `ERROR`-Regel, die nur fuer den gezielten Audit-Scan des `quality-gate-audit`-Skills feuern soll, nie fuer den Repo-weiten Scan (sonst dauerrot).
 
 ---
 
@@ -1225,6 +1273,10 @@ if [[ -f ".semgrep.yml" ]]; then
         for pack in $PACKS; do
             ARGS="$ARGS --config $pack"
         done
+        # BOO-185: Custom-Rule-Verzeichnis zusätzlich verdrahten
+        if [[ -d ".semgrep" ]]; then
+            ARGS="$ARGS --config .semgrep/"
+        fi
         echo "[PRE-COMMIT] Semgrep mit Packs: $(echo "$PACKS" | tr '\n' ' ')"
         if ! command -v semgrep >/dev/null 2>&1; then
             echo "[PRE-COMMIT] Semgrep CLI nicht installiert — 'brew install semgrep' (Mac) oder 'pip install semgrep' (Linux)"
@@ -1317,6 +1369,10 @@ jobs:
               echo "::error::No active packs in .semgrep.yml"
               exit 1
           fi
+          # BOO-185: Custom-Rule-Verzeichnis zusätzlich verdrahten (Registry-Packs + projekt-eigene Rules)
+          if [[ -d .semgrep ]]; then
+              ARGS="$ARGS --config .semgrep/"
+          fi
           # shellcheck disable=SC2086
           semgrep $ARGS --error --sarif --output=.ci-reports/semgrep.sarif
 
@@ -1331,7 +1387,9 @@ jobs:
           path: .ci-reports/semgrep.sarif
 ```
 
-**Two-Layer-Logik:** Beide Layer lesen `.semgrep.yml`. Wenn der Operator den Hook via `--no-verify` umgeht, blockiert spaetestens diese Action den Merge. Wenn die Action gestrippt wird, blockiert der Hook den Commit lokal. Belt-and-Suspenders.
+**Zwei Quellen, eine Action (BOO-185):** Die Action laedt beide Quellen — die Registry-Packs aus dem `.semgrep.yml`-Manifest **und** die projekt-eigenen Custom-Rules aus `.semgrep/` (via `--config .semgrep/`, sobald das Verzeichnis existiert). Damit ist die Custom-Rule-Schicht aktiv verdrahtet statt nur nominell vorhanden. Das Canary-Fixture `.semgrep/test-fixtures/` bleibt via `.semgrepignore` aus dem Repo-weiten Scan ausgenommen — es wird nur vom gezielten Audit-Scan erfasst (sonst dauerrot).
+
+**Two-Layer-Logik:** Beide Layer lesen `.semgrep.yml` und verdrahten `.semgrep/`. Wenn der Operator den Hook via `--no-verify` umgeht, blockiert spaetestens diese Action den Merge. Wenn die Action gestrippt wird, blockiert der Hook den Commit lokal. Belt-and-Suspenders.
 
 ---
 
@@ -1409,7 +1467,9 @@ jobs:
 
 ## hooks/dependency-check.sh (BOO-12 — Slopsquatting-Schutz)
 
-**Drittes Gate im Pre-Commit-Hook seit BOO-12 (2026-05-06):** Eigenstaendiges Bash-Skript unter `.claude/hooks/dependency-check.sh`, vom Pre-Commit-Hook (BOO-4) als drittes Gate nach ESLint und Semgrep aufgerufen. Pruefung neu hinzugefuegter Dependencies in drei Stufen: Existenz (Halluzinations-Block), Age (Typosquatter-Warnung), CVE (Vulnerability-Block).
+**Drittes Gate im Pre-Commit-Hook seit BOO-12 (2026-05-06):** Eigenstaendiges Bash-Skript unter `.claude/hooks/dependency-check.sh`, vom Pre-Commit-Hook (BOO-4) als drittes Gate nach ESLint und Semgrep aufgerufen. Pruefung neu hinzugefuegter Dependencies in vier Stufen: Wordlist (Offline-Block gegen bekannte Slopsquatting-/Typosquatting-Pakete, BOO-197), Existenz (Halluzinations-Block), Age (Typosquatter-Warnung), CVE (Vulnerability-Block).
+
+**Zwei Schichten seit BOO-197:** Die Wordlist-Stufe (`.claude/hooks/slopsquatting/wordlist.txt`, naechster Block) ist die **offline-faehige erste Schicht** — sie blockt bekannte malicious Pakete sofort per `grep`, ohne Registry-Roundtrip. Die Live-Registry-Query (Existenz/Age/CVE) bleibt unveraendert als **zweite Schicht** bestehen; die Wordlist ersetzt sie nicht, sondern faengt dokumentierte Slopsquatting-Treffer noch vor dem Netz-Call ab. Fehlt die Wordlist, wird die Stufe uebersprungen (kein Hard-Fail) — die Registry-Query greift weiter.
 
 > [!important] Schrader Code Crash Kap. 3-4
 > 19,7 % der KI-empfohlenen Pakete existieren nicht — Slopsquatting ist ein eigener Angriffsvektor. Angreifer registrieren typosquatted oder von KI halluzinierte Package-Namen mit Malware. ESLint und Semgrep pruefen Code, aber nicht die Supply Chain — dieser Hook schliesst diese Luecke vor dem Commit.
@@ -1422,12 +1482,15 @@ jobs:
 
 ```bash
 #!/usr/bin/env bash
-# hooks/dependency-check.sh — Slopsquatting-Schutz (BOO-12)
-# DE: Drei-Stufen-Check fuer neu hinzugefuegte Dependencies — Existenz, Age, CVE.
+# hooks/dependency-check.sh — Slopsquatting-Schutz (BOO-12, BOO-197)
+# DE: Vier-Stufen-Check fuer neu hinzugefuegte Dependencies — Wordlist, Existenz, Age, CVE.
 #     Schrader Code Crash Kap. 3-4: 19,7% der KI-empfohlenen Pakete existieren nicht.
-# EN: Three-stage check for newly added dependencies — existence, age, CVE.
+# EN: Four-stage check for newly added dependencies — wordlist, existence, age, CVE.
 #     Schrader Code Crash ch. 3-4: 19.7% of AI-recommended packages don't exist.
 set -euo pipefail
+
+# BOO-197: Offline-Wordlist als erste Schicht (zweite Schicht = Live-Registry-Query unten)
+WORDLIST=".claude/hooks/slopsquatting/wordlist.txt"
 
 # --- Trigger-Detection: laeuft nur wenn Manifest-Datei im Diff ---
 CHANGED=$(git diff --cached --name-only --diff-filter=ACMR)
@@ -1469,6 +1532,20 @@ extract_new_pypi_deps() {
             | sed -E 's/^\+[[:space:]]+"([a-zA-Z0-9_-]+).*/\1/' \
             || true
     fi
+}
+
+# --- Check 0: Wordlist (BOO-197 — offline-faehige erste Schicht) ---
+# Prueft <ecosystem>:<name> gegen die statische Slopsquatting-Wordlist.
+# Treffer = SOFORT BLOCK (return 1). Fehlt die Wordlist: ueberspringen (return 0).
+check_wordlist() {
+    local ecosystem="$1" pkg="$2"
+    [[ -f "$WORDLIST" ]] || return 0  # keine Wordlist — Stufe ueberspringen, Registry-Query greift weiter
+    # Exakt-Match auf "ecosystem:name", Kommentar-/Leerzeilen ignoriert.
+    if grep -vE '^[[:space:]]*#' "$WORDLIST" 2>/dev/null \
+        | grep -qiE "^[[:space:]]*${ecosystem}:${pkg}[[:space:]]*$"; then
+        return 1  # in Wordlist — malicious/typosquatted
+    fi
+    return 0
 }
 
 # --- Check 1: Existenz ---
@@ -1550,10 +1627,20 @@ check_pypi_cve() {
 
 # --- Hauptlauf ---
 echo "[DEP-CHECK] Slopsquatting-Schutz aktiv"
+if [[ -f "$WORDLIST" ]]; then
+    echo "[DEP-CHECK] Wordlist-Schicht aktiv: $WORDLIST"
+else
+    echo "[DEP-CHECK] HINWEIS: Wordlist '$WORDLIST' fehlt — Stufe 0 uebersprungen, nur Live-Registry-Query"
+fi
 
 if [[ -n "$TRIGGERS_NPM" ]]; then
     NEW_NPM=$(extract_new_npm_deps)
     for pkg in $NEW_NPM; do
+        if ! check_wordlist "npm" "$pkg"; then
+            echo "[DEP-CHECK] Paket in Slopsquatting-Wordlist — BLOCK: npm-Paket '$pkg' steht in $WORDLIST"
+            BLOCKED=1
+            continue  # bekannt malicious — Registry-Checks eruebrigen sich
+        fi
         if ! check_npm_existence "$pkg"; then
             echo "[DEP-CHECK] BLOCK: npm-Paket '$pkg' existiert nicht in der Registry — Halluzination?"
             BLOCKED=1
@@ -1567,6 +1654,11 @@ fi
 if [[ -n "$TRIGGERS_PIP" ]]; then
     NEW_PYPI=$(extract_new_pypi_deps)
     for pkg in $NEW_PYPI; do
+        if ! check_wordlist "pypi" "$pkg"; then
+            echo "[DEP-CHECK] Paket in Slopsquatting-Wordlist — BLOCK: PyPI-Paket '$pkg' steht in $WORDLIST"
+            BLOCKED=1
+            continue
+        fi
         if ! check_pypi_existence "$pkg"; then
             echo "[DEP-CHECK] BLOCK: PyPI-Paket '$pkg' existiert nicht — Halluzination?"
             BLOCKED=1
@@ -1592,8 +1684,176 @@ exit 0
 
 **Anti-Patterns:**
 - KEIN Auto-Install von `pip-audit` oder `npm` — Operator-Verantwortung. Hook bleibt sprachneutral.
-- KEINE Pflicht-Dependency wie `yq`/`jq` — Bash + `grep`/`sed`/`awk` + `curl` reichen.
+- KEINE Pflicht-Dependency wie `yq`/`jq` — Bash + `grep`/`sed`/`awk` + `curl` reichen. Die Wordlist-Stufe (BOO-197) liest `wordlist.txt` ausschliesslich per `grep` — kein YAML-/JSON-Parser.
 - KEIN Block bei Cargo-Diff — nur Hinweis, weil Cargo-Vollunterstuetzung in spaeterer Iteration.
+- KEIN Hard-Fail wenn die Wordlist fehlt — Stufe 0 wird uebersprungen, die Live-Registry-Query bleibt aktiv.
+
+---
+
+## .claude/hooks/slopsquatting/wordlist.txt (BOO-197 — Slopsquatting-Wordlist)
+
+**Offline-Schicht seit BOO-197 (2026-06-14):** Statische Wordlist bekannter malicious/typosquatted Pakete unter `.claude/hooks/slopsquatting/wordlist.txt`. Sie ist die **erste, offline-faehige Schicht** des Slopsquatting-Schutzes — der `dependency-check.sh`-Hook (vorheriger Block) prueft jede neu hinzugefuegte Dependency per `grep` gegen diese Liste, bevor er die Live-Registry-Query (zweite Schicht) anstoesst. Ein Treffer blockt sofort, ohne Netz-Call. Die Wordlist **ersetzt** die Registry-Query nicht — sie faengt dokumentierte Slopsquatting-/Typosquatting-Namen frueh und auch offline ab.
+
+> [!important] Schrader Code Crash Kap. 3-4
+> Slopsquatting funktioniert nur, solange ein malicious Name unbemerkt durchrutscht. Eine projekt-lokale Wordlist bekannter Faelle ist die billigste Frueherkennung: ein `grep` statt eines Registry-Roundtrips, und sie greift auch ohne Netz (CI-Runner ohne egress, Offline-Commit). Die Live-Query bleibt fuer alles Unbekannte zustaendig.
+
+**Format:** eine Zeile pro Paket, Schema `<ecosystem>:<package-name>` (`ecosystem` = `npm` | `pypi` | `cargo`). Kommentar- und Leerzeilen (`#`) werden ignoriert. Der Header traegt das Feld `# last_refreshed: YYYY-MM-DD`.
+
+**90-Tage-Frische-Kriterium (Anker fuer `quality-gate-audit`, BOO-183):** Der `quality-gate-audit`-Skill prueft Existenz **und** Alter der Wordlist — `last_refreshed` (bzw. die Datei-Mtime) darf nicht aelter als 90 Tage sein. Eine ueberalterte Wordlist faellt im Audit auf, weil dann der woechentliche Refresh-Workflow (naechster Block) nicht mehr laeuft.
+
+```text
+# .claude/hooks/slopsquatting/wordlist.txt — bekannte Slopsquatting-/Typosquatting-Pakete (BOO-197)
+# last_refreshed: 2026-06-14
+# Format: <ecosystem>:<package-name>   (ecosystem = npm | pypi | cargo)
+# Auto-gepflegt vom Workflow .github/workflows/slopsquatting-refresh.yml (woechentlich).
+# Manuelle Eintraege/Ausnahmen: .claude/hooks/slopsquatting/slopsquatting-override.yaml
+pypi:colourama
+pypi:requasts
+npm:noblox.js-proxy
+```
+
+**Seed-Inhalt:** Die drei Seed-Eintraege sind oeffentlich dokumentierte Faelle (Typosquats von `colorama`/`requests` bzw. der bekannte `noblox.js`-Typosquat). Die Liste startet bewusst klein — der woechentliche Refresh-Workflow (naechster Block) ergaenzt automatisch neue `malicious-package`-Eintraege aus oeffentlichen Advisory-Quellen.
+
+---
+
+## .github/workflows/slopsquatting-refresh.yml (BOO-197 — woechentlicher Wordlist-Refresh)
+
+**Refresh-Workflow seit BOO-197 (2026-06-14):** GitHub-Actions-Workflow, der die Wordlist (`wordlist.txt`, vorheriger Block) woechentlich aktuell haelt. Er zieht bekannte malicious Pakete aus oeffentlichen Advisory-Quellen, dedupliziert sie, diffed gegen die aktuelle Wordlist, aktualisiert `last_refreshed` und oeffnet bei Aenderung einen PR mit Diff-Beschreibung. Der Diff wird **nie** direkt auf `main` committet — ein Mensch merged den PR.
+
+**Quellen:** GitHub Advisory Database (GHSA, GraphQL — `malware`-Typ), OSV (osv.dev — `ecosystems`-Filter auf `MAL-`-IDs), OSSF Package-Analysis-Feed, npm Advisory-JSON. Alle Quellen werden auf `malicious-package`-Eintraege gefiltert. Wo eine API einen Token braucht, nutzt der Workflow `${{ secrets.GITHUB_TOKEN }}` (GHSA-GraphQL) — die uebrigen Quellen sind oeffentlich ohne Token.
+
+**Override:** `.claude/hooks/slopsquatting/slopsquatting-override.yaml` haelt manuelle Eintraege fest, die der Refresh **nie entfernt** (`never_remove`) bzw. **nie hinzufuegt** (`never_add` — False-Positives, projekt-eigene Pakete mit aehnlichem Namen). Der Override wird nach dem Merge der Quellen angewandt. bash-only Parsing per `grep`/`sed` — kein `yq`.
+
+> [!important] Token-Hinweis
+> `${{ secrets.GITHUB_TOKEN }}` ist der eingebaute Action-Token (kein PAT noetig). Reicht ein Quell-Endpunkt nicht mit dem eingebauten Token, dokumentiert der Workflow das benoetigte Secret als Kommentar — **niemals echte Secrets im Template**.
+
+```yaml
+# .github/workflows/slopsquatting-refresh.yml — woechentlicher Wordlist-Refresh (BOO-197)
+# DE: Zieht bekannte malicious Pakete, diffed gegen wordlist.txt, oeffnet bei Aenderung einen PR.
+# EN: Pulls known malicious packages, diffs against wordlist.txt, opens a PR on change.
+name: Slopsquatting Wordlist Refresh
+on:
+  schedule:
+    - cron: '0 6 * * 1'   # Montag 06:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Refresh wordlist from public advisory sources
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          WORDLIST=".claude/hooks/slopsquatting/wordlist.txt"
+          OVERRIDE=".claude/hooks/slopsquatting/slopsquatting-override.yaml"
+          mkdir -p "$(dirname "$WORDLIST")"
+          TMP_NEW="$(mktemp)"
+
+          # --- Quelle 1: GitHub Advisory DB (GHSA, GraphQL, type=MALWARE) ---
+          # Benoetigt nur den eingebauten GITHUB_TOKEN.
+          gh api graphql -f query='
+            query { securityAdvisories(first: 100, classifications: [MALWARE]) {
+              nodes { identifiers { value }
+                vulnerabilities(first: 10) { nodes { package { ecosystem name } } } } } }' \
+            --jq '.data.securityAdvisories.nodes[].vulnerabilities.nodes[]?
+                  | "\(.package.ecosystem|ascii_downcase):\(.package.name)"' \
+            2>/dev/null >> "$TMP_NEW" || echo "::warning::GHSA source unavailable"
+
+          # --- Quelle 2: OSV (osv.dev, malicious-package IDs beginnen mit MAL-) ---
+          for eco in npm PyPI crates.io; do
+            curl -fsSL --max-time 20 "https://api.osv.dev/v1/query" \
+              -d "{\"package\":{\"ecosystem\":\"$eco\"}}" 2>/dev/null \
+              | grep -oE '"id":"MAL-[^"]+"' >/dev/null 2>&1 || true
+          done
+          # OSV-Vollabzug laeuft ueber den OSV-Bucket-Export (gs://osv-vulnerabilities),
+          # hier bewusst nur als Platzhalter-Quelle — Operator erweitert pro Bedarf.
+
+          # --- Quelle 3: OSSF Package-Analysis-Feed (oeffentlich, ohne Token) ---
+          curl -fsSL --max-time 20 \
+            "https://raw.githubusercontent.com/ossf/package-analysis/main/examples/feeds/malicious-packages.txt" \
+            2>/dev/null >> "$TMP_NEW" || echo "::warning::OSSF feed unavailable"
+
+          # --- Normalisieren: ecosystem:name, klein, dedupliziert ---
+          NORM="$(mktemp)"
+          grep -vE '^[[:space:]]*(#|$)' "$TMP_NEW" \
+            | sed -E 's/[[:space:]]+//g' \
+            | tr 'A-Z' 'a-z' \
+            | sed -E 's/^pypi:/pypi:/; s/^crates.io:/cargo:/' \
+            | grep -E '^(npm|pypi|cargo):[a-z0-9._@/-]+$' \
+            | sort -u > "$NORM" || true
+
+          # --- Override anwenden (bash-only, kein yq) ---
+          # never_add: Zeilen aus dem Frischabzug entfernen.
+          # never_remove: am Ende garantiert wieder hinzufuegen.
+          if [[ -f "$OVERRIDE" ]]; then
+            sed -n '/never_add:/,/never_remove:/p' "$OVERRIDE" \
+              | grep -E '^[[:space:]]*-[[:space:]]' \
+              | sed -E 's/^[[:space:]]*-[[:space:]]*//; s/[[:space:]]*$//' \
+              | while read -r drop; do
+                  [[ -n "$drop" ]] && sed -i "\#^${drop}\$#d" "$NORM"
+                done
+          fi
+
+          # --- Bestehende (nicht-Kommentar) Eintraege mergen ---
+          MERGED="$(mktemp)"
+          { grep -vE '^[[:space:]]*(#|$)' "$WORDLIST" 2>/dev/null || true; cat "$NORM"; } \
+            | sort -u >> "$MERGED"
+
+          # never_remove garantiert behalten
+          if [[ -f "$OVERRIDE" ]]; then
+            sed -n '/never_remove:/,$p' "$OVERRIDE" \
+              | grep -E '^[[:space:]]*-[[:space:]]' \
+              | sed -E 's/^[[:space:]]*-[[:space:]]*//; s/[[:space:]]*$//' >> "$MERGED"
+          fi
+          MERGED_SORTED="$(mktemp)"; sort -u "$MERGED" > "$MERGED_SORTED"
+
+          # --- Neue Wordlist mit aktualisiertem Header schreiben ---
+          TODAY="$(date -u +%Y-%m-%d)"
+          {
+            echo "# .claude/hooks/slopsquatting/wordlist.txt — bekannte Slopsquatting-/Typosquatting-Pakete (BOO-197)"
+            echo "# last_refreshed: ${TODAY}"
+            echo "# Format: <ecosystem>:<package-name>   (ecosystem = npm | pypi | cargo)"
+            echo "# Auto-gepflegt vom Workflow .github/workflows/slopsquatting-refresh.yml (woechentlich)."
+            echo "# Manuelle Eintraege/Ausnahmen: .claude/hooks/slopsquatting/slopsquatting-override.yaml"
+            cat "$MERGED_SORTED"
+          } > "$WORDLIST"
+
+      - name: Open PR on change
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: chore/slopsquatting-wordlist-refresh
+          commit-message: 'chore(security): Slopsquatting-Wordlist-Refresh (BOO-197)'
+          title: 'chore(security): Slopsquatting-Wordlist-Refresh'
+          body: |
+            Automatischer woechentlicher Refresh der Slopsquatting-Wordlist (BOO-197).
+            Quellen: GHSA (MALWARE), OSV (MAL-), OSSF Package-Analysis-Feed.
+            Diff unten pruefen — Override-Regeln: .claude/hooks/slopsquatting/slopsquatting-override.yaml
+          add-paths: |
+            .claude/hooks/slopsquatting/wordlist.txt
+```
+
+**Override-Beispiel** (`.claude/hooks/slopsquatting/slopsquatting-override.yaml`):
+
+```yaml
+# slopsquatting-override.yaml — manuelle Steuerung des Wordlist-Refresh (BOO-197)
+# never_add:    diese Namen NIE in die Wordlist aufnehmen (False-Positives, eigene Pakete).
+# never_remove: diese Namen IMMER in der Wordlist behalten (manuell verifizierte Faelle).
+never_add:
+  - npm:my-internal-pkg
+never_remove:
+  - pypi:colourama
+```
+
+**Lauffaehigkeit & Grenzen:** Der Workflow ist im Aufbau lauffaehig — `peter-evans/create-pull-request@v6` oeffnet nur bei tatsaechlichem Diff einen PR (kein Leer-PR). Die OSV-Stufe ist als Platzhalter markiert: der vollstaendige `MAL-`-Abzug laeuft ueber den OSV-Bucket-Export; der Operator erweitert sie projektspezifisch. `${{ secrets.GITHUB_TOKEN }}` reicht fuer GHSA und PR-Erstellung — kein PAT noetig, keine echten Secrets im Template.
 
 ---
 

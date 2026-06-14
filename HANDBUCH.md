@@ -25,7 +25,7 @@
 10. [Governance für dein Projekt anpassen](#10-governance-für-dein-projekt-anpassen)
 11. [Tägliche Nutzung — ein typischer Workflow](#11-tägliche-nutzung--ein-typischer-workflow)
 12. [Häufige Fragen](#12-häufige-fragen) — inkl. Claude Agent SDK Migration
-13. [Anhänge — Wegweiser](#13-anhänge--wegweiser) — A bis AD im Überblick
+13. [Anhänge — Wegweiser](#13-anhänge--wegweiser) — A bis AF im Überblick
 
 ---
 
@@ -2359,7 +2359,7 @@ Zwei weitere Runbooks decken konkrete Setup-Aufgaben ab:
 
 ---
 
-Das Handbuch hat 30 Anhänge (A–Z + AA bis AD). Sie sind **Nachschlage- und Vertiefungs-Schicht** — du musst sie nicht von vorn bis hinten lesen. Diese Tabelle sagt dir, **wann welcher Anhang relevant ist**. Anhänge A–M sind die Grundlagen-/Tooling-Schicht, N–AD die Themen ab v0.2.0 (Wellen J–BI): Effizienz, Privacy, Deployment, Skalierung, Verifikation, Edit-Bodyguard, Contribute-Back, Ubiquitous Language, VPS/Cloud-Team-Runbook, Kunden-Onboarding, SonarCloud-Setup, Linear-MCP-auf-VPS, Knowledge-Onboarding, Sprint-Orchestrator.
+Das Handbuch hat 32 Anhänge (A–Z + AA bis AF). Sie sind **Nachschlage- und Vertiefungs-Schicht** — du musst sie nicht von vorn bis hinten lesen. Diese Tabelle sagt dir, **wann welcher Anhang relevant ist**. Anhänge A–M sind die Grundlagen-/Tooling-Schicht, N–AF die Themen ab v0.2.0 (Wellen J–BI): Effizienz, Privacy, Deployment, Skalierung, Verifikation, Edit-Bodyguard, Contribute-Back, Ubiquitous Language, VPS/Cloud-Team-Runbook, Kunden-Onboarding, SonarCloud-Setup, Linear-MCP-auf-VPS, Knowledge-Onboarding, Sprint-Orchestrator, Slopsquatting-Wordlist-Pflege, Quality-Gate-Audit.
 
 | Anhang | Thema | Wann relevant |
 |--------|-------|---------------|
@@ -2393,6 +2393,8 @@ Das Handbuch hat 30 Anhänge (A–Z + AA bis AD). Sie sind **Nachschlage- und Ve
 | **AB** | Linear-MCP auf headless VPS | Linear-MCP per OAuth/SSH-Tunnel auf einer VPS verbinden + Token-Setup |
 | **AC** | Knowledge-Onboarding | Bestands-Doku in Governance-Artefakte routen |
 | **AD** | /sprint-run — Sprint-Orchestrator | Backlog im Daemon-Modus abarbeiten, Worktree pro Story, Token-Boundary |
+| **AE** | Slopsquatting-Wordlist-Pflege | Wordlist aktuell + methodisch korrekt halten — woechentlicher Auto-Refresh, Quartals-Methodik-Review, 90-Tage-Frische-Gate |
+| **AF** | Quality-Gate-Audit (`/quality-gate-audit`) | prüfen, ob die Gates wirklich verdrahtet sind — drei Trigger, vier Gates, Status `verdrahtet`/`nominell`/`blind`, Sprint-STOPP bei `blind` |
 
 ---
 
@@ -2457,6 +2459,12 @@ BOOTSTRAP SKILL:
 | **Daemon** | Ein Prozess der dauerhaft im Hintergrund läuft |
 | **Vibe Coding** | KI-gestütztes Entwickeln wo die KI großteils den Code schreibt |
 | **Artefakt** | Datei mit definiertem Zweck im Governance-Framework (Doku, Hooks, Specs, Scripts) |
+| **Slopsquatting** | KI-spezifischer Supply-Chain-Vektor: eine KI empfiehlt ein nicht existierendes Paket, ein Angreifer belegt den Namen mit Schadcode. Gegenmittel: projekt-lokale Wordlist (`.claude/hooks/slopsquatting/wordlist.txt`, 90-Tage-Frische). Siehe **Anhang AE** + **AF** |
+| **Wordlist** | `.claude/hooks/slopsquatting/wordlist.txt` — Liste bekannter malicious/typosquatted Pakete im Schema `<ecosystem>:<package>`; vom `dependency-check.sh`-Hook gelesen, gilt ≤ 90 Tage als frisch |
+| **Wiring-Canary** | Fixture mit absichtlichem Verstoss (`.semgrep/test-fixtures/wiring-canary.py`, Regel `qgaudit-wiring-canary`), die nur feuert, wenn das Gate wirklich verdrahtet ist. Treffer = lebende Verdrahtung, Stille = blindes Gate. Siehe **Anhang AF** |
+| **Audit-Status** (`verdrahtet` / `nominell` / `blind`) | Ergebnis-Stufen des `quality-gate-audit` je Gate: `verdrahtet` = vorhanden + registriert + Signal-Test feuert; `nominell` = vorhanden, aber nie ausgeführt (trügerische Sicherheit); `blind` = prüft faktisch nichts. Siehe **Anhang AF** |
+| **Threshold (Schwellwert)** | Gate-Grenzwert: Coverage `COVERAGE_PASS=80`/`COVERAGE_WARN=60`, Wordlist-Frische 90 Tage, Architektur-Doku-Drift 30 Tage |
+| **Sprint vs. Cycle** | Sprint = Arbeits-Box von ~80 % eines Token-Fensters (modellunabhängig), kein Kalender-Zeitraum; Linear-*Cycles* bewusst nicht aktiviert, Sprint-Zuordnung via `Sprints.md`. Siehe **Anhang G** |
 
 ---
 
@@ -5037,6 +5045,163 @@ Nach jedem `/implement`-Lauf liest `/sprint-run` die `meta.json` des Story-Runs 
 ### Verweise
 
 `sprint-run/SKILL.md` · `sprint-run/references/{orchestration-checklist,gate-block-handling,worktree-flow,token-boundary}.md` · Runbook `docs/runbooks/sprint-run.md` · Anhang G (Sprint-Sizing) · BOO-148 (Remote-CI-Loop) · BOO-157.
+
+---
+
+## Anhang AE: Slopsquatting-Wordlist-Pflege (BOO-197)
+
+> Ergaenzt §8 (Guardrails) und §6 (Skill-Uebersicht). Schrader *Code Crash* Kap. 3-4: **19,7 % der KI-empfohlenen Pakete existieren nicht** — Slopsquatting ist ein eigener, KI-spezifischer Supply-Chain-Angriffsvektor. Der Pre-Commit-Hook `.claude/hooks/dependency-check.sh` (BOO-12) blockt neu hinzugefuegte Dependencies; seine **erste, offline-faehige Schicht** ist eine projekt-lokale Wordlist bekannter malicious/typosquatted Pakete. Dieser Anhang erklaert, **wie die Wordlist gepflegt wird** — automatisch, manuell, und wie das `quality-gate-audit`-Gate (BOO-183) ihre Frische erzwingt.
+
+### Worum es geht
+
+Die Wordlist `.claude/hooks/slopsquatting/wordlist.txt` ist nur so gut wie ihre Aktualitaet. Eine veraltete Wordlist blockt zwar weiter die alten Faelle, faengt aber neue malicious Pakete nicht — und ein Schutz, der unbemerkt blind wird, ist gefaehrlicher als gar keiner, weil er Sicherheit suggeriert. Die Pflege hat deshalb zwei Layer mit unterschiedlicher Kadenz und unterschiedlichem Ziel:
+
+| Layer | Was wird gepflegt | Kadenz | Wie | Wer entscheidet |
+|-------|-------------------|--------|-----|-----------------|
+| **1 — Daten** | die *Eintraege* der Wordlist | woechentlich, automatisch | GitHub-Actions-Workflow → PR | Mensch merged den PR |
+| **2 — Methodik** | das *Verfahren* hinter der Wordlist (Quellen, Filter, Thresholds) | quartalsweise, manuell | Skill `/slopsquatting-deep-refresh` → `/research` → Empfehlung | Operator setzt um (eigene Story) |
+
+Layer 1 haelt die Liste aktuell. Layer 2 prueft, ob die Liste **richtig** aktuell gehalten wird. Beide schreiben **nie direkt auf `main`** — Layer 1 via PR, Layer 2 nur als Empfehlung.
+
+### Wer pflegt die Wordlist
+
+- **Daten-Layer (Layer 1):** niemand manuell im Normalfall — der woechentliche Workflow erledigt das. Ein Mensch ist nur am Ende noetig: er **reviewed und merged den vom Workflow geoeffneten PR**. So bleibt ein malicious-Listen-Diff immer unter menschlicher Kontrolle (kein Auto-Commit eines Block-Eintrags, der z.B. ein projekt-eigenes Paket faelschlich treffen koennte).
+- **Methodik-Layer (Layer 2):** der Operator, einmal pro Quartal — getrieben durch `/slopsquatting-deep-refresh`. Manuelle Einzel-Ausnahmen (False-Positives, projekt-eigene Pakete) pflegt der Operator jederzeit in der Override-Datei (s.u.).
+
+### Wie automatisch — der woechentliche GitHub-Actions-Refresh
+
+`.github/workflows/slopsquatting-refresh.yml` laeuft per Cron (Montag 06:00 UTC) und auf `workflow_dispatch`. Ablauf:
+
+1. Zieht bekannte malicious Pakete aus oeffentlichen Advisory-Quellen: **GitHub Advisory Database** (GHSA, GraphQL, Klassifikation `MALWARE` — nutzt nur den eingebauten `GITHUB_TOKEN`), **OSV** (osv.dev, `MAL-`-IDs), **OSSF Package-Analysis-Feed**, npm-Advisory-JSON.
+2. Normalisiert auf das Schema `<ecosystem>:<package-name>` (`ecosystem` = `npm | pypi | cargo`), dedupliziert (`sort -u`), bash-only per `grep`/`sed` — **kein** `yq`/`jq` als Pflicht-Dependency.
+3. Wendet die Override-Regeln an (s.u.), merged mit den bestehenden Eintraegen, aktualisiert das Header-Feld `# last_refreshed: YYYY-MM-DD`.
+4. Bei Aenderung gegen die aktuelle Wordlist: oeffnet einen **PR mit Diff-Beschreibung**. Kein direkter Commit auf `main`.
+
+Greift eine Quelle nicht (Endpunkt down, Token reicht nicht), loggt der Workflow eine Warnung und faehrt mit den uebrigen Quellen fort — der Refresh failt nicht hart an einer einzelnen Quelle.
+
+### Wie manuell — der Quartals-Review via `/slopsquatting-deep-refresh`
+
+Der Auto-Refresh haelt die *Daten* frisch, aber nicht die *Methodik*: Quellen koennen abgekuendigt werden, neue Feeds entstehen, der Forschungsstand verschiebt sich, Schwellen veralten. Einmal pro Quartal fuehrt der Operator deshalb den Skill [`slopsquatting-deep-refresh`](slopsquatting-deep-refresh/SKILL.md) aus. Er ist ein duenner Orchestrator: er laedt den Ist-Stand (Wordlist + `last_refreshed`, Override, Quellenliste aus dem Workflow), fuehrt `/research` (Deep Research) mit einem festen Quartals-Prompt-Template und prueft vier Dimensionen — **neue Datenquellen**, **geaenderte/abgekuendigte Feeds**, **Methodik-Stand der Forschung**, **Threshold-Kandidaten**. Output ist eine zitierte **Update-Empfehlung** plus optionaler Threshold-Vorschlag — **kein Auto-Write**. Eine Methodik-Aenderung am Supply-Chain-Gate ist security-relevant und gehoert als eigene Story durch die Pipeline (`/intent` → ... → `/implement`), nicht auto-committet (INTENTRON-Leitsatz: leichtgewichtig + pragmatisch, ohne Security-Kompromisse).
+
+### Das 90-Tage-Frische-Kriterium
+
+Die Wordlist gilt als **frisch**, solange ihr `last_refreshed`-Datum (bzw. die Datei-Mtime als Fallback) nicht aelter als **90 Tage** ist. Dieses Kriterium ist der Anker, an dem das `quality-gate-audit`-Gate die Pflege erzwingt: laeuft der woechentliche Refresh-Workflow korrekt, ist die Wordlist nie aelter als wenige Tage. Wird sie aelter als 90 Tage, ist das ein hartes Signal, dass der Auto-Refresh **nicht mehr greift** (Workflow deaktiviert, alle Quellen tot, PR nie gemerged) — und ein Anlass fuer einen Ad-hoc-`/slopsquatting-deep-refresh`-Lauf.
+
+### Die Override-Datei `slopsquatting-override.yaml`
+
+`.claude/hooks/slopsquatting/slopsquatting-override.yaml` haelt manuelle Ausnahmen fest, die der Refresh-Workflow respektiert:
+
+- **`never_add`** — Eintraege, die der Refresh **nie aufnimmt**. Fuer False-Positives und projekt-eigene Pakete mit aehnlichem Namen, die sonst faelschlich geblockt wuerden.
+- **`never_remove`** — Eintraege, die der Refresh **nie entfernt**. Fuer manuell verifizierte malicious Pakete, die in keiner der oeffentlichen Quellen (mehr) gelistet sind, aber geblockt bleiben sollen.
+
+Der Workflow parst die Override-Datei bash-only (`grep`/`sed`, kein `yq`): `never_add`-Eintraege werden aus dem Frischabzug entfernt, `never_remove`-Eintraege am Ende garantiert wieder hinzugefuegt. So ueberstimmt die Operator-Entscheidung immer den automatischen Abzug.
+
+### Wie `quality-gate-audit` (BOO-183) die Frische prueft
+
+Der `quality-gate-audit`-Skill (BOO-183) automatisiert den Nachweis, dass ein Quality-Gate nicht nur *konfiguriert*, sondern auch **wirksam** ist — analog zur Wiring-Canary bei Semgrep (§8, `qgaudit-wiring-canary`). Fuer den Slopsquatting-Schutz prueft er zweierlei:
+
+1. **Existenz** — liegt `.claude/hooks/slopsquatting/wordlist.txt` ueberhaupt vor und wird der Hook (`dependency-check.sh`) sie tatsaechlich lesen?
+2. **Frische** — ist `last_refreshed` (bzw. die Datei-Mtime) juenger als 90 Tage? Eine ueberalterte Wordlist faellt im Audit auf, weil dann der woechentliche Refresh-Workflow nicht mehr laeuft.
+
+So ist ein blind gewordener Slopsquatting-Schutz nicht still: das Audit-Gate macht ihn sichtbar.
+
+### Verweise
+
+`slopsquatting-deep-refresh/SKILL.md` · `slopsquatting-deep-refresh/references/quarterly-review-prompt.md` · `.claude/hooks/slopsquatting/wordlist.txt` · `.claude/hooks/slopsquatting/slopsquatting-override.yaml` · `.github/workflows/slopsquatting-refresh.yml` · `.claude/hooks/dependency-check.sh` · §8 (Guardrails / Wiring-Canary) · BOO-197 · BOO-183 (`quality-gate-audit`) · BOO-12 (`dependency-check.sh`).
+
+---
+
+## Anhang AF: Quality-Gate-Audit — sind die Gates wirklich verdrahtet? (BOO-186)
+
+> Ergaenzt §8 (Guardrails) und §6 (Skill-Uebersicht). Ein Quality-Gate kann *konfiguriert* sein und trotzdem **blind** — ein Custom-Semgrep-Regelverzeichnis, das nie via `--config` an die CLI uebergeben wird, laeuft schlicht nie (ADR „Semgrep Custom-Rule-Wiring", 2026-06-11). Genau diese Luecke zwischen *konfiguriert* und *wirksam* schliesst der Skill [`quality-gate-audit`](quality-gate-audit/SKILL.md) (BOO-183): er **diagnostiziert**, ob die deklarierten Gates eines Projekts tatsaechlich im ausfuehrenden Pfad haengen — er **repariert nicht**.
+
+### Worum es geht
+
+Der `quality-gate-audit`-Skill prueft je Gate drei Dinge — **Existenz** (Datei vorhanden), **Registrierung** (im ausfuehrenden Pfad eingehaengt) und **Signal-Test** (feuert beim gezielten Trigger) — und stuft das Gate als `verdrahtet`, `nominell` oder `blind` ein. Das Ergebnis schreibt er als Audit-Report nach `docs/audits/`. Er ersetzt **keinen** Gate-Lauf (Security-Scan, Coverage-Check) — er prueft eine Ebene hoeher: ob die Gates ueberhaupt feuern *koennen*.
+
+### Abgrenzung
+
+`/security-architect` und `/implement` **fuehren** Gates aus. `/quality-gate-audit` verifiziert die **Verdrahtung** dieser Gates. Ein gruener Security-Scan sagt „kein Fund"; das Audit sagt „der Scan war ueberhaupt angeschlossen". Beides braucht man.
+
+### Die drei Trigger
+
+| Trigger | Wer loest aus | Verhalten |
+|---------|---------------|-----------|
+| `post-install` | letzter Schritt in [`/bootstrap`](bootstrap/SKILL.md) | Baseline-Report direkt nach dem Setup — stellt die Wiring-Wahrheit von Anfang an fest. |
+| `pre-sprint` | **HARD-HOOK** in [`/sprint-run`](sprint-run/SKILL.md) Schritt 1 (Anhang AD) | alle `verdrahtet` → Sprint startet; ≥1 Gate `blind` → **STOPP**. Im Daemon-Modus (`--auto`) ohne Override → Abbruch. |
+| `post-update` | Versions-Marker `.claude/.last-framework-version` (in `.gitignore`) | Mismatch zur Framework-`version` → Auto-Trigger, danach Marker aktualisieren. `--force` als manueller Fallback. |
+| `manual` | Operator (`/quality-gate-audit`) | Default, interaktiver Lauf. |
+
+### Die vier Gates
+
+| # | Gate | Was geprueft wird | Signal-Test |
+|---|------|-------------------|-------------|
+| 1 | **Semgrep-Wiring** | `.semgrep/`, Canary-Fixture, CI-Workflow mit `--config .semgrep/` | `semgrep` muss `qgaudit-wiring-canary` auf der **Wiring-Canary** (`.semgrep/test-fixtures/wiring-canary.py`) melden. |
+| 2 | **Coverage** | `.claude/hooks/coverage-check.sh` (+ Schwellwerte `COVERAGE_PASS=80`/`COVERAGE_WARN=60`) | Schwellwerte vorhanden **und** Hook registriert (settings.json / pre-commit / Implement-Kette). |
+| 3 | **Slopsquatting** | `.claude/hooks/slopsquatting/wordlist.txt`, `dependency-check.sh` | Wordlist ≤ 90 Tage (Anhang AE) + referenziert + bekannter Eintrag per `grep` erkannt. |
+| 4 | **Layer-0 Bodyguard** | `.claude/hooks/pre-edit-bodyguard.sh`, `bodyguard/patterns/*.yml`, `settings.json` | synthetischer AWS-Key-Edit → Hook blockt mit Exit 1 + `[BODYGUARD] BLOCKIERT`. |
+
+### Status-Lesehilfe — `verdrahtet` / `nominell` / `blind`
+
+| Status | Bedeutung | Reparatur-Pfad |
+|--------|-----------|----------------|
+| `verdrahtet` | Datei vorhanden + registriert + Signal-Test feuert. | nichts zu tun. |
+| `nominell` | vorhanden, aber Registrierung/Wiring fehlt — konfiguriert, **laeuft aber nie**. | Hook/Config in den ausfuehrenden Pfad einhaengen (settings.json-Matcher, CI-`--config`, Implement-Kette). |
+| `blind` | behauptet zu pruefen, prueft nichts (Datei fehlt/leer, Schicht haengt nirgends). | fehlendes Artefakt via `/bootstrap` (Gate-Scaffold) bzw. aus der Hook-Quelle nachziehen. |
+
+Die Unterscheidung **`nominell` vs. `blind` ist der Kern des Audits**: `nominell` gibt *falsche Sicherheit* (sieht eingerichtet aus, feuert nie), `blind` ist *offen kaputt*. Keiner von beiden ist Verdrahtung.
+
+### Override — wenn ein blindes Gate bewusst akzeptiert wird
+
+Ein `blind`-Befund laesst sich begruendet ueberstimmen — nie stillschweigend:
+
+- **transient:** `--override-gate <name>[,<name>...] --reason "..."` beim Aufruf. `--reason` ist **Pflicht**. Gilt nur fuer diesen Lauf.
+- **persistent:** im Report-Frontmatter `override_blind: true` + `reason`. Bleibt, bis es entfernt wird.
+
+Jeder Override landet im Audit-Trail (Frontmatter `overrides`) und erzeugt eine **gelbe Warnung** in der CLI-Ausgabe. So bleibt ein akzeptiertes blindes Gate sichtbar statt verborgen.
+
+### Eskalationspfad bei `blind`
+
+Findet das Audit ≥1 Gate `blind` **ohne** Override, ist der Exit-Code `1`. Folge:
+
+1. **Sprint-STOPP:** Der `pre-sprint`-Hard-Hook in `/sprint-run` Schritt 1 (Anhang AD) laesst den Sprint nicht starten. Im Daemon-Modus (`--auto`) bricht der Lauf ab — kein Sprint faehrt auf einem Projekt mit blinden Gates los.
+2. **Reparieren:** Im Report unter „Naechste Schritte" steht pro blindem Gate der konkrete Hinweis (welche Datei fehlt / welcher Hook nicht haengt). Reparatur via `/bootstrap` (Gate-Scaffold) bzw. der jeweiligen Hook-Quelle — der Audit-Skill repariert **nicht** selbst.
+3. **Re-Audit:** erneut `/quality-gate-audit` laufen lassen; wenn alle Gates `verdrahtet` sind, gibt der `pre-sprint`-Hook den Sprint frei.
+4. **Bewusst weiter:** nur via begruendetem Override (s.o.) — dokumentiert im Audit-Trail.
+
+### Beispiel-Report (mit Interpretation)
+
+Ein Baseline-Lauf (Trigger `post-install`) gegen ein sauber verdrahtetes Projekt sieht so aus (gekuerzt aus [`docs/audits/2026-06-14-quality-gate-audit.md`](docs/audits/2026-06-14-quality-gate-audit.md)):
+
+```yaml
+---
+audit_id: 2026-06-14-001
+triggered_by: post-install
+framework_version: 1.0.0
+overrides: []
+summary:
+  verdrahtet: 4
+  nominell: 0
+  blind: 0
+---
+```
+
+Body — Zusammenfassung als Status-Tabelle pro Gate:
+
+| Gate | Status |
+|------|--------|
+| semgrep | verdrahtet |
+| coverage | verdrahtet |
+| slopsquatting | verdrahtet |
+| bodyguard | verdrahtet |
+
+**Exit-Code:** 0 · **Aktive Overrides:** keine.
+
+**Interpretation:** Alle vier Gates feuern im Signal-Test (z.B. Semgrep `rule fired: qgaudit-wiring-canary`, Bodyguard `blocked: [BODYGUARD] BLOCKIERT (exit 1)`, Slopsquatting `wordlist match: pypi:colourama`). `summary.blind: 0` heisst: der `pre-sprint`-Hook gibt diesen Sprint frei. Ab dem 2. Lauf zeigt der Report unter „Diff zur letzten Pruefung", welches Gate den Status gewechselt hat — das macht eine *schleichend* blind werdende Schicht sichtbar. Stuende dort z.B. `slopsquatting: verdrahtet → blind`, waere die Wordlist ueber 90 Tage alt (Anhang AE) und der woechentliche Refresh-Workflow tot.
+
+### Verweise
+
+[`quality-gate-audit/SKILL.md`](quality-gate-audit/SKILL.md) · [`quality-gate-audit/references/gate-catalog.md`](quality-gate-audit/references/gate-catalog.md) · [`docs/audits/2026-06-14-quality-gate-audit.md`](docs/audits/2026-06-14-quality-gate-audit.md) · [`sprint-run/SKILL.md`](sprint-run/SKILL.md) (Pre-Sprint-Hook, Anhang AD) · **Anhang AE** (Slopsquatting-Wordlist-Frische) · §8 (Guardrails / Wiring-Canary) · BOO-186 · BOO-183 (`quality-gate-audit`).
 
 ---
 

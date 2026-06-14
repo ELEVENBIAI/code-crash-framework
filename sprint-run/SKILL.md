@@ -58,9 +58,18 @@ Pruefen und bei Verstoss STOPP mit konkretem Remediation-Hinweis:
   personal-data) sind konfiguriert und der Daemon kennt das Pause-Verhalten (Schritt 4.4).
 - **Werkzeug bereit?** `git worktree` verfuegbar, `gh` authentifiziert (fuer Remote-CI-Wait),
   Arbeitsbaum auf `main` clean.
+- **Quality Gates verdrahtet?** (BOO-183) `/quality-gate-audit --trigger pre-sprint` aufrufen —
+  prueft, ob die deklarierten Gates (Semgrep-Wiring, Coverage, Slopsquatting, Layer-0-Bodyguard)
+  tatsaechlich verdrahtet sind, nicht nur nominell konfiguriert. Engine: `quality-gate-audit/scripts/gate-checks.sh`,
+  Exit `0` = alle `verdrahtet`/akzeptiert ueberschrieben, Exit `1` = mindestens ein Gate `blind`.
+  **Mindestens ein Gate `blind` → STOPP** mit Verweis auf den Reparatur-Hinweis im Audit-Report
+  (`docs/audits/YYYY-MM-DD-quality-gate-audit.md`). Override nur bewusst:
+  `/quality-gate-audit --override-gate <name> --reason "..."` (transient) oder Report-Frontmatter
+  `override_blind: true` + `reason` (persistent). Im Daemon-Modus (`--auto`) ohne Override → Abbruch.
 
 > Dieser Gate ist die Voraussetzung dafuer, dass der Loop danach ohne Rueckfragen laufen darf.
 > Details: [references/orchestration-checklist.md](references/orchestration-checklist.md).
+> Cross-Link: der Pre-Sprint-Trigger wird im Skill [quality-gate-audit](../quality-gate-audit/SKILL.md) definiert.
 
 ### Schritt 2: Sprint-Token-Budget planen (BOO-38/40)
 

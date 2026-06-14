@@ -64,6 +64,8 @@ Derived from [`integration-discovery.en.md`](./integration-discovery.en.md) (RAC
 | Environment config | → `.claude/environment.json` | bootstrap | yes | always | Customer IT | `.claude/environment.json` | _open_ |
 | Developer onboarding | → `DEVELOPER_ONBOARDING.md` | bootstrap | yes (`bootstrap/references/project-documentation-ssot.md`) | always (autonomy goal) | Domain owner + IT | `DEVELOPER_ONBOARDING.md` | _open_ |
 | Integration discovery answers | `docs/onboarding/integration-discovery.md` | onboarding | yes (questionnaire) | on live integration | Customer IT + Operations | `.claude/environment.json` / Runbook | _open_ |
+| Sprint plan document (sprint SSoT) | `Sprints.md` (project/vault) | bootstrap → ongoing | no (operator-maintained) | as long as no Linear cycles active | Sponsor + Domain owner | `Sprints.md` (single source of truth for sprint assignment) | _open_ |
+| Slopsquatting wordlist | `.claude/hooks/slopsquatting/wordlist.txt` | bootstrap (setup template, BOO-197) | yes (bootstrap setup template) | on AI-generated code / package imports | Security + IT/architect | `.claude/hooks/slopsquatting/` (update: workflow `.github/workflows/slopsquatting-refresh.yml`, cron Mon 06:00 UTC → PR; quarterly review via `/research` skill `slopsquatting-deep-refresh`; manual exceptions in `slopsquatting-override.yaml`; freshness ≤ 90 days via `# last_refreshed:`); checked by the `quality-gate-audit` gate (BOO-183) | _open_ |
 
 ### B — Product & architecture
 
@@ -94,6 +96,7 @@ Derived from [`integration-discovery.en.md`](./integration-discovery.en.md) (RAC
 | Artifact | Path (framework → output) | Phase | Default template | When needed | Sign-off | Rule sink | Status |
 |---|---|---|---|---|---|---|---|
 | Implement report + quality gates | `journal/reports/local/` | implement | yes | always | IT/architect | `CONVENTIONS.md` (gates); end-to-end picture of the linter wiring: HANDBUCH chapter 8d-quart | _open_ |
+| Audit reports (quality-gate audit) | `docs/audits/YYYY-MM-DD-quality-gate-audit.md` | quality-gate-audit (skill, BOO-183) | yes (skill `quality-gate-audit`) | on audit run (trigger type in frontmatter `triggered_by`) | Audit + IT/architect | checked into Git (exempt from docs-drift watch) | _open_ |
 | Integration / deploy model | `docs/runbooks/` — Examples: [`vercel-cicd-setup.md`](../runbooks/vercel-cicd-setup.md), [`sonarcloud-setup.md`](../runbooks/sonarcloud-setup.md), [`sprint-unattended-tmux.en.md`](../runbooks/sprint-unattended-tmux.en.md) | cloud-system-engineer | yes | own operation / go-live | Operations + Customer IT | Runbook + `.claude/environment.json` | _open_ |
 | Monitoring / logging setup + alert rules | Grafana | grafana | yes | monitoring wanted / audit duty | Operations | `ARCHITECTURE_DESIGN.md` §5 + Grafana | _open_ |
 | Compliance evidence mechanism | `docs/compliance/compliance-mechanik.md` | docs/compliance | yes | "strict" / regulated industry | Audit + Sponsor | `CONVENTIONS.md` (gates, four-eyes) | _open_ |

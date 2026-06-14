@@ -64,6 +64,8 @@ Abgeleitet aus [`integration-discovery.md`](./integration-discovery.md) (RACI, A
 | Environment-Config | → `.claude/environment.json` | bootstrap | ja | immer | Kunden-IT | `.claude/environment.json` | _offen_ |
 | Developer-Onboarding | → `DEVELOPER_ONBOARDING.md` | bootstrap | ja (`bootstrap/references/project-documentation-ssot.md`) | immer (Autonomie-Ziel) | Domain-Owner + IT | `DEVELOPER_ONBOARDING.md` | _offen_ |
 | Integrations-Discovery-Antworten | `docs/onboarding/integration-discovery.md` | onboarding | ja (Fragebogen) | bei Live-Integration | Kunden-IT + Betrieb | `.claude/environment.json` / Runbook | _offen_ |
+| Sprint-Plan-Dokument (Sprint-SSoT) | `Sprints.md` (Projekt/Vault) | bootstrap → laufend | nein (Operator-gepflegt) | solange keine Linear-Cycles aktiv | Sponsor + Domain-Owner | `Sprints.md` (Single Source of Truth fuer Sprint-Zuordnung) | _offen_ |
+| Slopsquatting-Wordlist | `.claude/hooks/slopsquatting/wordlist.txt` | bootstrap (Setup-Template, BOO-197) | ja (Bootstrap-Setup-Template) | bei KI-generiertem Code / Paket-Imports | Security + IT/Architekt | `.claude/hooks/slopsquatting/` (Update: Workflow `.github/workflows/slopsquatting-refresh.yml`, Cron Mo 06:00 UTC → PR; Quartals-Review via `/research`-Skill `slopsquatting-deep-refresh`; manuelle Ausnahmen in `slopsquatting-override.yaml`; Frische ≤ 90 Tage via `# last_refreshed:`); geprueft vom Gate `quality-gate-audit` (BOO-183) | _offen_ |
 
 ### B — Produkt & Architektur
 
@@ -94,6 +96,7 @@ Abgeleitet aus [`integration-discovery.md`](./integration-discovery.md) (RACI, A
 | Artefakt | Pfad (Framework → Output) | Phase | Default-Template | Wann noetig | Abnehmer | Regel-Senke | Status |
 |---|---|---|---|---|---|---|---|
 | Implement-Report + Quality Gates | `journal/reports/local/` | implement | ja | immer | IT/Architekt | `CONVENTIONS.md` (Gates); End-to-End-Bild der Linter-Verdrahtung: HANDBUCH-Kapitel 8d-quart | _offen_ |
+| Audit-Reports (Quality-Gate-Audit) | `docs/audits/YYYY-MM-DD-quality-gate-audit.md` | quality-gate-audit (Skill, BOO-183) | ja (Skill `quality-gate-audit`) | bei Audit-Lauf (Trigger-Typ im Frontmatter `triggered_by`) | Audit + IT/Architekt | in Git eingecheckt (von Doku-Drift-Watch ausgenommen) | _offen_ |
 | Integrations-/Deploy-Modell | `docs/runbooks/` — Beispiele: [`vercel-cicd-setup.md`](../runbooks/vercel-cicd-setup.md), [`sonarcloud-setup.md`](../runbooks/sonarcloud-setup.md), [`sprint-unattended-tmux.md`](../runbooks/sprint-unattended-tmux.md) | cloud-system-engineer | ja | eigener Betrieb / Go-Live | Betrieb + Kunden-IT | Runbook + `.claude/environment.json` | _offen_ |
 | Monitoring-/Logging-Setup + Alert Rules | Grafana | grafana | ja | Monitoring gewuenscht / Audit-Pflicht | Betrieb | `ARCHITECTURE_DESIGN.md` §5 + Grafana | _offen_ |
 | Compliance-Nachweismechanik | `docs/compliance/compliance-mechanik.md` | docs/compliance | ja | „streng" / regulierte Branche | Audit + Sponsor | `CONVENTIONS.md` (Gates, Vier-Augen) | _offen_ |

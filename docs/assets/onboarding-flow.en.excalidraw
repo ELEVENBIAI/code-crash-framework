@@ -119,12 +119,7 @@
       "versionNonce": 1077,
       "isDeleted": false,
       "groupIds": [],
-      "boundElements": [
-        {
-          "id": "c1t",
-          "type": "text"
-        }
-      ],
+      "boundElements": null,
       "link": null,
       "locked": false,
       "roundness": {
@@ -135,15 +130,15 @@
       "type": "text",
       "id": "c1t",
       "x": 88,
-      "y": 188.0,
+      "y": 173.5,
       "width": 284,
-      "height": 20,
+      "height": 49,
       "text": "bootstrap-prep\nWhat to build? (basics)\nBusiness / management / IT",
       "originalText": "bootstrap-prep\nWhat to build? (basics)\nBusiness / management / IT",
       "fontSize": 13,
       "fontFamily": 2,
       "textAlign": "center",
-      "verticalAlign": "middle",
+      "verticalAlign": "top",
       "strokeColor": "#1d1d1b",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
@@ -160,8 +155,9 @@
       "boundElements": null,
       "link": null,
       "locked": false,
-      "containerId": "c1r",
-      "lineHeight": 1.25
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 15
     },
     {
       "type": "rectangle",
@@ -183,12 +179,7 @@
       "versionNonce": 1105,
       "isDeleted": false,
       "groupIds": [],
-      "boundElements": [
-        {
-          "id": "c2t",
-          "type": "text"
-        }
-      ],
+      "boundElements": null,
       "link": null,
       "locked": false,
       "roundness": {
@@ -199,15 +190,15 @@
       "type": "text",
       "id": "c2t",
       "x": 438,
-      "y": 188.0,
+      "y": 173.5,
       "width": 284,
-      "height": 20,
+      "height": 49,
       "text": "integration-discovery\nHow to integrate? (CI/CD)\nCustomer IT",
       "originalText": "integration-discovery\nHow to integrate? (CI/CD)\nCustomer IT",
       "fontSize": 13,
       "fontFamily": 2,
       "textAlign": "center",
-      "verticalAlign": "middle",
+      "verticalAlign": "top",
       "strokeColor": "#1d1d1b",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
@@ -224,8 +215,9 @@
       "boundElements": null,
       "link": null,
       "locked": false,
-      "containerId": "c2r",
-      "lineHeight": 1.25
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 15
     },
     {
       "type": "rectangle",
@@ -247,12 +239,7 @@
       "versionNonce": 1133,
       "isDeleted": false,
       "groupIds": [],
-      "boundElements": [
-        {
-          "id": "c3t",
-          "type": "text"
-        }
-      ],
+      "boundElements": null,
       "link": null,
       "locked": false,
       "roundness": {
@@ -263,15 +250,15 @@
       "type": "text",
       "id": "c3t",
       "x": 788,
-      "y": 188.0,
+      "y": 173.5,
       "width": 284,
-      "height": 20,
+      "height": 49,
       "text": "Artifact map\nWhich artifacts · who · which rules\nOperator + sign-off roles",
       "originalText": "Artifact map\nWhich artifacts · who · which rules\nOperator + sign-off roles",
       "fontSize": 13,
       "fontFamily": 2,
       "textAlign": "center",
-      "verticalAlign": "middle",
+      "verticalAlign": "top",
       "strokeColor": "#8a4e10",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
@@ -288,8 +275,9 @@
       "boundElements": null,
       "link": null,
       "locked": false,
-      "containerId": "c3r",
-      "lineHeight": 1.25
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 15
     },
     {
       "type": "arrow",
@@ -469,12 +457,7 @@
       "versionNonce": 1245,
       "isDeleted": false,
       "groupIds": [],
-      "boundElements": [
-        {
-          "id": "p1t",
-          "type": "text"
-        }
-      ],
+      "boundElements": null,
       "link": null,
       "locked": false,
       "roundness": {
@@ -485,15 +468,15 @@
       "type": "text",
       "id": "p1t",
       "x": 88,
-      "y": 355.5,
+      "y": 349.5,
       "width": 224,
-      "height": 20,
+      "height": 32,
       "text": "Architecture design doc\n→ Customer IT / architect",
       "originalText": "Architecture design doc\n→ Customer IT / architect",
       "fontSize": 13,
       "fontFamily": 2,
       "textAlign": "center",
-      "verticalAlign": "middle",
+      "verticalAlign": "top",
       "strokeColor": "#1d1d1b",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
@@ -510,8 +493,9 @@
       "boundElements": null,
       "link": null,
       "locked": false,
-      "containerId": "p1r",
-      "lineHeight": 1.25
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 15
     },
     {
       "type": "rectangle",
@@ -533,12 +517,7 @@
       "versionNonce": 1273,
       "isDeleted": false,
       "groupIds": [],
-      "boundElements": [
-        {
-          "id": "p2t",
-          "type": "text"
-        }
-      ],
+      "boundElements": null,
       "link": null,
       "locked": false,
       "roundness": {
@@ -549,15 +528,15 @@
       "type": "text",
       "id": "p2t",
       "x": 343,
-      "y": 355.5,
+      "y": 349.5,
       "width": 224,
-      "height": 20,
+      "height": 32,
       "text": "Specs / user stories\n→ Domain owner",
       "originalText": "Specs / user stories\n→ Domain owner",
       "fontSize": 13,
       "fontFamily": 2,
       "textAlign": "center",
-      "verticalAlign": "middle",
+      "verticalAlign": "top",
       "strokeColor": "#1d1d1b",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
@@ -574,8 +553,9 @@
       "boundElements": null,
       "link": null,
       "locked": false,
-      "containerId": "p2r",
-      "lineHeight": 1.25
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 15
     },
     {
       "type": "rectangle",
@@ -597,12 +577,7 @@
       "versionNonce": 1301,
       "isDeleted": false,
       "groupIds": [],
-      "boundElements": [
-        {
-          "id": "p3t",
-          "type": "text"
-        }
-      ],
+      "boundElements": null,
       "link": null,
       "locked": false,
       "roundness": {
@@ -613,15 +588,15 @@
       "type": "text",
       "id": "p3t",
       "x": 598,
-      "y": 355.5,
+      "y": 349.5,
       "width": 224,
-      "height": 20,
+      "height": 32,
       "text": "Data-protection package\n→ Data protection / DPO",
       "originalText": "Data-protection package\n→ Data protection / DPO",
       "fontSize": 13,
       "fontFamily": 2,
       "textAlign": "center",
-      "verticalAlign": "middle",
+      "verticalAlign": "top",
       "strokeColor": "#1d1d1b",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
@@ -638,8 +613,9 @@
       "boundElements": null,
       "link": null,
       "locked": false,
-      "containerId": "p3r",
-      "lineHeight": 1.25
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 15
     },
     {
       "type": "rectangle",
@@ -661,12 +637,7 @@
       "versionNonce": 1329,
       "isDeleted": false,
       "groupIds": [],
-      "boundElements": [
-        {
-          "id": "p4t",
-          "type": "text"
-        }
-      ],
+      "boundElements": null,
       "link": null,
       "locked": false,
       "roundness": {
@@ -677,15 +648,15 @@
       "type": "text",
       "id": "p4t",
       "x": 853,
-      "y": 355.5,
+      "y": 349.5,
       "width": 224,
-      "height": 20,
+      "height": 32,
       "text": "Design/CI specifications\n→ Design / Brand",
       "originalText": "Design/CI specifications\n→ Design / Brand",
       "fontSize": 13,
       "fontFamily": 2,
       "textAlign": "center",
-      "verticalAlign": "middle",
+      "verticalAlign": "top",
       "strokeColor": "#1d1d1b",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
@@ -702,8 +673,9 @@
       "boundElements": null,
       "link": null,
       "locked": false,
-      "containerId": "p4r",
-      "lineHeight": 1.25
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 15
     },
     {
       "type": "arrow",
@@ -799,12 +771,7 @@
       "versionNonce": 1399,
       "isDeleted": false,
       "groupIds": [],
-      "boundElements": [
-        {
-          "id": "s0t",
-          "type": "text"
-        }
-      ],
+      "boundElements": null,
       "link": null,
       "locked": false,
       "roundness": {
@@ -815,15 +782,15 @@
       "type": "text",
       "id": "s0t",
       "x": 88,
-      "y": 519.0,
+      "y": 522.0,
       "width": 114,
-      "height": 20,
+      "height": 14,
       "text": "CLAUDE.md",
       "originalText": "CLAUDE.md",
       "fontSize": 11,
       "fontFamily": 2,
       "textAlign": "center",
-      "verticalAlign": "middle",
+      "verticalAlign": "top",
       "strokeColor": "#ffffff",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
@@ -840,8 +807,9 @@
       "boundElements": null,
       "link": null,
       "locked": false,
-      "containerId": "s0r",
-      "lineHeight": 1.25
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 13
     },
     {
       "type": "rectangle",
@@ -863,12 +831,7 @@
       "versionNonce": 1427,
       "isDeleted": false,
       "groupIds": [],
-      "boundElements": [
-        {
-          "id": "s1t",
-          "type": "text"
-        }
-      ],
+      "boundElements": null,
       "link": null,
       "locked": false,
       "roundness": {
@@ -879,15 +842,15 @@
       "type": "text",
       "id": "s1t",
       "x": 233,
-      "y": 519.0,
+      "y": 522.0,
       "width": 114,
-      "height": 20,
+      "height": 14,
       "text": "CONVENTIONS.md",
       "originalText": "CONVENTIONS.md",
       "fontSize": 11,
       "fontFamily": 2,
       "textAlign": "center",
-      "verticalAlign": "middle",
+      "verticalAlign": "top",
       "strokeColor": "#ffffff",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
@@ -904,8 +867,9 @@
       "boundElements": null,
       "link": null,
       "locked": false,
-      "containerId": "s1r",
-      "lineHeight": 1.25
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 13
     },
     {
       "type": "rectangle",
@@ -927,12 +891,7 @@
       "versionNonce": 1455,
       "isDeleted": false,
       "groupIds": [],
-      "boundElements": [
-        {
-          "id": "s2t",
-          "type": "text"
-        }
-      ],
+      "boundElements": null,
       "link": null,
       "locked": false,
       "roundness": {
@@ -943,15 +902,15 @@
       "type": "text",
       "id": "s2t",
       "x": 378,
-      "y": 519.0,
+      "y": 522.0,
       "width": 114,
-      "height": 20,
+      "height": 14,
       "text": "ARCH_DESIGN §5",
       "originalText": "ARCH_DESIGN §5",
       "fontSize": 11,
       "fontFamily": 2,
       "textAlign": "center",
-      "verticalAlign": "middle",
+      "verticalAlign": "top",
       "strokeColor": "#ffffff",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
@@ -968,8 +927,9 @@
       "boundElements": null,
       "link": null,
       "locked": false,
-      "containerId": "s2r",
-      "lineHeight": 1.25
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 13
     },
     {
       "type": "rectangle",
@@ -991,12 +951,7 @@
       "versionNonce": 1483,
       "isDeleted": false,
       "groupIds": [],
-      "boundElements": [
-        {
-          "id": "s3t",
-          "type": "text"
-        }
-      ],
+      "boundElements": null,
       "link": null,
       "locked": false,
       "roundness": {
@@ -1007,15 +962,15 @@
       "type": "text",
       "id": "s3t",
       "x": 523,
-      "y": 519.0,
+      "y": 522.0,
       "width": 114,
-      "height": 20,
+      "height": 14,
       "text": "SECURITY.md",
       "originalText": "SECURITY.md",
       "fontSize": 11,
       "fontFamily": 2,
       "textAlign": "center",
-      "verticalAlign": "middle",
+      "verticalAlign": "top",
       "strokeColor": "#ffffff",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
@@ -1032,8 +987,9 @@
       "boundElements": null,
       "link": null,
       "locked": false,
-      "containerId": "s3r",
-      "lineHeight": 1.25
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 13
     },
     {
       "type": "rectangle",
@@ -1055,12 +1011,7 @@
       "versionNonce": 1511,
       "isDeleted": false,
       "groupIds": [],
-      "boundElements": [
-        {
-          "id": "s4t",
-          "type": "text"
-        }
-      ],
+      "boundElements": null,
       "link": null,
       "locked": false,
       "roundness": {
@@ -1071,15 +1022,15 @@
       "type": "text",
       "id": "s4t",
       "x": 668,
-      "y": 519.0,
+      "y": 522.0,
       "width": 114,
-      "height": 20,
+      "height": 14,
       "text": "dpo/controls/",
       "originalText": "dpo/controls/",
       "fontSize": 11,
       "fontFamily": 2,
       "textAlign": "center",
-      "verticalAlign": "middle",
+      "verticalAlign": "top",
       "strokeColor": "#ffffff",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
@@ -1096,8 +1047,9 @@
       "boundElements": null,
       "link": null,
       "locked": false,
-      "containerId": "s4r",
-      "lineHeight": 1.25
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 13
     },
     {
       "type": "rectangle",
@@ -1119,12 +1071,7 @@
       "versionNonce": 1539,
       "isDeleted": false,
       "groupIds": [],
-      "boundElements": [
-        {
-          "id": "s5t",
-          "type": "text"
-        }
-      ],
+      "boundElements": null,
       "link": null,
       "locked": false,
       "roundness": {
@@ -1135,15 +1082,15 @@
       "type": "text",
       "id": "s5t",
       "x": 813,
-      "y": 519.0,
+      "y": 522.0,
       "width": 114,
-      "height": 20,
+      "height": 14,
       "text": "environment.json",
       "originalText": "environment.json",
       "fontSize": 11,
       "fontFamily": 2,
       "textAlign": "center",
-      "verticalAlign": "middle",
+      "verticalAlign": "top",
       "strokeColor": "#ffffff",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
@@ -1160,8 +1107,9 @@
       "boundElements": null,
       "link": null,
       "locked": false,
-      "containerId": "s5r",
-      "lineHeight": 1.25
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 13
     },
     {
       "type": "rectangle",
@@ -1183,12 +1131,7 @@
       "versionNonce": 1567,
       "isDeleted": false,
       "groupIds": [],
-      "boundElements": [
-        {
-          "id": "s6t",
-          "type": "text"
-        }
-      ],
+      "boundElements": null,
       "link": null,
       "locked": false,
       "roundness": {
@@ -1199,15 +1142,15 @@
       "type": "text",
       "id": "s6t",
       "x": 958,
-      "y": 519.0,
+      "y": 522.0,
       "width": 114,
-      "height": 20,
+      "height": 14,
       "text": "DEV_ONBOARDING",
       "originalText": "DEV_ONBOARDING",
       "fontSize": 11,
       "fontFamily": 2,
       "textAlign": "center",
-      "verticalAlign": "middle",
+      "verticalAlign": "top",
       "strokeColor": "#ffffff",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
@@ -1224,8 +1167,9 @@
       "boundElements": null,
       "link": null,
       "locked": false,
-      "containerId": "s6r",
-      "lineHeight": 1.25
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 13
     },
     {
       "type": "arrow",
@@ -1289,12 +1233,7 @@
       "versionNonce": 1616,
       "isDeleted": false,
       "groupIds": [],
-      "boundElements": [
-        {
-          "id": "outt",
-          "type": "text"
-        }
-      ],
+      "boundElements": null,
       "link": null,
       "locked": false,
       "roundness": {
@@ -1305,15 +1244,15 @@
       "type": "text",
       "id": "outt",
       "x": 88,
-      "y": 647.0,
+      "y": 646.5,
       "width": 989,
-      "height": 20,
+      "height": 21,
       "text": "→ Autonomous team (3–4 people) develops compliantly on its own — contributes to IT transformation",
       "originalText": "→ Autonomous team (3–4 people) develops compliantly on its own — contributes to IT transformation",
       "fontSize": 17,
       "fontFamily": 2,
       "textAlign": "center",
-      "verticalAlign": "middle",
+      "verticalAlign": "top",
       "strokeColor": "#1d1d1b",
       "backgroundColor": "transparent",
       "fillStyle": "solid",
@@ -1330,8 +1269,221 @@
       "boundElements": null,
       "link": null,
       "locked": false,
-      "containerId": "outr",
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 20
+    },
+    {
+      "type": "text",
+      "id": "f4hdr",
+      "x": 80,
+      "y": 724,
+      "width": 940,
+      "height": 21,
+      "text": "4 · Further anchored artifacts (quality-gate layer)",
+      "originalText": "4 · Further anchored artifacts (quality-gate layer)",
+      "fontSize": 15,
+      "fontFamily": 2,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "strokeColor": "#d77f11",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "angle": 0,
+      "seed": 1701,
+      "version": 1,
+      "versionNonce": 1702,
+      "isDeleted": false,
+      "groupIds": [],
+      "boundElements": null,
+      "link": null,
+      "locked": false,
+      "containerId": null,
       "lineHeight": 1.25
+    },
+    {
+      "type": "rectangle",
+      "id": "q1r",
+      "x": 80,
+      "y": 756,
+      "width": 300,
+      "height": 100,
+      "strokeColor": "#869ea6",
+      "backgroundColor": "#f9f6f1",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "angle": 0,
+      "seed": 1710,
+      "version": 1,
+      "versionNonce": 1711,
+      "isDeleted": false,
+      "groupIds": [],
+      "boundElements": null,
+      "link": null,
+      "locked": false,
+      "roundness": {
+        "type": 3
+      }
+    },
+    {
+      "type": "text",
+      "id": "q1t",
+      "x": 88,
+      "y": 785.5,
+      "width": 284,
+      "height": 41,
+      "text": "Slopsquatting wordlist\n.claude/hooks/slopsquatting/wordlist.txt\n→ Security + IT/architect",
+      "originalText": "Slopsquatting wordlist\n.claude/hooks/slopsquatting/wordlist.txt\n→ Security + IT/architect",
+      "fontSize": 11,
+      "fontFamily": 2,
+      "textAlign": "center",
+      "verticalAlign": "top",
+      "strokeColor": "#1d1d1b",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "angle": 0,
+      "seed": 1712,
+      "version": 1,
+      "versionNonce": 1713,
+      "isDeleted": false,
+      "groupIds": [],
+      "boundElements": null,
+      "link": null,
+      "locked": false,
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 13
+    },
+    {
+      "type": "rectangle",
+      "id": "q2r",
+      "x": 430,
+      "y": 756,
+      "width": 300,
+      "height": 100,
+      "strokeColor": "#869ea6",
+      "backgroundColor": "#f9f6f1",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "angle": 0,
+      "seed": 1720,
+      "version": 1,
+      "versionNonce": 1721,
+      "isDeleted": false,
+      "groupIds": [],
+      "boundElements": null,
+      "link": null,
+      "locked": false,
+      "roundness": {
+        "type": 3
+      }
+    },
+    {
+      "type": "text",
+      "id": "q2t",
+      "x": 438,
+      "y": 785.5,
+      "width": 284,
+      "height": 41,
+      "text": "Audit reports (quality-gate-audit)\ndocs/audits/YYYY-MM-DD-quality-gate-audit.md\n→ Audit + IT/architect",
+      "originalText": "Audit reports (quality-gate-audit)\ndocs/audits/YYYY-MM-DD-quality-gate-audit.md\n→ Audit + IT/architect",
+      "fontSize": 11,
+      "fontFamily": 2,
+      "textAlign": "center",
+      "verticalAlign": "top",
+      "strokeColor": "#1d1d1b",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "angle": 0,
+      "seed": 1722,
+      "version": 1,
+      "versionNonce": 1723,
+      "isDeleted": false,
+      "groupIds": [],
+      "boundElements": null,
+      "link": null,
+      "locked": false,
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 13
+    },
+    {
+      "type": "rectangle",
+      "id": "q3r",
+      "x": 780,
+      "y": 756,
+      "width": 300,
+      "height": 100,
+      "strokeColor": "#869ea6",
+      "backgroundColor": "#f9f6f1",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "angle": 0,
+      "seed": 1730,
+      "version": 1,
+      "versionNonce": 1731,
+      "isDeleted": false,
+      "groupIds": [],
+      "boundElements": null,
+      "link": null,
+      "locked": false,
+      "roundness": {
+        "type": 3
+      }
+    },
+    {
+      "type": "text",
+      "id": "q3t",
+      "x": 788,
+      "y": 785.5,
+      "width": 284,
+      "height": 41,
+      "text": "Sprint plan document (sprint SSoT)\nSprints.md  (project/vault)\n→ Sponsor + domain owner",
+      "originalText": "Sprint plan document (sprint SSoT)\nSprints.md  (project/vault)\n→ Sponsor + domain owner",
+      "fontSize": 11,
+      "fontFamily": 2,
+      "textAlign": "center",
+      "verticalAlign": "top",
+      "strokeColor": "#1d1d1b",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "opacity": 100,
+      "angle": 0,
+      "seed": 1732,
+      "version": 1,
+      "versionNonce": 1733,
+      "isDeleted": false,
+      "groupIds": [],
+      "boundElements": null,
+      "link": null,
+      "locked": false,
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 13
     }
   ],
   "appState": {

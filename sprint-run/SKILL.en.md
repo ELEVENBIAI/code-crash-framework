@@ -58,9 +58,18 @@ Check and, on violation, STOP with a concrete remediation hint:
   personal-data) are configured and the daemon knows the pause behavior (step 4.4).
 - **Tooling ready?** `git worktree` available, `gh` authenticated (for remote CI wait),
   working tree on `main` clean.
+- **Quality gates wired?** (BOO-183) Call `/quality-gate-audit --trigger pre-sprint` — it checks
+  whether the declared gates (Semgrep wiring, coverage, slopsquatting, Layer-0 bodyguard) are
+  actually wired rather than only nominally configured. Engine: `quality-gate-audit/scripts/gate-checks.sh`,
+  exit `0` = all `wired`/accepted-override, exit `1` = at least one gate `blind`.
+  **At least one gate `blind` → STOP** with a pointer to the remediation hint in the audit report
+  (`docs/audits/YYYY-MM-DD-quality-gate-audit.md`). Override only deliberately:
+  `/quality-gate-audit --override-gate <name> --reason "..."` (transient) or report frontmatter
+  `override_blind: true` + `reason` (persistent). In daemon mode (`--auto`) without override → abort.
 
 > This gate is the prerequisite for the loop afterwards to run without follow-up questions.
 > Details: [references/orchestration-checklist.en.md](references/orchestration-checklist.en.md).
+> Cross-link: the pre-sprint trigger is defined in the [quality-gate-audit](../quality-gate-audit/SKILL.en.md) skill.
 
 ### Step 2: Plan the sprint token budget (BOO-38/40)
 
