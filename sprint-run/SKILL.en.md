@@ -231,7 +231,11 @@ subagents under `/goal` and must **no longer** be wired:
 
 A real autonomous sprint cannot be run within the skill implementation. The **manual operator
 validation protocol** (1-story sprint with `/goal`, incl. gate-failure recovery) lives in
-[references/goal-e2e-protocol.en.md](references/goal-e2e-protocol.en.md).
+[references/goal-e2e-protocol.en.md](references/goal-e2e-protocol.en.md). To play it through:
+[references/goal-e2e-fixture.en.md](references/goal-e2e-fixture.en.md) sets up the throwaway test
+project (trivial story + provoked gate failures), and
+[references/goal-e2e-journal-template.en.md](references/goal-e2e-journal-template.en.md) is the
+fill-in journal for the run (incl. BOO-203 DoD reconciliation).
 
 ## Integration with other skills
 
@@ -273,6 +277,8 @@ sprint-run/
     ├── orchestration-checklist.md            ← Sprint pre-flight + pre-/goal checks (+ .en.md)
     ├── goal-termination-phrases.md           ← Termination phrase library (+ .en.md)
     ├── goal-e2e-protocol.md                  ← Manual 1-story E2E protocol (+ .en.md)
+    ├── goal-e2e-journal-template.md          ← Fill-in E2E journal (BOO-203 DoD reconciliation) (+ .en.md)
+    ├── goal-e2e-fixture.md                   ← Throwaway test-project runsheet (story + gate failures) (+ .en.md)
     ├── gate-block-handling.md                ← /goal pause/resume on sensitive path (+ .en.md)
     ├── gate-assertion.md                     ← Post-story gate assertion (meta.json) (+ .en.md)
     ├── worktree-flow.md                      ← Worktree per story: add → merge → remove (+ .en.md)

@@ -240,7 +240,9 @@ cd /tmp && rm -rf intentron
 - **Runbook (step by step with an example session):** [`docs/runbooks/sprint-run.en.md`](../docs/runbooks/sprint-run.en.md).
 - **Orchestrated skills:** [`/backlog`](../backlog/README.en.md) · [`/goal`](../goal/README.en.md) · [`/implement`](../implement/README.en.md) · [`/quality-gate-audit`](../quality-gate-audit/README.en.md) · [`/sprint-review`](../sprint-review/README.en.md).
 - **Skill definition (workflow in detail):** [`SKILL.md`](SKILL.en.md) · **References:** [`references/`](references/).
-- **Manual E2E validation protocol:** [`references/goal-e2e-protocol.en.md`](references/goal-e2e-protocol.en.md).
+- **Manual E2E validation protocol:** [`references/goal-e2e-protocol.en.md`](references/goal-e2e-protocol.en.md)
+  — with [`references/goal-e2e-fixture.en.md`](references/goal-e2e-fixture.en.md) (throwaway test project) and
+  [`references/goal-e2e-journal-template.en.md`](references/goal-e2e-journal-template.en.md) (fill-in journal).
 
 Chain: `intent → ideation → backlog → sprint-run → /goal ( native subagents )* → sprint-review`.
 
@@ -258,6 +260,8 @@ sprint-run/
     ├── orchestration-checklist.md   (+ .en.md)  ← Sprint pre-flight + pre-/goal checks
     ├── goal-termination-phrases.md  (+ .en.md)  ← Termination phrase library
     ├── goal-e2e-protocol.md         (+ .en.md)  ← Manual 1-story E2E protocol
+    ├── goal-e2e-journal-template.md (+ .en.md)  ← Fill-in E2E journal (BOO-203 DoD reconciliation)
+    ├── goal-e2e-fixture.md          (+ .en.md)  ← Throwaway test-project runsheet (story + gate failures)
     ├── gate-block-handling.md       (+ .en.md)  ← /goal pause/resume on sensitive path
     ├── gate-assertion.md            (+ .en.md)  ← Post-story gate assertion (meta.json)
     ├── worktree-flow.md             (+ .en.md)  ← Worktree per story

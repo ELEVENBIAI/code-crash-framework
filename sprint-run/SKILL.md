@@ -235,6 +235,10 @@ Mit 2.0.0 **entfallen** folgende Mechanismen aus 1.x — sie sind durch native S
 Ein echter autonomer Sprint laesst sich nicht im Rahmen der Skill-Umsetzung fahren. Das
 **manuelle Operator-Validierungs-Protokoll** (1-Story-Sprint mit `/goal`, inkl.
 Gate-Failure-Recovery) liegt in [references/goal-e2e-protocol.md](references/goal-e2e-protocol.md).
+Zum Durchspielen: [references/goal-e2e-fixture.md](references/goal-e2e-fixture.md) setzt das
+wegwerfbare Test-Projekt (triviale Story + provozierte Gate-Failures) auf, und
+[references/goal-e2e-journal-template.md](references/goal-e2e-journal-template.md) ist das
+ausfuellbare Journal fuer den Durchlauf (inkl. DoD-Abgleich BOO-203).
 
 ## Integration mit anderen Skills
 
@@ -276,6 +280,8 @@ sprint-run/
     ├── orchestration-checklist.md            ← Sprint-Pre-Flight + Pre-/goal-Checks (+ .en.md)
     ├── goal-termination-phrases.md           ← Termination-Phrasen-Bibliothek (+ .en.md)
     ├── goal-e2e-protocol.md                  ← Manuelles 1-Story-E2E-Protokoll (+ .en.md)
+    ├── goal-e2e-journal-template.md          ← Ausfuellbares E2E-Journal (DoD-Abgleich BOO-203) (+ .en.md)
+    ├── goal-e2e-fixture.md                   ← Wegwerf-Test-Projekt-Runsheet (Story + Gate-Failures) (+ .en.md)
     ├── gate-block-handling.md                ← /goal-Pause/Resume bei Sensitive-Path (+ .en.md)
     ├── gate-assertion.md                     ← Post-Story-Gate-Assertion (meta.json) (+ .en.md)
     ├── worktree-flow.md                      ← Worktree pro Story: add → merge → remove (+ .en.md)

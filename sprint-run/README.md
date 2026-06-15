@@ -242,7 +242,9 @@ cd /tmp && rm -rf intentron
 - **Runbook (Schritt-fuer-Schritt mit Beispiel-Session):** [`docs/runbooks/sprint-run.md`](../docs/runbooks/sprint-run.md).
 - **Gesteuerte Skills:** [`/backlog`](../backlog/README.md) · [`/goal`](../goal/README.md) · [`/implement`](../implement/README.md) · [`/quality-gate-audit`](../quality-gate-audit/README.md) · [`/sprint-review`](../sprint-review/README.md).
 - **Skill-Definition (Workflow im Detail):** [`SKILL.md`](SKILL.md) · **Referenzen:** [`references/`](references/).
-- **Manuelles E2E-Validierungs-Protokoll:** [`references/goal-e2e-protocol.md`](references/goal-e2e-protocol.md).
+- **Manuelles E2E-Validierungs-Protokoll:** [`references/goal-e2e-protocol.md`](references/goal-e2e-protocol.md)
+  — mit [`references/goal-e2e-fixture.md`](references/goal-e2e-fixture.md) (Wegwerf-Test-Projekt) und
+  [`references/goal-e2e-journal-template.md`](references/goal-e2e-journal-template.md) (ausfuellbares Journal).
 
 Kette: `intent → ideation → backlog → sprint-run → /goal ( native Subagents )* → sprint-review`.
 
@@ -260,6 +262,8 @@ sprint-run/
     ├── orchestration-checklist.md   (+ .en.md)  ← Sprint-Pre-Flight + Pre-/goal-Checks
     ├── goal-termination-phrases.md  (+ .en.md)  ← Termination-Phrasen-Bibliothek
     ├── goal-e2e-protocol.md         (+ .en.md)  ← Manuelles 1-Story-E2E-Protokoll
+    ├── goal-e2e-journal-template.md (+ .en.md)  ← Ausfuellbares E2E-Journal (DoD-Abgleich BOO-203)
+    ├── goal-e2e-fixture.md          (+ .en.md)  ← Wegwerf-Test-Projekt-Runsheet (Story + Gate-Failures)
     ├── gate-block-handling.md       (+ .en.md)  ← /goal-Pause/Resume bei Sensitive-Path
     ├── gate-assertion.md            (+ .en.md)  ← Post-Story-Gate-Assertion (meta.json)
     ├── worktree-flow.md             (+ .en.md)  ← Arbeitsordner pro Story
