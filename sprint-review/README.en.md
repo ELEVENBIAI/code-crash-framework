@@ -4,7 +4,7 @@
 
 > Periodic system health check: active architecture dimensions · reports aggregation + metrics · tech debt inventory · backlog hygiene · process compliance · anti-pattern self-diagnosis · optional DPO audit trigger · learning-loop entry (L1/L2/L3). One run, one report, one action list — and a closed learning loop.
 
-**Version:** 2.6.0 · **Command:** `/sprint-review`
+**Version:** 2.7.0 · **Command:** `/sprint-review`
 
 > 🔗 Sprint automation: **`/sprint-run`** runs a whole sprint and orchestrates the chain `backlog → implement → sprint-review`. See [`sprint-run/`](../sprint-run/README.en.md) · HANDBUCH Appendix AD.
 
@@ -22,7 +22,7 @@ The output is actionable: Top-3 risks, a tech debt score (Low / Medium / High), 
 
 ---
 
-## How It Works (9 Steps)
+## How It Works (Steps 0–9b)
 
 ```
 Step 0: Load environment
@@ -85,6 +85,16 @@ Step 8: Learning-loop entry (MANDATORY when learning loop active)
    · L1: learnings.md (3x what worked / didn't / next experiment)
    · L2: structured sprint journal + quarterly meta-retro on every 4th sprint
    · L3: additionally SQLite insert (journal/learnings.db)
+
+Step 9: Cost snapshot (BOO-189) — append ccusage actuals to sprint-costs.md (soft gate)
+
+Step 9b: Worker-equivalent report (BOO-191, only if Financials active)
+   · reads the active billing rate from worker-equivalent-baseline.md section 1
+   · aggregates Σ effort_ai_hours (context) + Σ effort_human_equiv_hours of the sprint stories (dual column, BOO-193)
+   · AI cost from cost aggregate (step 2b) or ccusage; wall clock from sprint log/git
+   · ROI = Σ(effort_human_equiv_hours) × rate ÷ AI cost (Σ effort_ai_hours context only)
+   · report file docs/financials/sprint-XX-worker-equivalent.md; native currency, no FX conversion
+   · graceful skip without baseline/dual column; block also visible in step 6 + conclusion
 ```
 
 ---
@@ -122,6 +132,7 @@ Step 8: Learning-loop entry (MANDATORY when learning loop active)
 - **Aggregate Metrics** — into the sprint-file frontmatter (iterations, coverage trend, SonarQube hotspots, cost/tier breakdown)
 - **Anti-Pattern Self-Diagnosis** — Yes/No/Unclear matrix with countermeasures
 - **Privacy Audit** (if active) — `dpo/reports/<date>_audit.md` + `.json` with PASS/GAP/REVIEW-NEEDED list
+- **Worker-Equivalent Report** (if Financials active, BOO-191) — `docs/financials/sprint-XX-worker-equivalent.md` with AI cost, human-equivalent cost, ROI factor and wall clock (native currency)
 - **Learning-Loop Entries** — `journal/learnings.md` (L1), sprint journal (L2), SQLite DB (L3)
 
 ---

@@ -6,7 +6,7 @@ description: |
   a mandatory learning-loop entry (L1/L2/L3). Use for periodic reviews or when
   the operator says "sprint review", "architecture audit", "tech debt", "clean up"
   or "/sprint-review".
-version: 2.6.0
+version: 2.7.0
 language: en
 metadata:
   hermes:
@@ -280,6 +280,7 @@ Present to the operator:
 - **Tech-debt score**: low / medium / high
 - **Recommended issues**: new stories for identified tech debt
 - **Backlog cleanup**: issues to close/adjust
+- **Worker-equivalent** (if Financials active, BOO-191): AI cost, human-equivalent cost, ROI factor and wall clock — the sprint's output ROI in money (details + calculation see step 9b). With Financials inactive or no dual column: omit the line (graceful skip).
 
 ### Step 7: Anti-Pattern Self-Diagnosis (BOO-26)
 
@@ -406,9 +407,61 @@ quantity, complementary to the estimated `token_tracking` cost aggregate from st
   #313/#806/#950) — in heavily sub-agent-driven runs the reported consumption may be incomplete or
   charged to the parent.
 
+### Step 9b: Worker-Equivalent report (BOO-191, only if Financials active)
+
+> **Activation:** this step runs right after step 9 — the actual consumption (ccusage, `sprint-costs.md`) is
+> already available there. It surfaces the **output ROI** of the sprint in money: what it actually cost (AI),
+> what it would have cost the classic way (human equivalent), how fast we were (wall clock). No new data
+> collection — only aggregation of already-present sources.
+
+**Graceful skip (no hard block):** if `docs/financials/worker-equivalent-baseline.md` is missing (Financials not
+active) or the stories completed in the sprint carry no dual column (`effort_ai_hours` /
+`effort_human_equiv_hours`, BOO-193) → skip this step with `[!info] Worker-Equivalent report skipped — Financials
+not active or no dual-column data`. The review stays valid.
+
+**Inputs (all already present, collect nothing new):**
+
+| Input | Source |
+|---|---|
+| Active billing rate + currency | `docs/financials/worker-equivalent-baseline.md` **section 1** (`rate_per_hour`, `currency`, `geo`, `source`) — internal precedence already applies there (BOO-190) |
+| Σ `effort_ai_hours` (context) | Execution-isolation block of the stories completed in the sprint (dual column, BOO-193) |
+| Σ `effort_human_equiv_hours` | Execution-isolation block of the stories completed in the sprint (dual column, BOO-193) |
+| AI cost | Cost aggregate from step 2b (`cost_breakdown.total_cost_usd`); complemented by the ccusage actual snapshot from step 9 (`sprint-costs.md`, BOO-189) |
+| Wall clock | Sprint log / git window (first to last sprint commit) |
+
+**Calculation (exact):**
+
+- **Human-equivalent cost** = Σ `effort_human_equiv_hours` × `rate_per_hour` (native currency from the baseline,
+  **no** FX conversion).
+- **ROI factor** = human-equivalent cost ÷ AI cost.
+  > Σ `effort_ai_hours` is reported **as context only** — **not** part of the ROI formula.
+- **AI cost** comes from the cost aggregate (step 2b) or ccusage; native, no conversion. Note: ccusage does not
+  attribute sub-agent tokens cleanly (issues #313/#806/#950) — flag the AI-cost value in the report as an
+  **approximation**.
+
+**Output block "Worker-Equivalent" (DE+EN) — shown in the review:**
+
+```
+Worker-Equivalent (BOO-191) — Sprint {N}
+  - AI cost:                  {ki_cost} {currency}   (approximation, ccusage sub-agent limit)
+  - Σ effort_ai_hours:        {sum_ai} h  (context, not in ROI)
+  - Σ effort_human_equiv_h:   {sum_human} h
+  - Billing rate:             {rate_per_hour} {currency}/h  ({source})
+  - Human-equivalent cost:    {human_equiv_cost} {currency}
+  - ROI factor:               {roi_factor}×  (human equiv ÷ AI)
+  - Wall clock:               {wall_clock_days} days
+```
+
+**Persist the report file:** `docs/financials/sprint-XX-worker-equivalent.md` (template schema see
+[`docs/financials/sprint-XX-worker-equivalent.md`](../docs/financials/sprint-XX-worker-equivalent.md)). `XX` =
+sprint number. Keep the frontmatter structured so BOO-192 (forecast-vs-actual) can read it back machine-side.
+
+**Visibility:** also surface the worker-equivalent block in **step 6 (report)** and the **conclusion summary**
+(see below). ROI language stays **internal** for now (ADR-D §Open) until ≥3 sprints of data exist.
+
 ### Conclusion
 
-After step 8 (or step 7 if learning loop inactive):
+After step 9b (or step 8 with learning loop, otherwise step 7):
 
 ```
 Sprint review complete.
@@ -418,6 +471,7 @@ Report:
   - Tech debt: {score}
   - Backlog cleanup: {n} recommendations
   - Anti-pattern self-diagnosis: {n} Yes hits — {action}
+  - Worker-equivalent: ROI {roi_factor}× (human equiv {human_equiv_cost} {currency} ÷ AI {ki_cost} {currency}) — or: skipped
   - Learning loop: {level} → {n} entries saved
 
 Commits:

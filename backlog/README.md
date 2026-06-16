@@ -4,7 +4,7 @@
 
 > Laedt das gesamte Backlog, mappt Abhaengigkeiten, respektiert DB-Schema-Ketten und schlaegt konkrete Reihenfolge vor. Schluss mit "welche Story als naechstes?" per Bauchgefuehl.
 
-**Version:** 1.6.0 · **Befehl:** `/backlog`
+**Version:** 1.7.0 · **Befehl:** `/backlog`
 
 > 🔗 Sprint-Automation: **`/sprint-run`** faehrt einen ganzen Sprint und orchestriert die Kette `backlog → implement → sprint-review`. Siehe [`sprint-run/`](../sprint-run/README.md) · HANDBUCH Anhang AD.
 
@@ -108,6 +108,7 @@ Bei der Ausgabe wird der Grund erklaert: "Story X priorisiert vor Y weil on-inte
 - **Abhaengigkeits-Konflikte** — Orphans, Cycles, kaputte Referenzen
 - **Schema-Chain-Report** — wer vor wem, und warum
 - **Hygiene-Vorschlaege** — Issues zum Schliessen, neu priorisieren, splitten
+- **Sprint-Forecast** (wenn Financials aktiv, BOO-192) — erwartete KI-Kosten, Mensch-Equivalent-Wert, Wall-Clock und ROI je geplanter Story + Sprint-Aggregat; persistiert unter `docs/financials/sprint-XX-forecast.md`, plus Forecast-vs-Ist-Drift gegen den Ist-Report (Signal, kein Block). Siehe HANDBUCH Anhang AK.
 
 ---
 

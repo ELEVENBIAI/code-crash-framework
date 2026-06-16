@@ -47,8 +47,10 @@ Ein bestehendes Release nachtraeglich aktualisieren: `gh release edit v0.2.0 --n
 
 ---
 
-## Alle Releases — Index (83 Waves, neueste zuerst)
+## Alle Releases — Index (85 Waves, neueste zuerst)
 
+- **CE** — [Wave CE — Worker-Equivalent: zweite Steuerungs-Dimension neben Token-Verbrauch (BOO-190/191/192/193)](wave-ce-worker-equivalent.md) · [EN](wave-ce-worker-equivalent.en.md)
+- **CD** — [Wave CD — Semgrep Custom-Rule-Wiring + Verifikations-Canary (BOO-185/188)](wave-cd-semgrep-custom-rule-wiring.md) · [EN](wave-cd-semgrep-custom-rule-wiring.en.md)
 - **CC** — [Wave CC — Linter-Verdrahtung end-to-end: zentrales Bild + Sketch (BOO-182)](wave-cc-linter-verdrahtung-e2e.md) · [EN](wave-cc-linter-verdrahtung-e2e.en.md)
 - **CB** — [Wave CB — EN-Nachzug der 43 Alt-Wave-Release-Notes: DE+EN-Parität rückwirkend (BOO-174)](wave-cb-en-parity-altwaves.md) · [EN](wave-cb-en-parity-altwaves.en.md)
 - **CA** — [Wave CA — Observability sichtbar machen: Doku + Logging/Monitoring-Runbook (BOO-179)](wave-ca-observability-sichtbar.md) · [EN](wave-ca-observability-sichtbar.en.md)

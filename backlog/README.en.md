@@ -4,7 +4,7 @@
 
 > Loads the whole backlog, maps dependencies, honors DB schema chains, and proposes a concrete priority order. No more "which story next?" by gut feeling.
 
-**Version:** 1.6.0 · **Command:** `/backlog`
+**Version:** 1.7.0 · **Command:** `/backlog`
 
 > 🔗 Sprint automation: **`/sprint-run`** runs a whole sprint and orchestrates the chain `backlog → implement → sprint-review`. See [`sprint-run/`](../sprint-run/README.en.md) · HANDBUCH Appendix AD.
 
@@ -108,6 +108,7 @@ The output explains the reason: "Story X prioritized over Y because on-intent at
 - **Dependency conflicts** — orphans, cycles, broken references
 - **Schema chain report** — who goes before whom and why
 - **Hygiene suggestions** — issues to close, re-priority, or split
+- **Sprint forecast** (when Financials is active, BOO-192) — expected AI cost, human-equivalent value, wall clock and ROI per planned story + sprint aggregate; persisted under `docs/financials/sprint-XX-forecast.md`, plus forecast-vs-actual drift against the actual report (signal, no block). See HANDBUCH Appendix AK.
 
 ---
 

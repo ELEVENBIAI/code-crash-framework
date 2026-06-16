@@ -6,7 +6,7 @@ description: |
   and proposes a prioritized order.
   Validates the dual column effort_ai_hours / effort_human_equiv_hours on new stories.
   Use when the operator says "what's up", "backlog", "sprint planning", "priorities" or "/backlog".
-version: 1.6.0
+version: 1.7.0
 language: en
 metadata:
   hermes:
@@ -114,6 +114,104 @@ Show the operator:
 - **Dual-column hygiene findings** — new stories missing `effort_ai_hours` / `effort_human_equiv_hours`, explicitly marked **not sprint-ready**, with a remediation hint
 - Issues that may be stale or obsolete
 - Recommendation: "I would implement [STORY-XX] next because..."
+
+### Step 4b: Sprint forecast (BOO-192, only when Financials is active)
+
+> **Activation:** this step runs when proposing the sprint order (right after step 4) and makes the
+> **expected** ROI of the planned sprint visible in money — estimated per planned story, summed across all
+> stories into the **sprint aggregate**. It is the forecast counterpart to the actual report from
+> `/sprint-review` step 9b (BOO-191). No new data collection — only estimation from already-present sources
+> (`token_estimate`, dual column, baseline rate, tier price).
+
+**Graceful skip (no hard block):** if `docs/financials/worker-equivalent-baseline.md` is missing (Financials
+not active) or the planned stories carry no dual column (`effort_ai_hours` / `effort_human_equiv_hours`,
+BOO-193) → skip this step with `[!info] Sprint forecast skipped — Financials not active or no dual-column
+data`. Prioritization stays valid.
+
+**Inputs (all already present, nothing collected anew):**
+
+| Input | Source |
+|---|---|
+| `token_estimate` per story | Execution-isolation block of the spec (`specs/<STORY>.md`) or story frontmatter |
+| `recommended_model` per story | Spec/story (tier: `haiku` / `sonnet` / `opus`); if absent → `sonnet` default |
+| Tier price | `bootstrap/references/model-tiers.json`, `tiers.<tier>.pricing` (USD per million tokens) |
+| `effort_human_equiv_hours` / `effort_ai_hours` | Dual column per story (BOO-193) |
+| Active billing rate + currency | `docs/financials/worker-equivalent-baseline.md` **section 1** (`rate_per_hour`, `currency`, `geo`, `source`) — internal precedence already applies there (BOO-190) |
+
+**Load the tier price (analogous to `sprint-review` step 2b — graceful skip if not found):**
+
+```bash
+TIERS_FILE="$(git rev-parse --show-toplevel)/../intentron/bootstrap/references/model-tiers.json"
+# Fallback: search typical framework paths (operator setup)
+if [ ! -f "$TIERS_FILE" ]; then
+  TIERS_FILE=$(find ~/Documents/GitHub/intentron -name model-tiers.json -maxdepth 4 2>/dev/null | head -1)
+fi
+# If not found: drop the AI-cost estimate (graceful skip); the forecast block continues
+# with human-equivalent + wall-clock.
+```
+
+**Calculation per story (exact — native currency, no FX):**
+
+- **Expected AI cost** = `token_estimate` × tier price from `model-tiers.json`
+  (`tiers.<recommended_model>.pricing`, USD per million tokens). Approximation: without an input/output split,
+  apply the conservative output rate per million tokens (`output_per_million`), or a 70/30 input/output mix if
+  the spec carries a split. The tier price is USD — with a CHF/EUR baseline, do **not** force an FX conversion of
+  the AI cost (USD stays USD; flag it in the output).
+- **Expected human-equivalent value** = `effort_human_equiv_hours` × `rate_per_hour` (native baseline currency).
+- **Expected wall clock** (heuristic) = derived from `effort_ai_hours`: rough rule of thumb
+  `wall_clock_days ≈ ceil(Σ effort_ai_hours / 6)` (one AI working day ≈ 6 productive AI hours incl. setup/review).
+  Heuristic, not a promise — label it as "expected".
+- **ROI factor per story** = expected human-equivalent value ÷ expected AI cost.
+  > `effort_ai_hours` does **not** enter the ROI formula — only as context and into the wall-clock heuristic.
+
+**Sprint aggregate** across all planned stories: Σ expected AI cost, Σ expected human-equivalent value,
+Σ wall clock (or aggregate heuristic), sprint ROI = Σ human-equivalent ÷ Σ AI cost.
+
+**Output block "Sprint forecast" (DE+EN) — shows when proposing the order:**
+
+```
+Sprint forecast (BOO-192) — planned sprint {N}
+  Per story:
+    {STORY} — AI ~{ki_cost} USD · human-equiv ~{human_equiv} {currency} · wall-clock ~{days} d · ROI ~{roi}×
+    ...
+  Sprint aggregate:
+    - Expected AI cost:           ~{Σ ki_cost} USD   (token_estimate × tier price, approximation)
+    - Expected human-equiv:       ~{Σ human_equiv} {currency}
+    - Expected wall clock:        ~{Σ days} days  (heuristic from effort_ai_hours)
+    - Expected sprint ROI:        ~{roi}×  (human-equiv ÷ AI)
+```
+
+**Persist the forecast:** store the forecast under `docs/financials/sprint-XX-forecast.md`
+(template schema see [`docs/financials/sprint-XX-forecast.md`](../docs/financials/sprint-XX-forecast.md)).
+`XX` = sprint number. Keep the frontmatter **field-identical** to the actual report
+(`sprint-XX-worker-equivalent.md`, BOO-191), only `type: worker-equivalent-forecast` and estimated instead of
+actual values — otherwise the forecast-vs-actual comparison won't match.
+
+#### Step 4b-2: Forecast-vs-actual comparison (drift)
+
+> Runs on the next planning pass, once **both** files exist for an earlier sprint:
+> the persisted forecast (`docs/financials/sprint-XX-forecast.md`) and the actual report
+> (`docs/financials/sprint-XX-worker-equivalent.md`, BOO-191). If either is missing → skip with a note.
+
+1. Load both frontmatters and line them up per dimension.
+2. Report **drift** per dimension (actual against forecast, in percent):
+   - `ki_cost` drift = (actual `ki_cost` − forecast `ki_cost`) ÷ forecast `ki_cost`
+   - `human_equiv_cost` drift = (actual − forecast) ÷ forecast
+   - `roi_factor` drift = (actual − forecast) ÷ forecast
+3. **Drift = quality-gate signal, NOT a hard block.** The drift blocks no sprint; it surfaces
+   systematic under/over-estimation (calibration), analogous to the token pre-flight warnings.
+   Hook-up: the cost-drift signal feeds `quality-gate-audit` (cf.
+   [[Decisions/2026-05-06 Cost-Drift als Quality-Gate-Dimension]]) — as a **signal**, not a gate block.
+
+**Output block "Forecast-vs-actual" (DE+EN):**
+
+```
+Forecast-vs-actual (BOO-192) — Sprint {N}   [signal, no block]
+  - AI cost:       forecast ~{f_ki} → actual {a_ki}   (drift {±x}%)
+  - human-equiv:   forecast ~{f_he} → actual {a_he}   (drift {±x}%)
+  - ROI factor:    forecast ~{f_roi}× → actual {a_roi}×  (drift {±x}%)
+  Note: drift is a calibration signal (quality-gate-audit cost-drift), not a sprint block.
+```
 
 ### Step 5: Backlog hygiene (optional)
 

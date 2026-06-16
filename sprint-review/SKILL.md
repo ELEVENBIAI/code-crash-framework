@@ -6,7 +6,7 @@ description: |
   Learning-Loop-Eintrag (L1/L2/L3) als Pflicht-Schritt. Verwenden fuer periodische Reviews
   oder wenn der Operator "Sprint Review", "Architektur Audit", "Tech Debt", "Aufraumen"
   oder "/sprint-review" sagt.
-version: 2.6.0
+version: 2.7.0
 metadata:
   hermes:
     category: governance
@@ -279,6 +279,7 @@ Dem Operator praesentieren:
 - **Tech Debt Score**: Niedrig / Mittel / Hoch
 - **Empfohlene Issues**: Neue Stories fuer identifizierten Tech Debt
 - **Backlog-Bereinigung**: Issues zum Schliessen/Anpassen vorschlagen
+- **Worker-Equivalent** (wenn Financials aktiv, BOO-191): KI-Kosten, Mensch-Equivalent-Kosten, ROI-Faktor und Wall-Clock — der Output-ROI des Sprints in Geld (Details + Rechnung siehe Schritt 9b). Bei inaktiven Financials oder fehlender Doppelspalte: Zeile weglassen (graceful skip).
 
 ### Schritt 7: Anti-Pattern-Selbstdiagnose (BOO-26)
 
@@ -404,9 +405,61 @@ Groesse, komplementaer zum geschaetzten `token_tracking`-Cost-Aggregat aus Schri
   in stark sub-agent-getriebenen Laeufen ist der ausgewiesene Verbrauch evtl. unvollstaendig bzw. dem Parent
   zugeschlagen.
 
+### Schritt 9b: Worker-Equivalent-Report (BOO-191, nur wenn Financials aktiv)
+
+> **Aktivierung:** Dieser Schritt laeuft direkt nach Schritt 9 — dort liegt der Ist-Verbrauch (ccusage,
+> `sprint-costs.md`) bereits vor. Er macht den **Output-ROI** des Sprints in Geld sichtbar:
+> was hat es real gekostet (KI), was haette es klassisch gekostet (Mensch-Equivalent), wie schnell waren wir
+> (Wall-Clock). Keine neue Datenerhebung — nur Aggregation schon vorhandener Quellen.
+
+**Graceful skip (kein harter Block):** Fehlt `docs/financials/worker-equivalent-baseline.md` (Financials nicht
+aktiv) oder tragen die im Sprint abgeschlossenen Stories keine Doppelspalte (`effort_ai_hours` /
+`effort_human_equiv_hours`, BOO-193) → diesen Schritt mit `[!info] Worker-Equivalent-Report uebersprungen —
+Financials nicht aktiv bzw. keine Doppelspalten-Daten` ueberspringen. Das Review bleibt gueltig.
+
+**Eingaben (alle schon vorhanden, nichts neu erheben):**
+
+| Eingabe | Quelle |
+|---|---|
+| Aktiver Verrechnungssatz + Waehrung | `docs/financials/worker-equivalent-baseline.md` **Abschnitt 1** (`rate_per_hour`, `currency`, `geo`, `source`) — Intern-Vorrang gilt dort bereits (BOO-190) |
+| Σ `effort_ai_hours` (Kontext) | Execution-Isolation-Block der im Sprint abgeschlossenen Stories (Doppelspalte, BOO-193) |
+| Σ `effort_human_equiv_hours` | Execution-Isolation-Block der im Sprint abgeschlossenen Stories (Doppelspalte, BOO-193) |
+| KI-Kosten | Cost-Aggregat aus Schritt 2b (`cost_breakdown.total_cost_usd`); ergaenzend der ccusage-Ist-Snapshot aus Schritt 9 (`sprint-costs.md`, BOO-189) |
+| Wall-Clock | Sprint-Log / Git-Zeitraum (erster bis letzter Sprint-Commit) |
+
+**Rechnung (exakt):**
+
+- **Mensch-Equivalent-Kosten** = Σ `effort_human_equiv_hours` × `rate_per_hour` (native Waehrung aus der Baseline,
+  **keine** FX-Umrechnung).
+- **ROI-Faktor** = Mensch-Equivalent-Kosten ÷ KI-Kosten.
+  > Σ `effort_ai_hours` wird **nur als Kontext** ausgewiesen — **nicht** Teil der ROI-Formel.
+- **KI-Kosten** stammen aus dem Cost-Aggregat (Schritt 2b) bzw. ccusage; native ohne Umrechnung. Achtung: ccusage
+  attribuiert Sub-Agent-Token nicht sauber (Issues #313/#806/#950) — den KI-Kosten-Wert im Report als **Naeherung**
+  kennzeichnen.
+
+**Output-Block „Worker-Equivalent" (DE+EN) — zeigt im Review:**
+
+```
+Worker-Equivalent (BOO-191) — Sprint {N}
+  - KI-Kosten:                {ki_cost} {currency}   (Naeherung, ccusage-Sub-Agent-Grenze)
+  - Σ effort_ai_hours:        {sum_ai} h  (Kontext, nicht in ROI)
+  - Σ effort_human_equiv_h:   {sum_human} h
+  - Verrechnungssatz:         {rate_per_hour} {currency}/h  ({source})
+  - Mensch-Equivalent-Kosten: {human_equiv_cost} {currency}
+  - ROI-Faktor:               {roi_factor}×  (Mensch-Equiv ÷ KI)
+  - Wall-Clock:               {wall_clock_days} Tage
+```
+
+**Report-Datei ablegen:** `docs/financials/sprint-XX-worker-equivalent.md` (Template-Schema siehe
+[`docs/financials/sprint-XX-worker-equivalent.md`](../docs/financials/sprint-XX-worker-equivalent.md)). `XX` =
+Sprint-Nummer. Frontmatter strukturiert halten, damit BOO-192 (Forecast-vs-Ist) sie maschinell gegenliest.
+
+**Sichtbarkeit:** Den Worker-Equivalent-Block zusaetzlich in **Schritt 6 (Report)** und in der **Abschluss-Summary**
+ausweisen (siehe unten). ROI-Sprache bleibt vorerst **intern** (ADR-D §Offen), bis ≥3 Sprints Daten vorliegen.
+
 ### Abschluss
 
-Nach Schritt 8 (oder Schritt 7 wenn Learning-Loop inaktiv):
+Nach Schritt 9b (bzw. Schritt 8 wenn Learning-Loop, sonst Schritt 7):
 
 ```
 Sprint-Review abgeschlossen.
@@ -416,6 +469,7 @@ Report:
   - Tech Debt: {Score}
   - Backlog-Bereinigung: {n} Empfehlungen
   - Anti-Pattern-Selbstdiagnose: {n} Ja-Treffer — {Aktion}
+  - Worker-Equivalent: ROI {roi_factor}× (Mensch-Equiv {human_equiv_cost} {currency} ÷ KI {ki_cost} {currency}) — oder: uebersprungen
   - Learning-Loop: {Level} → {n} Eintraege gespeichert
 
 Commits:

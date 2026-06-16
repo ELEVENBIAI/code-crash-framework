@@ -4,7 +4,7 @@
 
 > Periodischer System-Check: aktive Architektur-Dimensionen · Reports-Aggregation + Metriken · Tech-Debt-Inventur · Backlog-Hygiene · Prozess-Compliance · Anti-Pattern-Selbstdiagnose · optionaler DPO-Audit-Trigger · Learning-Loop-Eintrag (L1/L2/L3). Ein Durchlauf, ein Report, eine Action-Liste — und ein geschlossener Learning-Loop.
 
-**Version:** 2.6.0 · **Befehl:** `/sprint-review`
+**Version:** 2.7.0 · **Befehl:** `/sprint-review`
 
 > 🔗 Sprint-Automation: **`/sprint-run`** faehrt einen ganzen Sprint und orchestriert die Kette `backlog → implement → sprint-review`. Siehe [`sprint-run/`](../sprint-run/README.md) · HANDBUCH Anhang AD.
 
@@ -22,7 +22,7 @@ Der Output ist handlungsfaehig: Top-3-Risiken, Tech-Debt-Score (Niedrig / Mittel
 
 ---
 
-## Wie er funktioniert (9 Schritte)
+## Wie er funktioniert (Schritte 0–9b)
 
 ```
 Schritt 0: Environment laden
@@ -85,6 +85,16 @@ Schritt 8: Learning-Loop-Eintrag (PFLICHT wenn Learning-Loop aktiv)
    · L1: learnings.md (3x WAS funktionierte / nicht / naechstes Experiment)
    · L2: strukturiertes Sprint-Journal + Quartals-Meta-Retro bei jedem 4. Sprint
    · L3: zusaetzlich SQLite-Insert (journal/learnings.db)
+
+Schritt 9: Kosten-Snapshot (BOO-189) — ccusage-Ist-Verbrauch an sprint-costs.md anhaengen (Soft-Gate)
+
+Schritt 9b: Worker-Equivalent-Report (BOO-191, nur wenn Financials aktiv)
+   · liest aktiven Verrechnungssatz aus worker-equivalent-baseline.md Abschnitt 1
+   · aggregiert Σ effort_ai_hours (Kontext) + Σ effort_human_equiv_hours der Sprint-Stories (Doppelspalte, BOO-193)
+   · KI-Kosten aus Cost-Aggregat (Schritt 2b) bzw. ccusage; Wall-Clock aus Sprint-Log/Git
+   · ROI = Σ(effort_human_equiv_hours) × Satz ÷ KI-Kosten (Σ effort_ai_hours nur Kontext)
+   · Report-Datei docs/financials/sprint-XX-worker-equivalent.md; native Waehrung, keine FX-Umrechnung
+   · graceful skip ohne Baseline/Doppelspalte; Block auch in Schritt 6 + Abschluss sichtbar
 ```
 
 ---
@@ -122,6 +132,7 @@ Schritt 8: Learning-Loop-Eintrag (PFLICHT wenn Learning-Loop aktiv)
 - **Aggregat-Metriken** — ins Sprint-File-Frontmatter (Iterations, Coverage-Trend, SonarQube-Hotspots, Cost-Breakdown/Tier-Breakdown)
 - **Anti-Pattern-Selbstdiagnose** — Ja/Nein/Unklar-Matrix mit Gegenmittel
 - **Privacy Audit** (wenn aktiv) — `dpo/reports/<date>_audit.md` + `.json` mit PASS/GAP/REVIEW-NEEDED-Liste
+- **Worker-Equivalent-Report** (wenn Financials aktiv, BOO-191) — `docs/financials/sprint-XX-worker-equivalent.md` mit KI-Kosten, Mensch-Equivalent-Kosten, ROI-Faktor und Wall-Clock (native Waehrung)
 - **Learning-Loop-Eintraege** — `journal/learnings.md` (L1), Sprint-Journal (L2), SQLite-DB (L3)
 
 ---
