@@ -176,6 +176,18 @@ Pro Aufruf via CLI-Flag, z.B. `/implement --model opus`. Praezedenz: **CLI-Flag 
 
 Security-relevante Skills (`architecture-review`, `cloud-system-engineer`, `/implement` Schritt 6e) duerfen pro Story-Lauf **nicht** automatisch auf ein schwaecheres Tier downgrade-en. Operator-Override moeglich, aber dokumentiert im Audit-Trail.
 
+## Native-Pfade (ADR-2 / BOO-199)
+
+Claude-Code-Native-Features vor Framework-Eigenbau. Pro Projekt überschreibbar. Die Flags gelten **nur** bei `runtime_target: claude-code` (Schalter A) — bei `codex`/`cross-tool` sind sie inaktiv.
+
+```yaml
+native_paths:
+  prefer_native_subagents: true   # /implement generiert echte .claude/agents/<story>-<agent>.md (eigenes 200k-Window) statt Text-Block-Briefings
+  prefer_goal_termination: true   # /sprint-run nutzt /goal als Termination-Engine
+  prefer_ultraplan: auto          # /architecture-review + /ideation schlagen /ultraplan vor — auto | always | never
+  complement_insights: true       # /sprint-review ruft /insights auf und integriert Meta-Block
+```
+
 ## Prompt-Caching (BOO-84)
 
 Prompt-Caching nutzt Anthropics ephemeral cache markers fuer Komponenten mit hoher Wiederverwendung innerhalb einer Story-Iteration. Geltungsbereich:

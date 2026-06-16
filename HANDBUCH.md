@@ -25,7 +25,7 @@
 10. [Governance für dein Projekt anpassen](#10-governance-für-dein-projekt-anpassen)
 11. [Tägliche Nutzung — ein typischer Workflow](#11-tägliche-nutzung--ein-typischer-workflow)
 12. [Häufige Fragen](#12-häufige-fragen) — inkl. Claude Agent SDK Migration
-13. [Anhänge — Wegweiser](#13-anhänge--wegweiser) — A bis AJ im Überblick
+13. [Anhänge — Wegweiser](#13-anhänge--wegweiser) — A bis AM im Überblick (AL: Schalter A / Native-Pfade · AM: Automemory vs Learning-Loop)
 
 ---
 
@@ -2361,7 +2361,7 @@ Zwei weitere Runbooks decken konkrete Setup-Aufgaben ab:
 
 ---
 
-Das Handbuch hat 36 Anhänge (A–Z + AA bis AJ). Sie sind **Nachschlage- und Vertiefungs-Schicht** — du musst sie nicht von vorn bis hinten lesen. Diese Tabelle sagt dir, **wann welcher Anhang relevant ist**. Anhänge A–M sind die Grundlagen-/Tooling-Schicht, N–AJ die Themen ab v0.2.0 (Wellen J–BI, Sprint 3): Effizienz, Privacy, Deployment, Skalierung, Verifikation, Edit-Bodyguard, Contribute-Back, Ubiquitous Language, VPS/Cloud-Team-Runbook, Kunden-Onboarding, SonarCloud-Setup, Linear-MCP-auf-VPS, Knowledge-Onboarding, Sprint-Konfigurator, Slopsquatting-Wordlist-Pflege, Quality-Gate-Audit, Build-vs-Buy-Doktrin, /goal-Engine, Doku-Konsistenz, Release-Konvention.
+Das Handbuch hat 39 Anhänge (A–Z + AA bis AM). Sie sind **Nachschlage- und Vertiefungs-Schicht** — du musst sie nicht von vorn bis hinten lesen. Diese Tabelle sagt dir, **wann welcher Anhang relevant ist**. Anhänge A–M sind die Grundlagen-/Tooling-Schicht, N–AM die Themen ab v0.2.0 (Wellen J–BI, Sprint 3–5a): Effizienz, Privacy, Deployment, Skalierung, Verifikation, Edit-Bodyguard, Contribute-Back, Ubiquitous Language, VPS/Cloud-Team-Runbook, Kunden-Onboarding, SonarCloud-Setup, Linear-MCP-auf-VPS, Knowledge-Onboarding, Sprint-Konfigurator, Slopsquatting-Wordlist-Pflege, Quality-Gate-Audit, Build-vs-Buy-Doktrin, /goal-Engine, Doku-Konsistenz, Release-Konvention, Financials, Schalter A / Native-Pfade, Automemory vs Learning-Loop.
 
 | Anhang | Thema | Wann relevant |
 |--------|-------|---------------|
@@ -2401,6 +2401,9 @@ Das Handbuch hat 36 Anhänge (A–Z + AA bis AJ). Sie sind **Nachschlage- und Ve
 | **AH** | Cloud-Engine /goal | native Termination-Engine — Sprint- vs. Story-Termination, Evaluator liest nur das Transkript, drei Sicherheits-Voraussetzungen |
 | **AI** | Doku-Konsistenz und Querverlinkung | bei jeder Doku-Aenderung DE+EN/Skill-Dateien/HANDBUCH/CONVENTIONS/Index/Sketches/Vault/Cross-Links/Glossar mitziehen + Drift-Gate gruen; Pflicht-Akzeptanz-Block ab Sprint 3 |
 | **AJ** | Release-Konvention (Sprint-Notes + Major) | pro Sprint eine Release-Note (Sprint 3→v0.11.0, 5→v0.12.0, 6→v0.13.0), nach Sprint 6 Major v1.0; Release-Note = DoD-Pflichtpunkt ab Sprint 3 |
+| **AK** | Financials & Worker-Equivalent | optionales ROI-/Budget-Modul — KI-Kosten gegen Mensch-Equivalent-Kosten, Aktivierung in `/bootstrap` A.9 |
+| **AL** | Schalter A — Claude-Code-first & Native-Pfade | `runtime_target` (Default `claude-code` seit BOO-199) + die vier `native_paths`-Flags; Migration via `migrate_boo_199()`; nur Konfig-Oberfläche (Verhalten migriert Sprint 5b) |
+| **AM** | Zwei Gedächtnisse — Automemory vs Learning-Loop | Abgrenzung Operator-Präferenz (Automemory, lokal) vs Projekt-Lesson (Learning-Loop, im Repo); Entscheidungs-Heuristik, ADR-3 |
 
 ---
 
@@ -5425,6 +5428,74 @@ Die Bootstrap-Frage zeigt das **Primär-Set (extern P50)** als Default; der kons
 - Aktivierung: `bootstrap`-Skill A.9 + Phase 4.4o; optionale Komponente: `bootstrap/references/optional-components.md §D.9`.
 
 ROI-Sprache bleibt vorerst **intern**, bis ≥3 Sprints Daten vorliegen (ADR-D §Offen).
+
+---
+
+## Anhang AL: Schalter A — Claude-Code-first & Native-Pfade (BOO-199, ADR-2)
+
+> Quelle: Bootstrap-Block A.1c (`runtime_target`) + die vier `native_paths`-Flags im `CLAUDE.md`-Template. Bestehende Projekte werden via `migrate_boo_199()` nachgerüstet. Entscheidung dokumentiert in ADR-2.
+
+### `runtime_target` — der eine Schalter
+
+`runtime_target` legt fest, gegen welche KI-Laufzeit das Projekt primär arbeitet. Der Bootstrap-Default (Block A.1c) ist seit BOO-199 `claude-code` — vorher stand er auf `unklar`. Mögliche Werte:
+
+| Wert | Bedeutung |
+|---|---|
+| `claude-code` | Projekt läuft primär unter Claude Code (Default seit BOO-199). |
+| `codex` | Projekt läuft primär unter Codex. |
+| `cross-tool` | Projekt soll tool-neutral bleiben (mehrere Laufzeiten). |
+| `unknown` | Laufzeit (noch) nicht festgelegt. |
+
+Der Schalter ist **reversibel**: ein späterer Wechsel des `runtime_target` ist jederzeit möglich, ohne dass am restlichen Setup etwas zerbricht.
+
+### Die vier Native-Pfade-Flags
+
+Im `CLAUDE.md`-Template steht ein `native_paths`-Block mit vier Flags. Sie steuern, ob die Skills die nativen Claude-Code-Mechanismen (echte Subagents, `/goal`, `/ultraplan`, `/insights`) bevorzugen. **Diese Flags gelten nur bei `runtime_target: claude-code`** — bei `codex` oder `cross-tool` sind sie inaktiv (Schalter-A-Kopplung: ohne Claude-Code-Laufzeit gibt es keine Claude-Code-Native-Pfade).
+
+```yaml
+native_paths:
+  prefer_native_subagents: true   # /implement generiert echte .claude/agents/<story>-<agent>.md (eigenes 200k-Window) statt Text-Block-Briefings
+  prefer_goal_termination: true   # /sprint-run nutzt /goal als Termination-Engine
+  prefer_ultraplan: auto          # /architecture-review + /ideation schlagen /ultraplan vor — auto | always | never
+  complement_insights: true       # /sprint-review ruft /insights auf und integriert Meta-Block
+```
+
+| Flag | Default | Wertebereich |
+|---|---|---|
+| `prefer_native_subagents` | `true` | `true` \| `false` |
+| `prefer_goal_termination` | `true` | `true` \| `false` |
+| `prefer_ultraplan` | `auto` | `auto` \| `always` \| `never` |
+| `complement_insights` | `true` | `true` \| `false` |
+
+### Migration bestehender Projekte
+
+Bestehende Projekte werden über `migrate_boo_199()` nachgerüstet — sie läuft im `intentron migrate`-Lauf. Die Migration ist **additiv und nicht-destruktiv**: fehlende Felder werden ergänzt, aber eine bereits getroffene explizite `codex`- oder `cross-tool`-Wahl wird **nicht** überschrieben.
+
+### Geltungsbereich — nur Konfig-Oberfläche
+
+Wichtig: Diese Flags definieren in Sprint 5a **nur die Konfigurations-Oberfläche**. Das tatsächliche Verhalten von `/implement`, `/architecture-review`, `/ideation` und `/sprint-review` entlang dieser Pfade migriert erst in Sprint 5b (BOO-204/207/211).
+
+---
+
+## Anhang AM: Zwei Gedächtnisse — Automemory vs Learning-Loop (BOO-200, ADR-3)
+
+> Quelle: ADR-3. Zwei getrennte Gedächtnis-Systeme, die oft verwechselt werden — dieser Anhang grenzt sie sauber ab.
+
+Das Framework hat zwei Gedächtnisse, die unterschiedliche Dinge speichern, an unterschiedlichen Orten liegen und unterschiedlich persistiert werden:
+
+| System | Inhalt | Ort | Persistenz |
+|---|---|---|---|
+| Automemory | Operator-Präferenzen: Stil, Tool-Konfig, persönliche Trigger | `~/.claude/projects/<project>/memory/` | Lokal, nicht im Repo |
+| Learning-Loop | Projekt-Wissen: Story-Patterns, Anti-Patterns, Architektur-Lessons | `journal/learnings.md`, `journal/learnings/*.md`, SQLite | Im Repo, versioniert |
+
+### Entscheidungs-Heuristik
+
+Die Faustregel, in welches Gedächtnis ein Eintrag gehört:
+
+- **Operator-Präferenz → Automemory.** Alles, was an die Person des Operators gebunden ist (Schreibstil, bevorzugte Tools, persönliche Trigger), bleibt lokal und reist nicht ins Repo.
+- **Projekt-Lesson → Learning-Loop.** Alles, was das Projekt als solches gelernt hat (wiederkehrende Story-Patterns, Anti-Patterns, Architektur-Lessons), wird im Repo versioniert, damit das ganze Team davon profitiert.
+
+Die ausführliche Begründung der Trennung steht in ADR-3.
 
 ---
 

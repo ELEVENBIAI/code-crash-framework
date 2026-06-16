@@ -102,6 +102,26 @@ for d in specs journal; do
 done
 if [[ -f "DEVELOPER_ONBOARDING.md" ]]; then c_pass "DEVELOPER_ONBOARDING.md vorhanden"; else c_warn "DEVELOPER_ONBOARDING.md fehlt im Repo-Root (kanonischer Name, BOO-134) — bei Obsidian-SSoT liegt das Onboarding im Vault (dann ok); bei repo-docs hier anlegen"; fi
 
+# --- 4b. Claude-Code-first: runtime_target + Native-Pfade (ADR-2 / BOO-199) -
+section "4b. Claude-Code-first (runtime_target + Native-Pfade, ADR-2)"
+if [[ -f "CONVENTIONS.md" ]]; then
+  if grep -qE '^runtime_target:[[:space:]]*(claude-code|codex|cross-tool|unknown)' CONVENTIONS.md; then
+    rt=$(grep -E '^runtime_target:' CONVENTIONS.md | head -1 | sed 's/runtime_target:[[:space:]]*//')
+    c_pass "runtime_target gesetzt: $rt"
+    if [[ "$rt" == "claude-code" ]]; then
+      if [[ -f "CLAUDE.md" ]] && grep -q '^native_paths:' CLAUDE.md; then
+        c_pass "Native-Pfade-Block (native_paths:) in CLAUDE.md vorhanden"
+      else
+        c_warn "runtime_target=claude-code, aber Native-Pfade-Block fehlt in CLAUDE.md — 'intentron migrate' (migrate_boo_199) nachziehen"
+      fi
+    fi
+  else
+    c_warn "runtime_target fehlt/ungueltig in CONVENTIONS.md — erwartet: claude-code|codex|cross-tool|unknown (Default neu: claude-code, ADR-2)"
+  fi
+else
+  c_warn "CONVENTIONS.md fehlt — runtime_target nicht pruefbar"
+fi
+
 # --- 5. Privacy-Add-on (nur falls aktiv) -----------------------------------
 section "5. Privacy-Add-on (nur falls aktiviert)"
 if [[ -f "PRIVACY.md" || -f ".claude/personal-data-paths.json" || -f ".codex/personal-data-paths.json" ]]; then

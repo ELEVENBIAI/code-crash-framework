@@ -1,7 +1,7 @@
 ---
 name: bootstrap
 recommended_model: sonnet  # BOO-84 — tier mapping in bootstrap/references/model-tiers.json
-version: 3.40.0
+version: 3.41.0
 description: Setzt ein neues Projekt mit Governance-Framework auf — interaktiver Block-Interview-Flow in 4 Schritten, Doku-Architektur mit Hub-Auto-Verlinkung, optionaler Learning-Loop L1/L2/L3. Verwenden wenn der Operator ein neues Projekt aufsetzen will oder "/bootstrap" sagt.
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 metadata:
@@ -197,7 +197,7 @@ Welche KI-Runtime soll das Projekt primaer nutzen?
   b) Codex — AGENTS.md ist aktiver Einstieg, CLAUDE.md bleibt Kompatibilitaetsbruecke
   c) Cross-Tool — beide Einstiege aktiv, CONVENTIONS.md ist der harte Adapter-Vertrag
   d) unklar — Cross-Tool-Baseline anlegen, spaeter in CONVENTIONS.md schaerfen
-  Default: unklar
+  Default: claude-code (ADR-2: Claude-Code-first — Native-Pfade aktiv; bei codex/cross-tool inaktiv)
 ```
 
 **Merken:** `RUNTIME_TARGET = claude-code | codex | cross-tool | unknown`

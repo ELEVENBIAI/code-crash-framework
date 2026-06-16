@@ -162,6 +162,18 @@ Per invocation via CLI flag, e.g. `/implement --model opus`. Precedence: **CLI f
 
 Security-relevant skills (`architecture-review`, `cloud-system-engineer`, `/implement` step 6e) MUST NOT automatically downgrade to a weaker tier during a story run. Operator override is possible but logged in the audit trail.
 
+## Native paths (ADR-2 / BOO-199)
+
+Claude-Code-native features before framework-built equivalents. Overridable per project. The flags apply **only** when `runtime_target: claude-code` (switch A) — they are inactive for `codex`/`cross-tool`.
+
+```yaml
+native_paths:
+  prefer_native_subagents: true   # /implement generates real .claude/agents/<story>-<agent>.md (own 200k window) instead of text-block briefings
+  prefer_goal_termination: true   # /sprint-run uses /goal as the termination engine
+  prefer_ultraplan: auto          # /architecture-review + /ideation suggest /ultraplan — auto | always | never
+  complement_insights: true       # /sprint-review calls /insights and integrates a meta block
+```
+
 ## Prompt Caching (BOO-84)
 
 Prompt caching uses Anthropic's ephemeral cache markers for components with high reuse within a story iteration. Scope:

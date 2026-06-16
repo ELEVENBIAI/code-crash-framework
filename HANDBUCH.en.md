@@ -25,7 +25,7 @@
 10. [Tailoring Governance to Your Project](#10-tailoring-governance-to-your-project)
 11. [Daily Usage — A Typical Workflow](#11-daily-usage--a-typical-workflow)
 12. [FAQ](#12-faq) — incl. Claude Agent SDK migration
-13. [Appendices — signpost](#13-appendices--signpost) — A through AJ at a glance
+13. [Appendices — signpost](#13-appendices--signpost) — A through AM at a glance (AL: Switch A / native paths · AM: Automemory vs Learning-Loop)
 
 ---
 
@@ -2231,7 +2231,7 @@ Two further runbooks cover concrete setup tasks:
 
 ---
 
-The handbook has 36 appendices (A–Z + AA through AJ). They are a **reference and deep-dive layer** — you don't need to read them front to back. This table tells you **when which appendix is relevant**. A–M are the foundations/tooling layer, N–AJ the themes from v0.2.0 onward (waves J–BI, Sprint 3): efficiency, privacy, deployment, scaling, verification, edit bodyguard, contribute-back, ubiquitous language, VPS/cloud team runbook, customer onboarding, SonarCloud setup, Linear MCP on VPS, knowledge onboarding, sprint configurator, slopsquatting wordlist maintenance, quality-gate audit, build-vs-buy doctrine, /goal engine, doc consistency, release convention.
+The handbook has 39 appendices (A–Z + AA through AM). They are a **reference and deep-dive layer** — you don't need to read them front to back. This table tells you **when which appendix is relevant**. A–M are the foundations/tooling layer, N–AM the themes from v0.2.0 onward (waves J–BI, Sprint 3–5a): efficiency, privacy, deployment, scaling, verification, edit bodyguard, contribute-back, ubiquitous language, VPS/cloud team runbook, customer onboarding, SonarCloud setup, Linear MCP on VPS, knowledge onboarding, sprint configurator, slopsquatting wordlist maintenance, quality-gate audit, build-vs-buy doctrine, /goal engine, doc consistency, release convention, financials, Switch A / native paths, Automemory vs Learning-Loop.
 
 | Appendix | Topic | When relevant |
 |----------|-------|---------------|
@@ -2271,6 +2271,9 @@ The handbook has 36 appendices (A–Z + AA through AJ). They are a **reference a
 | **AH** | Cloud engine /goal | native termination engine — sprint vs. story termination, the evaluator only reads the transcript, three safety preconditions |
 | **AI** | Doc consistency and cross-linking | on every doc change pull along DE+EN/skill files/HANDBUCH/CONVENTIONS/index/sketches/vault/cross-links/glossary + drift gate green; mandatory acceptance block from Sprint 3 |
 | **AJ** | Release convention (sprint notes + major) | one release note per sprint (Sprint 3→v0.11.0, 5→v0.12.0, 6→v0.13.0), major v1.0 after Sprint 6; release note = mandatory DoD item from Sprint 3 |
+| **AK** | Financials & Worker-Equivalent | optional ROI/budget module — AI cost vs human-equivalent cost, activation in `/bootstrap` A.9 |
+| **AL** | Switch A — Claude-Code-first & native paths | `runtime_target` (default `claude-code` since BOO-199) + the four `native_paths` flags; migration via `migrate_boo_199()`; config surface only (behaviour migrates Sprint 5b) |
+| **AM** | Two memories — Automemory vs Learning-Loop | distinction operator preference (Automemory, local) vs project lesson (Learning-Loop, in repo); decision heuristic, ADR-3 |
 
 ---
 
@@ -5331,6 +5334,74 @@ The bootstrap question shows the **primary set (external P50)** as the default; 
 - Activation: `bootstrap` skill A.9 + Phase 4.4o; optional component: `bootstrap/references/optional-components.md §D.9`.
 
 ROI language stays **internal** for now, until ≥3 sprints of data exist (ADR-D §Open).
+
+---
+
+## Appendix AL: Switch A — Claude-Code-first & native paths (BOO-199, ADR-2)
+
+> Source: bootstrap block A.1c (`runtime_target`) + the four `native_paths` flags in the `CLAUDE.md` template. Existing projects are retrofitted via `migrate_boo_199()`. Decision documented in ADR-2.
+
+### `runtime_target` — the single switch
+
+`runtime_target` defines which AI runtime the project primarily targets. The bootstrap default (block A.1c) has been `claude-code` since BOO-199 — previously it was `unklar`. Possible values:
+
+| Value | Meaning |
+|---|---|
+| `claude-code` | Project runs primarily under Claude Code (default since BOO-199). |
+| `codex` | Project runs primarily under Codex. |
+| `cross-tool` | Project should stay tool-neutral (multiple runtimes). |
+| `unknown` | Runtime not (yet) decided. |
+
+The switch is **reversible**: changing `runtime_target` later is possible at any time without breaking the rest of the setup.
+
+### The four native-path flags
+
+The `CLAUDE.md` template carries a `native_paths` block with four flags. They control whether the skills prefer the native Claude Code mechanisms (real subagents, `/goal`, `/ultraplan`, `/insights`). **These flags apply only when `runtime_target: claude-code`** — under `codex` or `cross-tool` they are inactive (the Switch-A coupling: no Claude Code runtime means no Claude Code native paths).
+
+```yaml
+native_paths:
+  prefer_native_subagents: true   # /implement generates real .claude/agents/<story>-<agent>.md (own 200k window) instead of text-block briefings
+  prefer_goal_termination: true   # /sprint-run uses /goal as the termination engine
+  prefer_ultraplan: auto          # /architecture-review + /ideation suggest /ultraplan — auto | always | never
+  complement_insights: true       # /sprint-review calls /insights and integrates a meta block
+```
+
+| Flag | Default | Value range |
+|---|---|---|
+| `prefer_native_subagents` | `true` | `true` \| `false` |
+| `prefer_goal_termination` | `true` | `true` \| `false` |
+| `prefer_ultraplan` | `auto` | `auto` \| `always` \| `never` |
+| `complement_insights` | `true` | `true` \| `false` |
+
+### Migrating existing projects
+
+Existing projects are retrofitted via `migrate_boo_199()` — it runs inside the `intentron migrate` pass. The migration is **additive and non-destructive**: missing fields are added, but an already-made explicit `codex` or `cross-tool` choice is **not** overwritten.
+
+### Scope — config surface only
+
+Important: in Sprint 5a these flags define **only the configuration surface**. The actual behaviour of `/implement`, `/architecture-review`, `/ideation` and `/sprint-review` along these paths migrates only in Sprint 5b (BOO-204/207/211).
+
+---
+
+## Appendix AM: Two memories — Automemory vs Learning-Loop (BOO-200, ADR-3)
+
+> Source: ADR-3. Two separate memory systems that are often confused — this appendix draws a clean line between them.
+
+The framework has two memories that store different things, live in different places, and are persisted differently:
+
+| System | Content | Location | Persistence |
+|---|---|---|---|
+| Automemory | Operator preferences: style, tool config, personal triggers | `~/.claude/projects/<project>/memory/` | Local, not in the repo |
+| Learning-Loop | Project knowledge: story patterns, anti-patterns, architecture lessons | `journal/learnings.md`, `journal/learnings/*.md`, SQLite | In the repo, versioned |
+
+### Decision heuristic
+
+The rule of thumb for which memory an entry belongs to:
+
+- **Operator preference → Automemory.** Anything bound to the operator as a person (writing style, preferred tools, personal triggers) stays local and does not travel into the repo.
+- **Project lesson → Learning-Loop.** Anything the project itself has learned (recurring story patterns, anti-patterns, architecture lessons) is versioned in the repo so the whole team benefits.
+
+The full rationale for the split is documented in ADR-3.
 
 ---
 

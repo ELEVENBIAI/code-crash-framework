@@ -2931,6 +2931,9 @@ migrate_all() {
     # Wave — Financials-Aktivierung (BOO-190): Budget-Template + Worker-Equivalent-Baseline-Pointer
     migrate_boo_190
 
+    # Wave — Claude-Code-first (BOO-199): runtime_target=claude-code-Default + Native-Pfade-Block (ADR-2)
+    migrate_boo_199
+
     log_info "DE: Migration abgeschlossen. Status pro Projekt in migration-status.md eintragen."
     log_info "EN: Migration finished. Record per-project status in migration-status.md."
 }
@@ -4449,6 +4452,63 @@ migrate_boo_180() {
     log_info "BOO-180: Doku-Definition-of-Done als Konvention (reine Doku, kein Code)"
     log_manual "BOO-180: Doku-DoD neu in issue-writing-guidelines-template + CONVENTIONS.md §3 (Vernetzung, 3 Indizes, DE+EN, Release-Note pro Issue, Touchpoint-Quartett: HANDBUCH/Doku - Release-Note - Spec - Linear). Bestandsprojekt: docs/issue-writing-guidelines.md aus bootstrap/references/issue-writing-guidelines-template.de.md neu ziehen (eigene Anpassungen vorher sichern)."
     return 0
+}
+
+migrate_boo_199() {
+    # BOO-199 — Schalter A (runtime_target=claude-code-Default) + Native-Pfade-Block (ADR-2)
+    # https://linear.app/owlist/issue/BOO-199
+    #
+    # Ruestet BESTEHENDE Projekte additiv auf den Claude-Code-first-Pfad nach (ADR-2 §Offen-Item 2 —
+    # Migration ohne Bootstrap-Neulauf). Zwei idempotente, nicht-destruktive Schritte:
+    #   (1) runtime_target in CONVENTIONS.md auf claude-code setzen — NUR wenn aktuell unknown/fehlend.
+    #       Eine explizite codex/cross-tool-Wahl wird NIE ueberschrieben (Operator-Entscheidung bleibt).
+    #   (2) Native-Pfade-Block (native_paths:) an CLAUDE.md anhaengen, falls noch nicht vorhanden. Der
+    #       Block ist BYTE-IDENTISCH zum Template in bootstrap/references/file-templates.md §Native-Pfade
+    #       und zum HANDBUCH-Beispiel (Triplikat-Konsistenz, BOO-199).
+    # Zweiter Lauf doppelt nichts.
+    log_info "BOO-199: Claude-Code-first nachruesten (runtime_target + Native-Pfade-Block)"
+
+    # --- 1. runtime_target in CONVENTIONS.md (nur wenn unknown/fehlend) ---
+    if [[ ! -f "CONVENTIONS.md" ]]; then
+        log_skip "CONVENTIONS.md fehlt — runtime_target nicht setzbar (erst Bootstrap)"
+    elif grep -qE '^runtime_target:[[:space:]]*(claude-code|codex|cross-tool)' CONVENTIONS.md; then
+        local cur; cur=$(grep -E '^runtime_target:' CONVENTIONS.md | head -1 | sed 's/runtime_target:[[:space:]]*//')
+        log_skip "runtime_target bereits explizit gesetzt ($cur) — Operator-Wahl nicht ueberschrieben"
+    elif [[ "$DRY_RUN" == "true" ]]; then
+        log_dry "set runtime_target: claude-code in CONVENTIONS.md (war unknown/fehlend)"
+    else
+        if grep -qE '^runtime_target:' CONVENTIONS.md; then
+            sed -i.bak 's/^runtime_target:.*/runtime_target: claude-code/' CONVENTIONS.md && rm -f CONVENTIONS.md.bak
+        else
+            printf 'runtime_target: claude-code\n' >> CONVENTIONS.md
+        fi
+        log_info "runtime_target: claude-code in CONVENTIONS.md gesetzt (war unknown/fehlend)"
+    fi
+
+    # --- 2. Native-Pfade-Block an CLAUDE.md (byte-identisch zum file-templates.md-Template) ---
+    if [[ ! -f "CLAUDE.md" ]]; then
+        log_skip "CLAUDE.md fehlt — Native-Pfade-Block nicht einfuegbar"
+    elif grep -q '^native_paths:' CLAUDE.md; then
+        log_skip "Native-Pfade-Block bereits in CLAUDE.md — nicht dupliziert"
+    elif [[ "$DRY_RUN" == "true" ]]; then
+        log_dry "append Native-Pfade-Block (native_paths:) an CLAUDE.md"
+    else
+        cat >> "CLAUDE.md" <<'NATIVE_PATHS_EOF'
+
+## Native-Pfade (ADR-2 / BOO-199)
+
+Claude-Code-Native-Features vor Framework-Eigenbau. Pro Projekt überschreibbar. Die Flags gelten **nur** bei `runtime_target: claude-code` (Schalter A) — bei `codex`/`cross-tool` sind sie inaktiv.
+
+```yaml
+native_paths:
+  prefer_native_subagents: true   # /implement generiert echte .claude/agents/<story>-<agent>.md (eigenes 200k-Window) statt Text-Block-Briefings
+  prefer_goal_termination: true   # /sprint-run nutzt /goal als Termination-Engine
+  prefer_ultraplan: auto          # /architecture-review + /ideation schlagen /ultraplan vor — auto | always | never
+  complement_insights: true       # /sprint-review ruft /insights auf und integriert Meta-Block
+```
+NATIVE_PATHS_EOF
+        log_info "Native-Pfade-Block an CLAUDE.md angehaengt (byte-identisch zum Template)"
+    fi
 }
 
 migrate_boo_190() {
