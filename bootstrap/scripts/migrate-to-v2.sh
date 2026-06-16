@@ -2934,6 +2934,9 @@ migrate_all() {
     # Wave — Claude-Code-first (BOO-199): runtime_target=claude-code-Default + Native-Pfade-Block (ADR-2)
     migrate_boo_199
 
+    # Wave — Memory-Abgrenzung (BOO-200): Automemory-Header in MEMORY.md (ADR-3)
+    migrate_boo_200
+
     log_info "DE: Migration abgeschlossen. Status pro Projekt in migration-status.md eintragen."
     log_info "EN: Migration finished. Record per-project status in migration-status.md."
 }
@@ -4452,6 +4455,47 @@ migrate_boo_180() {
     log_info "BOO-180: Doku-Definition-of-Done als Konvention (reine Doku, kein Code)"
     log_manual "BOO-180: Doku-DoD neu in issue-writing-guidelines-template + CONVENTIONS.md §3 (Vernetzung, 3 Indizes, DE+EN, Release-Note pro Issue, Touchpoint-Quartett: HANDBUCH/Doku - Release-Note - Spec - Linear). Bestandsprojekt: docs/issue-writing-guidelines.md aus bootstrap/references/issue-writing-guidelines-template.de.md neu ziehen (eigene Anpassungen vorher sichern)."
     return 0
+}
+
+migrate_boo_200() {
+    # BOO-200 — Automemory/Learning-Loop-Abgrenzung: MEMORY.md-Header (ADR-3)
+    # https://linear.app/owlist/issue/BOO-200
+    #
+    # Stellt der operator-lokalen Automemory-Index-Datei einen Abgrenzungs-Header voran: Automemory =
+    # Operator-Praeferenzen (lokal); Projekt-Wissen gehoert in den Repo-Learning-Loop
+    # (journal/learnings.md). Verhindert, dass Projekt-Lessons faelschlich im Automemory landen.
+    # Automemory liegt unter ~/.claude/projects/<enc>/memory/MEMORY.md (Claude-Code-Konvention:
+    # Projekt-Pfad mit '/' -> '-'). Idempotent + nicht-destruktiv: bestehende Index-Zeilen bleiben, der
+    # Header wird nur vorangestellt wenn der Marker noch fehlt. Aktion NUR wenn das memory/-Verzeichnis
+    # bereits existiert (kein Orphan an evtl. falschem Pfad).
+    log_info "BOO-200: Automemory-Abgrenzungs-Header in MEMORY.md voranstellen"
+    local enc mem_dir mem
+    enc=$(pwd | sed 's#/#-#g')
+    mem_dir="$HOME/.claude/projects/$enc/memory"
+    mem="$mem_dir/MEMORY.md"
+    if [[ ! -d "$mem_dir" ]]; then
+        log_skip "Automemory-Verzeichnis fehlt ($mem_dir) — Header per /bootstrap (D.4b) anlegen"
+        return 0
+    fi
+    if [[ -f "$mem" ]] && grep -q 'automemory-vs-learning-loop:' "$mem"; then
+        log_skip "MEMORY.md-Header bereits vorhanden — nicht dupliziert"
+        return 0
+    fi
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log_dry "prepend Automemory-Abgrenzungs-Header an $mem"
+        return 0
+    fi
+    local header
+    header='<!-- automemory-vs-learning-loop: ADR-3 / BOO-200 -->
+> **Operator-lokales Automemory** — Stil, Tool-Konfig, persoenliche Trigger. NICHT im Repo.
+> Projekt-Wissen (Story-Patterns, Anti-Patterns, Architektur-Lessons) gehoert in den **Learning-Loop**: `journal/learnings.md`. Abgrenzung: ADR-3.
+'
+    if [[ -f "$mem" ]]; then
+        printf '%s\n%s\n' "$header" "$(cat "$mem")" > "$mem"
+    else
+        printf '%s' "$header" > "$mem"
+    fi
+    log_info "MEMORY.md-Header vorangestellt ($mem)"
 }
 
 migrate_boo_199() {

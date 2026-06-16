@@ -1,7 +1,7 @@
 ---
 name: bootstrap
 recommended_model: sonnet  # BOO-84 — tier mapping in bootstrap/references/model-tiers.json
-version: 3.41.0
+version: 3.42.0
 language: en
 description: Sets up a new project with a governance framework — interactive 4-block interview flow, docs architecture with automatic hub linking, optional learning loop L1/L2/L3. Use when the operator wants to set up a new project or says "/bootstrap".
 tools: [Read, Write, Edit, Bash, Glob, Grep]
@@ -1517,6 +1517,20 @@ If `L1/L2/L3` selected:
 - If Obsidian active: `04 Ressourcen/{PROJECT_NAME}/learnings.md` as a cross-link from the PMO hub
 
 The learning loop is fed by `sprint-review` (mandatory step at the end of the review) and read by `ideation` during story creation (anti-pattern warning).
+
+### D.4b MEMORY.md header — Automemory boundary (BOO-200, ADR-3)
+
+Prepend a boundary header to the operator-local automemory index file so project knowledge does not wrongly end up in automemory (boundary: ADR-3, HANDBUCH Appendix AM). Automemory lives at `~/.claude/projects/<project>/memory/MEMORY.md` (Claude Code convention: project path with `/` → `-`).
+
+Non-destructive: existing index lines stay; the header is only prepended when the marker `automemory-vs-learning-loop:` is still missing. Header content (the `migrate` script writes the German variant; both carry the same marker):
+
+```
+<!-- automemory-vs-learning-loop: ADR-3 / BOO-200 -->
+> **Operator-local automemory** — style, tool config, personal triggers. NOT in the repo.
+> Project knowledge (story patterns, anti-patterns, architecture lessons) belongs in the **Learning-Loop**: `journal/learnings.md`. Boundary: ADR-3.
+```
+
+Existing projects pull the header via `intentron migrate` (`migrate_boo_200`); `verify-setup.sh` §4c checks its presence.
 
 ### D.5 SonarQube Cloud
 

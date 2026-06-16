@@ -122,6 +122,19 @@ else
   c_warn "CONVENTIONS.md fehlt — runtime_target nicht pruefbar"
 fi
 
+# --- 4c. Automemory-Abgrenzungs-Header (ADR-3 / BOO-200) --------------------
+section "4c. Automemory-Header (Abgrenzung zum Learning-Loop, ADR-3)"
+mem_dir="$HOME/.claude/projects/$(pwd | sed 's#/#-#g')/memory"
+if [[ -d "$mem_dir" ]]; then
+  if [[ -f "$mem_dir/MEMORY.md" ]] && grep -q 'automemory-vs-learning-loop:' "$mem_dir/MEMORY.md"; then
+    c_pass "MEMORY.md-Abgrenzungs-Header vorhanden"
+  else
+    c_warn "Automemory aktiv, aber MEMORY.md-Abgrenzungs-Header fehlt — 'intentron migrate' (migrate_boo_200) nachziehen"
+  fi
+else
+  c_pass "Kein lokales Automemory fuer dieses Projekt — Abgrenzungs-Header nicht noetig"
+fi
+
 # --- 5. Privacy-Add-on (nur falls aktiv) -----------------------------------
 section "5. Privacy-Add-on (nur falls aktiviert)"
 if [[ -f "PRIVACY.md" || -f ".claude/personal-data-paths.json" || -f ".codex/personal-data-paths.json" ]]; then

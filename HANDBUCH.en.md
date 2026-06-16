@@ -5403,6 +5403,10 @@ The rule of thumb for which memory an entry belongs to:
 
 The full rationale for the split is documented in ADR-3.
 
+### Bootstrap creates the header (BOO-200)
+
+So nobody accidentally writes project knowledge into operator-local automemory, Bootstrap (block D.4b) prepends a short boundary header to the automemory index file `~/.claude/projects/<project>/memory/MEMORY.md` — non-destructive (marker `automemory-vs-learning-loop:`, existing entries stay). Existing projects pull it via `intentron migrate` (`migrate_boo_200`); `verify-setup.sh` §4c checks its presence.
+
 ---
 
 *This handbook is part of the INTENTRON.*

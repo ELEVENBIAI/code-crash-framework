@@ -5497,6 +5497,10 @@ Die Faustregel, in welches Gedächtnis ein Eintrag gehört:
 
 Die ausführliche Begründung der Trennung steht in ADR-3.
 
+### Bootstrap legt den Header an (BOO-200)
+
+Damit niemand Projekt-Wissen versehentlich ins operator-lokale Automemory schreibt, stellt Bootstrap (Block D.4b) der Automemory-Index-Datei `~/.claude/projects/<projekt>/memory/MEMORY.md` einen kurzen Abgrenzungs-Header voran — nicht-destruktiv (Marker `automemory-vs-learning-loop:`, bestehende Einträge bleiben). Bestehende Projekte ziehen ihn via `intentron migrate` (`migrate_boo_200`) nach; `verify-setup.sh` §4c prüft seine Präsenz.
+
 ---
 
 *Dieses Handbuch ist Teil des INTENTRONs.*
