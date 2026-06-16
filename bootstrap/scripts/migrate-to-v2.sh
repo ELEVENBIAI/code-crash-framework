@@ -2928,6 +2928,9 @@ migrate_all() {
     # Wave — Doku-Definition-of-Done (BOO-180): Doku-DoD als Konvention
     migrate_boo_180
 
+    # Wave — Financials-Aktivierung (BOO-190): Budget-Template + Worker-Equivalent-Baseline-Pointer
+    migrate_boo_190
+
     log_info "DE: Migration abgeschlossen. Status pro Projekt in migration-status.md eintragen."
     log_info "EN: Migration finished. Record per-project status in migration-status.md."
 }
@@ -4448,6 +4451,114 @@ migrate_boo_180() {
     return 0
 }
 
+migrate_boo_190() {
+    # BOO-190 — financials-Skill: Projekt-Budget-Template + Worker-Equivalent-Baseline-Pointer
+    # https://linear.app/owlist/issue/BOO-190
+    #
+    # Generiert die Financials-Templates ins Zielprojekt (Bootstrap-Triplikat-Verteilung):
+    #   (1) docs/financials/budget.md      — schlankes Projekt-Budget (Verrechnungssatz/Geo/Token).
+    #       Heredoc unten ist BYTE-IDENTISCH zur SSoT docs/financials/budget.md im Framework-Repo
+    #       und zum Template-Block in bootstrap/references/file-templates.md §docs/financials/budget.md.
+    #   (2) docs/financials/worker-equivalent-baseline.md — KURZER Pointer-Stub. Die volle ~60-Zeilen-
+    #       Geo-Default-Tabelle ist Framework-Referenz (Skill financials), KEIN pro-Projekt-Heredoc
+    #       (Triplikat-Pflege vermeiden). Der Stub haelt nur den aktiven Satz lokal + verweist auf die
+    #       Skill-Referenz.
+    # Idempotent, nicht-destruktiv: existiert eine Datei bereits, wird sie [SKIP]ped (Operator-Pflege
+    # bleibt erhalten). Zweiter Lauf doppelt nichts.
+    log_info "BOO-190: Financials-Templates anlegen (budget.md + worker-equivalent-baseline.md Pointer-Stub)"
+
+    ensure_dir "docs/financials"
+
+    # --- 1. docs/financials/budget.md (byte-identisch zur SSoT) ---
+    local budget="docs/financials/budget.md"
+    if [[ -f "$budget" ]]; then
+        log_skip "$budget existiert — nicht ueberschrieben (idempotent, Operator-Pflege)"
+    elif [[ "$DRY_RUN" == "true" ]]; then
+        log_dry "write $budget (byte-identisch zur SSoT docs/financials/budget.md)"
+    else
+        cat > "$budget" <<'BUDGET_MD_EOF'
+# Projekt-Budget — Worker-Equivalent & Kosten
+
+> Schlankes Budget-Template für die Financials-/ROI-Sicht eines Projekts (BOO-190). Von `/bootstrap`
+> (Financials-Frage) angelegt, danach vom Operator gepflegt. Verweist auf die zwei Mess-/Referenz-Quellen
+> daneben — selbst hält diese Datei nur die Projekt-Annahmen.
+
+## Projekt-Annahmen
+
+```yaml
+geo: <CH | DE | AT | US>
+currency: <CHF | EUR | USD>
+rate_per_hour: <Zahl>             # = aktiver Satz aus worker-equivalent-baseline.md Abschnitt 1
+token_cost_assumption: <optional> # falls KI-Token-Kosten separat budgetiert werden
+```
+
+## Quellen daneben (nicht hier duplizieren)
+
+| Quelle | Was sie liefert | Datei |
+|--------|------------------|-------|
+| Verrechnungssatz + Geo-Defaults | aktiver Satz (intern/market-research) + Fallback-Baseline | [`worker-equivalent-baseline.md`](worker-equivalent-baseline.md) |
+| Ist-Token-/Kosten-Verbrauch | gemessene ccusage-Snapshots pro Sprint/Story (BOO-189) | [`sprint-costs.md`](sprint-costs.md) |
+| Worker-Equivalent-Report pro Sprint | KI-Kosten / Mensch-Equiv / ROI / Wall-Clock (BOO-191) | `sprint-XX-worker-equivalent.md` |
+
+## So rechnet die ROI-Sicht (Kurzform)
+
+- **KI-Kosten** = gemessener Token-/Kosten-Verbrauch (`sprint-costs.md`).
+- **Mensch-Equivalent-Kosten** = Σ `effort_human_equiv_hours` der Sprint-Stories × `rate_per_hour`.
+- **ROI-Faktor** = Mensch-Equivalent-Kosten ÷ KI-Kosten.
+- **Wall-Clock** = reale Sprint-Dauer aus dem Sprint-Log.
+
+> Die Doppelspalte `effort_ai_hours` / `effort_human_equiv_hours` pro Story (BOO-193) ist die
+> Datenquelle. ROI-Sprache bleibt vorerst intern, bis ≥3 Sprints Daten vorliegen (ADR-D §Offen).
+BUDGET_MD_EOF
+        log_info "created $budget (byte-identisch zur SSoT)"
+    fi
+
+    # --- 2. docs/financials/worker-equivalent-baseline.md (kurzer Pointer-Stub, kein Voll-Duplikat) ---
+    local baseline="docs/financials/worker-equivalent-baseline.md"
+    if [[ -f "$baseline" ]]; then
+        log_skip "$baseline existiert — nicht ueberschrieben (idempotent)"
+    elif [[ "$DRY_RUN" == "true" ]]; then
+        log_dry "write $baseline (Pointer-Stub auf financials-Skill-Referenz, kein Voll-Duplikat)"
+    else
+        cat > "$baseline" <<'BASELINE_STUB_EOF'
+# Worker-Equivalent-Baseline — aktiver Satz (Pointer-Stub)
+
+> Pointer-Stub (BOO-190). Diese Datei haelt **nur den aktiven Projekt-Verrechnungssatz** (Abschnitt 1).
+> Die vollstaendigen **Market-Research-Geo-Defaults** (CH/DE/AT/US, primaer + konservativ, mit Quelle,
+> Confidence und Erhebungsjahr) sind **Framework-Referenz** und werden vom Skill `financials`
+> dokumentiert — sie werden hier bewusst **nicht dupliziert** (Triplikat-Pflege vermeiden).
+>
+> **Regel native Waehrung:** Satz bleibt nativ pro Geo (CH CHF, DE/AT EUR, US USD). **Keine**
+> FX-Cross-Umrechnung. Bei Kurs-Drift >5 % nur Nutzerhinweis, kein automatisches Umrechnen.
+
+## 1. Aktiver Verrechnungssatz (dieses Projekt)
+
+> Von `/bootstrap` (Financials-Frage) gesetzt. Eigener Satz → `source: intern`. Frage uebersprungen →
+> Market-Research-Default (`source: market-research-2026`). **Intern-Vorrang:** ein eingegebener
+> interner Satz schlaegt den Default immer (ADR-D, entschieden).
+
+```yaml
+geo: <CH | DE | AT | US>          # bestimmt die Waehrung
+currency: <CHF | EUR | USD>
+rate_per_hour: <Zahl>             # Verrechnungssatz pro Stunde, native Waehrung
+source: <intern | market-research-2026>
+erhebungsjahr: <Jahr>             # bei intern: Jahr des internen Satzes; bei market-research: 2025
+basis: <freelance-p50 | intern-vollkosten | eigen>
+```
+
+## 2. Market-Research-Geo-Defaults
+
+Vollstaendige Geo-Default-Tabelle (CH/DE/AT/US, primaer extern P50 + konservativ intern, je mit
+Quelle/Confidence/Erhebungsjahr), Methodik, Quellen-Hierarchie und Update-Trigger: siehe Skill-Referenz
+`financials` (Framework-Doku). Diese Projekt-Datei haelt nur den aktiven Satz oben.
+BASELINE_STUB_EOF
+        log_info "created $baseline (Pointer-Stub auf financials-Skill-Referenz)"
+    fi
+
+    log_manual "BOO-190: Financials ist ein Opt-in — Bootstrap fragt beim Setup, ob aktivieren. Aktiven Verrechnungssatz in docs/financials/worker-equivalent-baseline.md Abschnitt 1 setzen (oder Market-Research-Default uebernehmen). Geo-Default-Tabelle + Methodik: Skill financials. Intern-Vorrang bei Konflikt."
+    return 0
+}
+
 # -----------------------------------------------------------------------------
 # CLI / Argument Parsing
 # -----------------------------------------------------------------------------
@@ -4479,6 +4590,7 @@ ALL_ISSUES=(
     BOO-176
     BOO-177
     BOO-180
+    BOO-190
 )
 
 print_help() {

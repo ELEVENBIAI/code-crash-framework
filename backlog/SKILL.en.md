@@ -4,8 +4,9 @@ recommended_model: sonnet  # BOO-84 — tier mapping in bootstrap/references/mod
 description: |
   Sprint planning and backlog overview. Loads all issues, analyzes dependencies
   and proposes a prioritized order.
+  Validates the dual column effort_ai_hours / effort_human_equiv_hours on new stories.
   Use when the operator says "what's up", "backlog", "sprint planning", "priorities" or "/backlog".
-version: 1.5.0
+version: 1.6.0
 language: en
 metadata:
   hermes:
@@ -81,6 +82,16 @@ Before analyzing issues, understand system state — otherwise blockers that hav
 4. Conflict flag: two stories with the same `targetSchemaVersion` → report immediately as a **critical blocker** (one must be rewritten)
 5. Mention explicitly in the priority recommendation: "schema chain: STORY-A (v17→v18) must go before STORY-B (v18→v19)"
 
+**Dual-column check (mandatory — runs on every backlog pass):**
+
+Every **new** story (status `Todo` or `Backlog`, created from the roll-out of this change onward) must carry the two effort fields `effort_ai_hours` (the real estimated AI effort incl. setup, iteration, review) and `effort_human_equiv_hours` (the classic senior-dev effort for the same story without the framework). The check is **deterministic** (field present + numeric), not a prompt promise.
+
+1. For each new story, read both fields from the story frontmatter/body.
+2. **Pass criterion:** both fields present AND numeric AND `> 0`.
+3. If one is missing or non-numeric / `<= 0` → **FLAG the story as a hygiene finding** and do **NOT** treat it as sprint-ready in steps 3/4.
+4. Emit a concrete **remediation hint:** "Story X is missing `effort_ai_hours` and/or `effort_human_equiv_hours` (numeric, >0) — add it in the story template (see HANDBUCH Appendix G, dual-column section). Not sprint-ready until added."
+5. **Exception (no backfill):** the pre-rollout stories **BOO-183 through BOO-188** are **NOT** flagged — the dual column does not apply to them retroactively.
+
 ### Step 3: Propose order
 
 Sort criteria (in this priority):
@@ -93,11 +104,14 @@ Sort criteria (in this priority):
 
 **Intent-label source:** the label is extracted from the `## Intent-Check` section in the story body (set by `/ideation` step 0.6). If the label is missing, the story is treated as `neutral`. In the output, explain: "Story X prioritized over Y because on-intent at equal points."
 
+**Sprint-ready gate (dual column):** stories flagged by the dual-column check (step 2) count as **not sprint-ready** and are NOT recommended as the next story to implement — even if they would rank first by priority/age. They appear with a hygiene flag until the fields are added.
+
 ### Step 4: Present
 
 Show the operator:
 - Prioritized list with rationale
 - Dependency conflicts or gaps
+- **Dual-column hygiene findings** — new stories missing `effort_ai_hours` / `effort_human_equiv_hours`, explicitly marked **not sprint-ready**, with a remediation hint
 - Issues that may be stale or obsolete
 - Recommendation: "I would implement [STORY-XX] next because..."
 

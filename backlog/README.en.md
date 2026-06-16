@@ -4,7 +4,7 @@
 
 > Loads the whole backlog, maps dependencies, honors DB schema chains, and proposes a concrete priority order. No more "which story next?" by gut feeling.
 
-**Version:** 1.5.0 · **Command:** `/backlog`
+**Version:** 1.6.0 · **Command:** `/backlog`
 
 > 🔗 Sprint automation: **`/sprint-run`** runs a whole sprint and orchestrates the chain `backlog → implement → sprint-review`. See [`sprint-run/`](../sprint-run/README.en.md) · HANDBUCH Appendix AD.
 

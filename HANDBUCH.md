@@ -2769,6 +2769,19 @@ estimation_basis: |
 
 Nach 5–10 Sprints enthaelt die L3-Learnings-DB tatsaechlichen Token-Verbrauch pro Story. `/ideation` liest das und kalibriert die Heuristik: aehnliche vergangene Stories verschieben den Multiplikator. Selbst-korrigierende Schaetzung ueber die Zeit.
 
+### Die Doppelspalte — Effort als Output-Signal (BOO-193)
+
+Der `token_estimate` oben ist eine **Input**-Metrik: er sagt, was die Maschine verbraucht, nicht was sie geleistet hat. Auftraggeber und CFOs fragen aber nach dem **Output**: Wie viel klassische Senior-Dev-Arbeit ersetzt ein KI-Sprint, und zu welchem Preis (ROI)? Reine Menschen-Stunden-Schaetzung verliert dieses Signal genauso wie reine Token-Zahlen. Deshalb traegt jede neue Story zwei zusaetzliche Pflichtfelder — die **Doppelspalte**:
+
+| Feld | Bedeutung |
+|---|---|
+| `effort_ai_hours` | Real geschaetzter KI-Aufwand fuer die Story — inkl. Setup, Iteration und Review (die Stunden, die der Operator tatsaechlich mit dem KI-gestuetzten Durchlauf verbringt). |
+| `effort_human_equiv_hours` | Klassischer Senior-Dev-Aufwand fuer dieselbe Story **ohne** Framework-Unterstuetzung — die Vergleichsgroesse fuer das ROI-Signal. |
+
+Aus dem Verhaeltnis der beiden Werte bilden nachgelagerte Auswertungen (Worker-Equivalent-Report, Sprint-Forecast) den ROI-Faktor. Die Doppelspalte ist damit die kleinste gemeinsame Datenquelle fuer eine Output-Steuerung statt einer reinen Input-Metrik.
+
+**Pflicht ab Roll-Out, kein Backfill.** Die zwei Felder sind fuer **neue** Stories (ab Einfuehrung dieser Aenderung) verpflichtend. Bestehende Stories werden **bewusst nicht** nachgetragen — ein Backfill wuerde Schein-Daten ohne echte Schaetzung erzeugen. Der `backlog`-Skill (ab v1.6.0) prueft die Doppelspalte **deterministisch** (Feld vorhanden + numerisch, `> 0`) und flaggt neue Stories ohne gueltige Werte als **nicht sprint-ready**, mit konkretem Remediation-Hinweis — die Validierung ist eine maschinelle Pruefung, kein Prompt-Versprechen.
+
 ---
 
 ## Anhang H: Lighthouse-CI-Integration fuer Frontend-Performance (BOO-45)
@@ -5365,6 +5378,53 @@ Die Sprint-Release-Note ist **ab Sprint 3 ein Pflichtpunkt der Definition of Don
 ### Verweise
 
 [`docs/releases/_index.md`](docs/releases/_index.md) (+ `.en.md`, Index) · [`docs/releases/_template-sprint.md`](docs/releases/_template-sprint.md) (+ `.en.md`) · [`docs/releases/_template-major.md`](docs/releases/_template-major.md) (+ `.en.md`) · [`README.md`](README.md) (Konvention + vollstaendige Wave-Liste) · Anhang AI (Doku-Konsistenz) · BOO-216.
+
+---
+
+## Anhang AK: Financials & Worker-Equivalent (BOO-190)
+
+> Quelle: Templates [`docs/financials/budget.md`](docs/financials/budget.md) + [`docs/financials/worker-equivalent-baseline.md`](docs/financials/worker-equivalent-baseline.md). Aktivierung im `bootstrap`-Skill (A.9 + Phase 4.4o). Datengrundlage: interne Deep-Research `Research/2026-06-13 senior_dev_rates_baseline.md` (Owlist GmbH, Erhebungsdaten 2025).
+
+### Was das Feature ist
+
+Financials ist ein **optionales, operator-aktiviertes** ROI-/Budget-Modul. Es macht den Wert der KI-Arbeit in **Geld** messbar: KI-Kosten (gemessener Token-Verbrauch, `sprint-costs.md`, BOO-189) gegen **Mensch-Equivalent-Kosten** (Σ `effort_human_equiv_hours` der Sprint-Stories × Verrechnungssatz). Bewusst **leichtgewichtig** (Designprinzip 2026-05-25): ein Template-Generator, kein Laufzeit-Rechner, kein externes Tooling.
+
+### Aktivierung via /bootstrap
+
+Financials wird **nicht in Block D** abgefragt, sondern als eigene Ja/Nein-Frage **am Ende von Block A (A.9)** — exakt das Aktivierungs-Muster des Privacy-Add-ons (A.4 → Phase 4.4n):
+
+1. **A.9 (a) — Aktivierung:** „Financials/ROI-Tracking aktivieren?" Bei **nein** passiert nichts (kein Template, keine Folge-Frage).
+2. **A.9 (b) — Verrechnungssatz (nur bei Ja):** Folge-Frage nach dem internen Satz, mit den vier Geo-Defaults als sichtbare Auswahl.
+3. **Phase 4.4o — Financials-Setup:** generiert die zwei Templates unter `docs/financials/` und schreibt den aktiven Satz in die Baseline (Abschnitt 1).
+
+### Die zwei Default-Sets pro Geo
+
+Beide stammen aus der Primärquelle (nicht der ADR-Kurzfassung), jeweils mit Confidence + Erhebungsjahr:
+
+| Geo | Primär — externer Freelance/Contract **P50** (Opportunity-Cost, ROI-Basis) | Konservativ — interner Vollkosten-Lower-Bound |
+|---|---|---|
+| Schweiz (CHF) | **CHF 137 / h** (★★☆) | CHF 99 / h |
+| Deutschland (EUR) | **EUR 95 / h** (★★★) | EUR 58 / h |
+| Österreich (EUR) | **EUR 85 / h** (★★☆) | EUR 57 / h |
+| USA (USD) | **USD 120 / h** (★★★) | USD 116 / h |
+
+Die Bootstrap-Frage zeigt das **Primär-Set (extern P50)** als Default; der konservative intern-Satz steht in der Baseline (`worker-equivalent-baseline.md` §2.2) als Alternative.
+
+### Regeln
+
+- **Native Währung — keine FX-Cross-Umrechnung.** Sätze bleiben nativ pro Geo (CH CHF / DE,AT EUR / US USD). Bei Kursdrift >5 % gegenüber Jahresanfang nur ein **Nutzerhinweis**, nie automatisches Umrechnen (Primärquelle §2.3).
+- **Intern-Vorrang (final, ADR-D):** Gibt der Operator einen eigenen internen Satz ein, schlägt er den Market-Research-Default **immer**. Kein Mischen.
+- **Source-Pflicht:** Jeder Wert in der Baseline trägt `source: intern` (bei Eingabe) oder `source: market-research-2026` (übersprungen) plus `erhebungsjahr`.
+
+### Konsumenten + Verweise
+
+- **BOO-191** — Worker-Equivalent-Report im `/sprint-review` (KI-Kosten / Mensch-Equiv / ROI / Wall-Clock).
+- **BOO-192** — Sprint-Forecast im `/backlog`.
+- **BOO-189** — `docs/financials/sprint-costs.md` (ccusage-Ist-Kosten, bereits live; `budget.md` verweist daneben, ersetzt es nicht).
+- **BOO-193 / Anhang G** — die Story-**Doppelspalte** `effort_ai_hours` / `effort_human_equiv_hours` ist die Datenquelle der ROI-Rechnung; Sprint-Sizing-Mechanik siehe Anhang G.
+- Aktivierung: `bootstrap`-Skill A.9 + Phase 4.4o; optionale Komponente: `bootstrap/references/optional-components.md §D.9`.
+
+ROI-Sprache bleibt vorerst **intern**, bis ≥3 Sprints Daten vorliegen (ADR-D §Offen).
 
 ---
 

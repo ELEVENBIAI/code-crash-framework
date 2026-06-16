@@ -164,6 +164,19 @@ Monitoring is an architecture decision, not just a skill installation detail. Bo
 
 The logging contract belongs in `docs/MONITORING.md` or a clearly marked governance/observability section.
 
+## D.9 — Financials / ROI tracking (BOO-190)
+
+> **Note on placement:** Financials is **not asked in Block D**, but as an operator-activated Yes/No question **at the end of Block A (A.9)** — analogous to the Privacy add-on (A.4). Listed here only for completeness as an optional component.
+
+**What this does:** optional ROI/budget tracking. When activated, bootstrap generates two templates under `docs/financials/`:
+
+- `budget.md` — slim project budget template (geo, currency, active billing rate, optional token-cost assumptions); references `worker-equivalent-baseline.md` (active rate) and `sprint-costs.md` (actuals, BOO-189).
+- `worker-equivalent-baseline.md` — billing-rate baseline: active project rate (section 1) + market-research defaults per geo as a fallback (section 2). Native currency, no FX cross-conversion.
+
+**Flow:** A.9 asks (a) Yes/No activation; on yes (b) a follow-up question for the internal billing rate with the four geo defaults (CH CHF 137 / DE EUR 95 / AT EUR 85 / US USD 120, external P50) as a visible choice. Input → `source: intern`; skipped → `source: market-research-2026`. **Internal precedence** on conflict. Operational setup phase: **4.4o (Financials Setup)**. Details: HANDBUCH Appendix AK.
+
+**Consumers:** worker-equivalent report (`/sprint-review`, BOO-191), sprint forecast (`/backlog`, BOO-192), data source story dual column (BOO-193).
+
 ## Finalization after Block D
 
 Skill summarizes optional components status:

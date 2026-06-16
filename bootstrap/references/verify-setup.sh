@@ -115,6 +115,23 @@ else
   [[ $QUIET -eq 1 ]] || printf '  ----  Privacy-Add-on nicht aktiv — uebersprungen\n'
 fi
 
+# --- 5b. Financials-Add-on (nur falls aktiv, BOO-190) ----------------------
+section "5b. Financials-Add-on (nur falls aktiviert)"
+if [[ -d "docs/financials" || -f "docs/financials/worker-equivalent-baseline.md" || -f "docs/financials/sprint-costs.md" ]]; then
+  if [[ -f "docs/financials/budget.md" ]]; then
+    c_pass "docs/financials/budget.md vorhanden (Projekt-Budget-Template, BOO-190)"
+  else
+    c_warn "docs/financials/ aktiv, aber budget.md fehlt — 'migrate-to-v2.sh --issue BOO-190' nachziehen"
+  fi
+  if [[ -f "docs/financials/worker-equivalent-baseline.md" ]]; then
+    c_pass "docs/financials/worker-equivalent-baseline.md vorhanden (aktiver Verrechnungssatz)"
+  else
+    c_warn "worker-equivalent-baseline.md fehlt — aktiver Satz nicht gesetzt (Skill financials / BOO-190)"
+  fi
+else
+  [[ $QUIET -eq 1 ]] || printf '  ----  Financials-Add-on nicht aktiv — uebersprungen\n'
+fi
+
 # --- 6. Backlog-Adapter ----------------------------------------------------
 section "6. Backlog-Adapter"
 if [[ -f ".claude/ISSUE_WRITING_GUIDELINES.md" ]] || grep -q "backlog" "$ENV_FILE" 2>/dev/null; then

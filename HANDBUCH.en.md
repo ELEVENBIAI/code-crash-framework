@@ -2637,6 +2637,19 @@ estimation_basis: |
 
 After 5–10 sprints, the L3 learnings DB contains actual token usage per story. `/ideation` reads this and calibrates the heuristic: similar past stories shift the multiplier. Self-correcting estimation over time.
 
+### The dual column — effort as an output signal (BOO-193)
+
+The `token_estimate` above is an **input** metric: it tells you what the machine consumed, not what it delivered. But clients and CFOs ask about the **output**: how much classic senior-dev work does an AI sprint replace, and at what price (ROI)? A pure human-hours estimate loses that signal just as much as raw token counts do. That is why every new story carries two additional mandatory fields — the **dual column**:
+
+| Field | Meaning |
+|---|---|
+| `effort_ai_hours` | The real estimated AI effort for the story — incl. setup, iteration and review (the hours the operator actually spends on the AI-assisted run). |
+| `effort_human_equiv_hours` | The classic senior-dev effort for the same story **without** framework support — the baseline for the ROI signal. |
+
+Downstream evaluations (worker-equivalent report, sprint forecast) derive the ROI factor from the ratio of the two values. The dual column is thus the smallest common data source for output-based steering rather than a pure input metric.
+
+**Mandatory from roll-out, no backfill.** The two fields are mandatory for **new** stories (from the introduction of this change onward). Existing stories are **deliberately not** backfilled — a backfill would create fake data without a real estimate. The `backlog` skill (from v1.6.0) validates the dual column **deterministically** (field present + numeric, `> 0`) and flags new stories without valid values as **not sprint-ready**, with a concrete remediation hint — the validation is a machine check, not a prompt promise.
+
 ---
 
 ## Appendix H: Lighthouse-CI integration for frontend performance (BOO-45)
@@ -5271,6 +5284,53 @@ The sprint release note is **a mandatory Definition-of-Done item of every sprint
 ### References
 
 [`docs/releases/_index.en.md`](docs/releases/_index.en.md) (+ `.md`, index) · [`docs/releases/_template-sprint.en.md`](docs/releases/_template-sprint.en.md) (+ `.md`) · [`docs/releases/_template-major.en.md`](docs/releases/_template-major.en.md) (+ `.md`) · [`README.md`](README.md) (convention + full wave list) · Appendix AI (doc consistency) · BOO-216.
+
+---
+
+## Appendix AK: Financials & Worker-Equivalent (BOO-190)
+
+> Source: templates [`docs/financials/budget.md`](docs/financials/budget.md) + [`docs/financials/worker-equivalent-baseline.md`](docs/financials/worker-equivalent-baseline.md). Activation in the `bootstrap` skill (A.9 + Phase 4.4o). Data basis: internal deep research `Research/2026-06-13 senior_dev_rates_baseline.md` (Owlist GmbH, survey data 2025).
+
+### What the feature is
+
+Financials is an **optional, operator-activated** ROI/budget module. It makes the value of AI work measurable in **money**: AI cost (measured token consumption, `sprint-costs.md`, BOO-189) against **human-equivalent cost** (Σ `effort_human_equiv_hours` of the sprint stories × billing rate). Deliberately **lightweight** (design principle 2026-05-25): a template generator, not a runtime calculator, no external tooling.
+
+### Activation via /bootstrap
+
+Financials is **not asked in Block D**, but as a dedicated Yes/No question **at the end of Block A (A.9)** — exactly the activation pattern of the Privacy add-on (A.4 → Phase 4.4n):
+
+1. **A.9 (a) — activation:** "Activate Financials / ROI tracking?" On **no**, nothing happens (no template, no follow-up).
+2. **A.9 (b) — billing rate (only on yes):** follow-up question for the internal rate, with the four geo defaults as a visible choice.
+3. **Phase 4.4o — Financials Setup:** generates the two templates under `docs/financials/` and writes the active rate into the baseline (section 1).
+
+### The two default sets per geo
+
+Both come from the primary source (not the ADR short form), each with confidence + survey year:
+
+| Geo | Primary — external freelance/contract **P50** (opportunity cost, ROI basis) | Conservative — internal fully-loaded lower bound |
+|---|---|---|
+| Switzerland (CHF) | **CHF 137 / h** (★★☆) | CHF 99 / h |
+| Germany (EUR) | **EUR 95 / h** (★★★) | EUR 58 / h |
+| Austria (EUR) | **EUR 85 / h** (★★☆) | EUR 57 / h |
+| USA (USD) | **USD 120 / h** (★★★) | USD 116 / h |
+
+The bootstrap question shows the **primary set (external P50)** as the default; the conservative internal rate sits in the baseline (`worker-equivalent-baseline.md` §2.2) as an alternative.
+
+### Rules
+
+- **Native currency — no FX cross-conversion.** Rates stay native per geo (CH CHF / DE,AT EUR / US USD). On rate drift >5% versus the start of the year, only a **user notice**, never automatic conversion (primary source §2.3).
+- **Internal precedence (final, ADR-D):** if the operator enters their own internal rate, it beats the market-research default **always**. No mixing.
+- **Source obligation:** every value in the baseline carries `source: intern` (on input) or `source: market-research-2026` (skipped) plus `erhebungsjahr`.
+
+### Consumers + references
+
+- **BOO-191** — worker-equivalent report in `/sprint-review` (AI cost / human equiv / ROI / wall clock).
+- **BOO-192** — sprint forecast in `/backlog`.
+- **BOO-189** — `docs/financials/sprint-costs.md` (ccusage actuals, already live; `budget.md` references it alongside, does not replace it).
+- **BOO-193 / Appendix G** — the story **dual column** `effort_ai_hours` / `effort_human_equiv_hours` is the data source of the ROI calculation; for sprint-sizing mechanics see Appendix G.
+- Activation: `bootstrap` skill A.9 + Phase 4.4o; optional component: `bootstrap/references/optional-components.md §D.9`.
+
+ROI language stays **internal** for now, until ≥3 sprints of data exist (ADR-D §Open).
 
 ---
 

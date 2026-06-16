@@ -291,7 +291,9 @@ Each activated add-on extends the architecture dimensions in `ARCHITECTURE_DESIG
 
 > **EU AI Act add-on (BOO-101/105):** On `[x] EU AI Act`, bootstrap copies the catalogue `dpo/controls/optional/eu-ai-act.yml` into the project overlay `.claude/dpo/controls/` and renders `AI_SYSTEM.md` from `dpo/references/ai-system-template.md`. Operational phase: **4.4n-bis**. Requires the Privacy add-on. **Strictly opt-in** — the catalogue lives under `controls/optional/` and is loaded by the dpo runner ONLY once copied into the project (no noise in non-AI projects). No legal advice; judgment items = REVIEW-NEEDED.
 
-**Remember:** `ADDONS = [...activated]`
+> **Financials / ROI-tracking add-on (BOO-190):** Optional, operator-activated, mirroring the Privacy add-on pattern (Yes/No → template generation → follow-up question). Bootstrap asks a dedicated Yes/No question **at the end of Block A** (not as an architecture dimension, but as a Financials activation): *"Activate Financials / ROI tracking?"* On **yes**, bootstrap generates the templates `docs/financials/budget.md` + `docs/financials/worker-equivalent-baseline.md` and asks the **follow-up question for the internal billing rate** (with the four geo defaults as a visible choice). The operational setup phase is **4.4o (Financials Setup, analogous to 4.4n Privacy Setup)**. On **no**, nothing happens — no template, no follow-up. Details: HANDBUCH Appendix AK.
+
+**Remember:** `ADDONS = [...activated]`, `FINANCIALS = yes | no`
 
 ### A.5 Governance intensity (BOO-51)
 
@@ -373,6 +375,63 @@ Append the section (only if `## Machine context` is missing):
 ```
 
 Do not write any secret. Write/read format + idempotency rule: `references/global-registry-update.en.md §Machine context`. Related: `PROJECTS_ROOT` (BOO-138, Block B) — together they form the machine-level context of the global `~/.claude/CLAUDE.md`.
+
+### A.9 Financials / ROI tracking (BOO-190, optional)
+
+Optional, operator-activated question — exactly the activation pattern of the Privacy add-on (Yes/No → template generation → follow-up). On `no`, nothing happens.
+
+**Question (a) — activation:**
+
+```
+Activate Financials / ROI tracking?
+
+What this does: creates two budget/reference templates under docs/financials/
+(budget.md + worker-equivalent-baseline.md) and asks for your internal billing
+rate. This lets the framework later derive a money-denominated ROI factor from
+the story dual column (effort_ai_hours / effort_human_equiv_hours, BOO-193) —
+AI cost vs. human-equivalent cost.
+
+Recommended: when you want to express the value of AI work in money (internal, ROI).
+Solo experiment without a budget view: not needed — can be added later via Phase 4.4o.
+
+Activate now?
+  [yes]  Templates are generated, the billing rate is asked (follow-up)
+  [no]   (default) — no template, no follow-up
+```
+
+**Remember:** `FINANCIALS = yes | no`. On `no` → end A.9, no follow-up.
+
+**Question (b) — internal billing rate (only on `yes`):**
+
+The four geo defaults are shown as a **visible choice** — they come from the primary default set (external freelance/contract **P50**, opportunity-cost basis) of the internal deep research (Owlist GmbH, survey data 2025). Source reference: `docs/financials/worker-equivalent-baseline.md` section 2 (with confidence + sources per geo; it also lists the **conservative internal fully-loaded rate** as an alternative).
+
+```
+Internal billing rate per hour?
+
+Enter your own internal rate — or press Enter to take the market-research
+default for your geo:
+
+  CH  CHF 137 / h   (external freelance P50)
+  DE  EUR  95 / h   (external freelance P50)
+  AT  EUR  85 / h   (external freelance P50)
+  US  USD 120 / h   (external contract  P50)
+
+Source of the defaults: docs/financials/worker-equivalent-baseline.md §2
+(incl. conservative internal fully-loaded rate per geo as an alternative).
+Native currency per geo — no FX cross-conversion.
+
+Your internal rate (Enter = take default): ____
+```
+
+**Evaluation rule (mirrored from the baseline template):**
+
+- **Input present** → `source: intern`, `erhebungsjahr` = year of the internal rate.
+- **Question skipped** (Enter) → take the geo default, `source: market-research-2026`, `erhebungsjahr: 2025`, `basis: freelance-p50`.
+- **Internal precedence (final, ADR-D):** if an entered internal rate exists, it beats the market-research default **always**. No mixing.
+
+**Remember:** `FINANCIALS_GEO`, `FINANCIALS_CURRENCY`, `FINANCIALS_RATE`, `FINANCIALS_SOURCE`. The values are written in Phase **4.4o (Financials Setup)** into `docs/financials/worker-equivalent-baseline.md` section 1.
+
+> **Issue reference:** BOO-190. Consumers of the baseline: worker-equivalent report (`/sprint-review`, BOO-191) + sprint forecast (`/backlog`, BOO-192), data source dual column (BOO-193). HANDBUCH background: Appendix AK (Financials & Worker-Equivalent), dual column: Appendix G.
 
 Phase 1 checkpoint: print a short confirmation of the answers.
 
@@ -1221,6 +1280,34 @@ If `B.2 == no/c` (no GitHub wanted): skip phase 4.4k completely — branch prote
 > **Issue reference:** BOO-69. Source: `references/privacy-template.md` + `references/file-templates.md` §`personal-data-paths.json`. Migration for existing projects: `references/migration-checklist-v1-to-v2.md` §BOO-69. HANDBUCH background: Appendix O Privacy by Design.
 
 > **Design-decision note:** Privacy is optional, but when active: fully operationalised. Mirrors the Security pattern (security-architect + SECURITY.md + sensitive-paths). The operator does not need to bring DPO knowledge — the skill asks the right probing questions. Issuing legal recommendations is not the skill's job; probing questions are.
+
+### 4.4o Financials Setup (BOO-190, only if Financials activated)
+
+**Purpose:** when `FINANCIALS = yes` (see A.9), this phase creates the Financials/ROI templates and writes the billing rate captured in A.9 into the baseline. Analogous to Privacy Setup (4.4n): template generation + initial fill, no runtime calculator. Bootstrap adds nothing if `FINANCIALS = no`.
+
+**Precondition:** `FINANCIALS == yes`. Otherwise skip.
+
+**Steps:**
+
+1. **Create templates** under `docs/financials/` in the target project: `budget.md` (project budget template) + `worker-equivalent-baseline.md` (billing rate + geo defaults). Both are the canonical template sources in the framework repo (analogous to `sprint-costs.md`, BOO-189). `sprint-costs.md` (BOO-189) is not replaced — `budget.md` references it alongside.
+2. **Write the active billing rate** into `worker-equivalent-baseline.md` section 1 from the A.9 values:
+   - `geo` = `FINANCIALS_GEO`, `currency` = `FINANCIALS_CURRENCY`, `rate_per_hour` = `FINANCIALS_RATE`.
+   - `source` = `FINANCIALS_SOURCE` (`intern` on input, otherwise `market-research-2026`).
+   - `erhebungsjahr` accordingly (intern: year of the internal rate; market-research: `2025`).
+   - **Internal precedence** is already resolved in A.9 — here just write, do not mix again.
+3. **Pre-fill `budget.md` project assumptions** (geo/currency/rate_per_hour) with the same values; the reference to `worker-equivalent-baseline.md` (active rate) and `sprint-costs.md` (actuals, BOO-189) is already in the template.
+4. **Native-currency rule** stays untouched as documented in the baseline template (no FX cross-conversion, only a >5% notice) — bootstrap writes no conversion.
+
+**Operator checkpoint:**
+
+- [ ] `docs/financials/budget.md` present in the project
+- [ ] `docs/financials/worker-equivalent-baseline.md` present in the project
+- [ ] Baseline section 1 filled with the active rate (`geo` / `currency` / `rate_per_hour` / `source` / `erhebungsjahr`)
+- [ ] `budget.md` project assumptions pre-filled with the same values
+
+> **Issue reference:** BOO-190. Source: `docs/financials/budget.md` + `docs/financials/worker-equivalent-baseline.md` (template SSoT in the framework repo). Consumers: BOO-191 (`/sprint-review` report), BOO-192 (`/backlog` forecast), data source dual column BOO-193. HANDBUCH background: Appendix AK.
+
+> **Design-decision note:** Financials is optional, but when active: a lightweight template generator (design principle 2026-05-25) — no runtime calculator, no external tooling. The baseline numbers come from the internal deep research, not from fabricated rates. ROI language stays internal for now (ADR-D §Open) until ≥3 sprints of data exist.
 
 ### Phase 4.10: Domain Deep Research (MANDATORY)
 

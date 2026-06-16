@@ -1989,6 +1989,59 @@ echo "[ccusage] Snapshot angehaengt: $OUT ($LABEL)"
 
 ---
 
+## docs/financials/budget.md (BOO-190 — Projekt-Budget-Template)
+
+**Template-Generator seit BOO-190 — kein Laufzeit-Rechner:** Schlankes Projekt-Budget fuer die Financials-/ROI-Sicht. Von `/bootstrap` (Financials-Frage) **einmalig generiert** und danach vom Operator gepflegt. Haelt nur die Projekt-Annahmen (Verrechnungssatz, Geo/Waehrung, optional Token-Kosten) und verweist auf die zwei Mess-/Referenz-Quellen daneben (`worker-equivalent-baseline.md`, `sprint-costs.md`).
+
+> [!important] Schrader Code Crash — ROI braucht einen belegten Satz
+> Aus der Story-Doppelspalte (`effort_ai_hours` / `effort_human_equiv_hours`, BOO-193) wird nur dann ein ROI-Faktor in Geld, wenn ein projektspezifischer Verrechnungssatz existiert. `budget.md` ist die eine Stelle, an der dieser Satz und seine Geo/Waehrung wohnen — alles andere (Ist-Kosten, Baseline) liegt referenziert daneben, nicht dupliziert.
+
+**Generierung (byte-identisch zur SSoT):** Der Heredoc unten ist die kanonische Template-Quelle und **byte-identisch** zu `docs/financials/budget.md` im Framework-Repo. `migrate_boo_190()` in `migrate-to-v2.sh` legt die Datei daraus an, falls sie im Zielprojekt fehlt (idempotent).
+
+**Worker-Equivalent-Baseline (`worker-equivalent-baseline.md`) gehoert dazu, ist aber kein zweites Voll-Heredoc:** Die Baseline ist **Framework-Referenzdatum** (Geo-Defaults aus der internen Deep-Research, vom `financials`-Skill dokumentiert) — keine pro-Projekt-Datentabelle. `migrate_boo_190()` legt dafuer nur einen **kurzen Pointer-Stub** an, der den aktiven Satz (Abschnitt 1) lokal haelt und fuer die Geo-Defaults auf die Skill-Referenz verweist. So vermeiden wir die Triplikat-Pflege einer ~60-Zeilen-Tabelle.
+
+```markdown
+# Projekt-Budget — Worker-Equivalent & Kosten
+
+> Schlankes Budget-Template für die Financials-/ROI-Sicht eines Projekts (BOO-190). Von `/bootstrap`
+> (Financials-Frage) angelegt, danach vom Operator gepflegt. Verweist auf die zwei Mess-/Referenz-Quellen
+> daneben — selbst hält diese Datei nur die Projekt-Annahmen.
+
+## Projekt-Annahmen
+
+```yaml
+geo: <CH | DE | AT | US>
+currency: <CHF | EUR | USD>
+rate_per_hour: <Zahl>             # = aktiver Satz aus worker-equivalent-baseline.md Abschnitt 1
+token_cost_assumption: <optional> # falls KI-Token-Kosten separat budgetiert werden
+```
+
+## Quellen daneben (nicht hier duplizieren)
+
+| Quelle | Was sie liefert | Datei |
+|--------|------------------|-------|
+| Verrechnungssatz + Geo-Defaults | aktiver Satz (intern/market-research) + Fallback-Baseline | [`worker-equivalent-baseline.md`](worker-equivalent-baseline.md) |
+| Ist-Token-/Kosten-Verbrauch | gemessene ccusage-Snapshots pro Sprint/Story (BOO-189) | [`sprint-costs.md`](sprint-costs.md) |
+| Worker-Equivalent-Report pro Sprint | KI-Kosten / Mensch-Equiv / ROI / Wall-Clock (BOO-191) | `sprint-XX-worker-equivalent.md` |
+
+## So rechnet die ROI-Sicht (Kurzform)
+
+- **KI-Kosten** = gemessener Token-/Kosten-Verbrauch (`sprint-costs.md`).
+- **Mensch-Equivalent-Kosten** = Σ `effort_human_equiv_hours` der Sprint-Stories × `rate_per_hour`.
+- **ROI-Faktor** = Mensch-Equivalent-Kosten ÷ KI-Kosten.
+- **Wall-Clock** = reale Sprint-Dauer aus dem Sprint-Log.
+
+> Die Doppelspalte `effort_ai_hours` / `effort_human_equiv_hours` pro Story (BOO-193) ist die
+> Datenquelle. ROI-Sprache bleibt vorerst intern, bis ≥3 Sprints Daten vorliegen (ADR-D §Offen).
+```
+
+**Anti-Patterns:**
+- KEIN zweites Voll-Heredoc fuer `worker-equivalent-baseline.md` — die ~60-Zeilen-Geo-Tabelle ist Framework-Referenz (Skill `financials`), nicht pro-Projekt-Daten. Nur Pointer-Stub generieren.
+- KEINE FX-Cross-Umrechnung — Satz bleibt nativ pro Geo (CH CHF / DE,AT EUR / US USD); bei Kurs-Drift >5 % nur Nutzerhinweis (Primaerquelle §2.3).
+- KEIN Ueberschreiben einer vorhandenen `budget.md` — `migrate_boo_190()` legt nur an, wenn sie fehlt (idempotent, Operator-Pflege bleibt erhalten).
+
+---
+
 ## hooks/pre-edit-bodyguard.sh (BOO-86 — Layer-0 Edit-Bodyguard)
 
 **Layer-0-Gate seit BOO-86:** Ein Claude-Code-**PreToolUse-Hook** auf `Edit|Write`, der

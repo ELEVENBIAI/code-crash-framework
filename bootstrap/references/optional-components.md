@@ -301,6 +301,19 @@ Monitoring ist eine Architekturentscheidung, kein reines Skill-Installationsdeta
 
 Der Logging-Vertrag gehoert in `docs/MONITORING.md` oder eine klar markierte Governance-/Observability-Sektion.
 
+## D.9 — Financials / ROI-Tracking (BOO-190)
+
+> **Hinweis zum Ort:** Financials wird **nicht in Block D** abgefragt, sondern als operator-aktivierte Ja/Nein-Frage **am Ende von Block A (A.9)** — analog zum Privacy-Add-on (A.4). Hier nur der Vollstaendigkeit halber als optionale Komponente gelistet.
+
+**Was das macht:** Optionales ROI-/Budget-Tracking. Bei Aktivierung generiert Bootstrap zwei Templates unter `docs/financials/`:
+
+- `budget.md` — schlankes Projekt-Budget-Template (Geo, Waehrung, aktiver Verrechnungssatz, optionale Token-Kosten-Annahmen); verweist auf `worker-equivalent-baseline.md` (aktiver Satz) und `sprint-costs.md` (Ist-Kosten, BOO-189).
+- `worker-equivalent-baseline.md` — Verrechnungssatz-Baseline: aktiver Projekt-Satz (Abschnitt 1) + Market-Research-Defaults pro Geo als Fallback (Abschnitt 2). Native Waehrung, keine FX-Cross-Umrechnung.
+
+**Flow:** A.9 stellt (a) Ja/Nein-Aktivierung; bei Ja (b) Folge-Frage interner Verrechnungssatz mit den vier Geo-Defaults (CH CHF 137 / DE EUR 95 / AT EUR 85 / US USD 120, externer P50) als sichtbare Auswahl. Eingabe → `source: intern`; uebersprungen → `source: market-research-2026`. **Intern-Vorrang** bei Konflikt. Operative Setup-Phase: **4.4o (Financials-Setup)**. Details: HANDBUCH Anhang AK.
+
+**Konsumenten:** Worker-Equivalent-Report (`/sprint-review`, BOO-191), Sprint-Forecast (`/backlog`, BOO-192), Datenquelle Story-Doppelspalte (BOO-193).
+
 
 ## Finalisierung nach Block D
 
