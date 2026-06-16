@@ -54,12 +54,10 @@ Artifact: `docs/MONITORING.md` or a clearly marked section in `GOVERNANCE.md` / 
 Bootstrap asks:
 
 ```text
-Should the Research skill be installed?
-Source:
-  a) included in INTENTRON
-  b) companion skill from claudecodeskills/research
-  c) already installed globally
-  d) do not install
+Research skill source (a vendored bundle skill since BOO-219, in the Minimum set):
+  a) included in INTENTRON (default — installed in Phase 5)
+  b) already installed globally
+  c) do not install
 
 Provider:
   a) local Perplexity MCP

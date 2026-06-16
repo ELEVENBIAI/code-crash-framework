@@ -399,7 +399,7 @@ Claude legt Dateien an, initialisiert Git, richtet Linting ein, installiert Gove
 
 ### Phase 5: Skills installieren (automatisch)
 
-Skills werden via `git clone` aus dem Framework-Repository `vibercoder79/intentron` nach `.claude/skills/` geholt — **keine Symlinks, keine Runtime-Abhängigkeit zum Quell-Repo**. Die Skill-Kopien sind lokal und portabel. (Companion-Skills wie `research`/`skill-creator` liegen separat in `claudecodeskills` und werden nur bei Bedarf ergänzt.)
+Skills werden via `git clone` aus dem Framework-Repository `vibercoder79/intentron` nach `.claude/skills/` geholt — **keine Symlinks, keine Runtime-Abhängigkeit zum Quell-Repo**. Die Skill-Kopien sind lokal und portabel. (`research` ist seit BOO-219 ein vendored Bundle-Skill im Framework-Repo; Companion-Skills wie `skill-creator` liegen separat in `claudecodeskills` und werden nur bei Bedarf ergänzt.)
 
 Wichtige Trennung: VS-Code-Plugins sind Workstation-Infrastruktur; Skills sind Projekt-Infrastruktur. ESLint, SonarQube for IDE, Error Lens, Python/Ruff usw. installierst du einmal in VS Code. Bootstrap prueft und dokumentiert pro Projekt nur, ob diese Plugins verfuegbar sind; er installiert sie nicht fuer jedes Projekt neu. Skills sind anders: Jedes gebootstrappte Projekt bekommt eine eigene lokale `.claude/skills/`-Kopie (und bei Codex-Adaptern optional `.codex/skills/`). Diese Kopie ist der gepinnte Runtime-Stand des Projekts. Wenn du ein zweites Projekt bootstrappst, werden die ausgewaehlten Skills auch in dieses zweite Projekt kopiert. Das ist Absicht, keine doppelte globale Installation.
 
@@ -407,8 +407,8 @@ Wenn ein Projekt bereits `.claude/skills/<skill>/` enthaelt, ist Phase 5 eine Up
 
 ```
 Welche Skills installieren?
-a) Minimum (ideation, implement, backlog, intent)   ← Für den Start ideal
-b) Standard (+ architecture-review, sprint-review, research, breakfix)  ← Empfohlen
+a) Minimum (ideation, implement, backlog, intent, research)   ← Für den Start ideal
+b) Standard (+ architecture-review, sprint-review, breakfix)  ← Empfohlen
 c) Voll (alle Skills)                          ← Volles Arsenal
 d) Manuell auswählen
 ```
@@ -4690,7 +4690,7 @@ sudo git clone --depth 1 https://github.com/vibercoder79/intentron /opt/claude/s
 cp -r /opt/claude/skills/_intentron-bundle/bootstrap ~/.claude/skills/bootstrap   # der /bootstrap-Skill muss im Skill-Verzeichnis liegen
 ```
 
-> **Bundle vs. Companion:** Im Repo `vibercoder79/intentron` liegen die Framework-Skills + die vendored Bundle-Skills `dpo` und `security-architect` (ein `git clone` ist self-contained). Companion-Skills (`research`, `skill-creator`, …) liegen separat in `claudecodeskills` und werden nur bei Bedarf ergänzt.
+> **Bundle vs. Companion:** Im Repo `vibercoder79/intentron` liegen die Framework-Skills + die vendored Bundle-Skills `dpo`, `security-architect` und `research` (ein `git clone` ist self-contained). Companion-Skills (`skill-creator`, …) liegen separat in `claudecodeskills` und werden nur bei Bedarf ergänzt.
 
 **Globale Claude-Code-Config:**
 

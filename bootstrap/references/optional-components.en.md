@@ -131,11 +131,11 @@ Default: L1. Which level?
 
 **Details:** See `learning-loop.en.md` for the full specification.
 
-## D.6 — Research as companion or framework skill
+## D.6 — Research skill: source + provider
 
-Research is optional and evaluated separately:
+Since BOO-219, research is a **vendored bundle skill** (in the Minimum set). The skill itself is therefore always included in the framework; only the **provider** remains to be evaluated separately:
 
-- Skill source: included in the framework, companion from `claudecodeskills/research`, globally installed, or not used.
+- Skill source: included in the framework (default), already installed globally, or deliberately not used. **No** `claudecodeskills` companion clone anymore.
 - Provider: Perplexity MCP, Perplexity API, OpenRouter, or no provider.
 - Status: Only `OK` when skill source and provider verification were evaluated separately and positively.
 

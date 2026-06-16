@@ -1397,6 +1397,8 @@ Bei `B.2 == nein/c` (kein GitHub gewuenscht): Phase 4.4k komplett skippen — Br
 
 **Zweck:** Domainwissen persistieren bevor Stories geschrieben werden. KI-Operator-Teams haben kein verteiltes Fach-Team-Wissen — dieser Schritt kompensiert das systematisch (Schrader Kap. 2 §Differenzierungskrise).
 
+> **Skill-Quelle (BOO-219):** `/research` ist ein **vendored Bundle-Skill** und liegt direkt im `intentron`-Repo (im Minimum-Set, Phase 5). Damit ist diese Pflicht-Phase ohne externe Repo-Abhaengigkeit erfuellbar — kein `claudecodeskills`-Clone noetig.
+
 **Schritte:**
 
 1. Operator fragen: "Welche Branche / welcher fachliche Domain-Kontext gilt fuer dieses Projekt?"
@@ -1463,33 +1465,23 @@ git clone --depth 1 https://github.com/vibercoder79/intentron "$SKILL_SRC"
 
 Das `intentron`-Repo enthaelt **alle** Bundle-Skills flach als Top-Level-Ordner — keine `intentron/`-Verschachtelung mehr (das war die alte `claudecodeskills`-Struktur):
 
-- **`$SKILL_SRC/<skill>/`** — alle Framework-Skills: `architecture-review`, `backlog`, `bootstrap`, `cloud-system-engineer`, `grafana`, `ideation`, `implement`, `intent`, `knowledge-onboarding`, `pitch`, `sprint-review`, `visualize` **plus `dpo` und `security-architect`** (vendored, BOO-74). `knowledge-onboarding` ist Bestands-Doku-Onboarding (BOO-137) — nur Installation, kein Auto-Run.
+- **`$SKILL_SRC/<skill>/`** — alle Framework-Skills: `architecture-review`, `backlog`, `bootstrap`, `cloud-system-engineer`, `grafana`, `ideation`, `implement`, `intent`, `knowledge-onboarding`, `pitch`, `sprint-review`, `visualize` **plus `dpo`, `security-architect` und `research`** (vendored, BOO-74/219). `knowledge-onboarding` ist Bestands-Doku-Onboarding (BOO-137) — nur Installation, kein Auto-Run. `research` ist die Engine der Pflicht-Phase 4.10 (Domain Deep Research) und liegt seit BOO-219 im Bundle, damit ein einziges `git clone` self-contained ist.
 
-**Nicht im Framework-Repo:** eigenstaendige Allzweck-Skills wie `research`, `design-md-generator`, `setup-checklist`, `skill-creator` bleiben im `claudecodeskills`-Repo. Sie werden nur auf Wunsch ergaenzend gecloned (siehe optionale Zusatzfrage unten).
+**Nicht im Framework-Repo:** `setup-checklist` ist ein eigenes oeffentliches Repo (BOO-113). `design-md-generator` und `skill-creator` bleiben global/standalone und werden nicht vom Framework gesourced — keine optionale claudecodeskills-Clone-Frage mehr im Bootstrap (BOO-219).
 
-> **Master vs. Mirror (BOO-74):** `dpo` und `security-architect` werden im `claudecodeskills`-Repo gepflegt (Master, via `publish_skill.py`) und ins Framework-Repo **gespiegelt** (Vendoring). Bei einem Skill-Update gilt: erst Master in `claudecodeskills` aktualisieren, dann den Framework-Mirror nachziehen. Details: `references/skills-setup.md` §Sync-Konvention.
+> **Master vs. Mirror (BOO-74/219):** `dpo`, `security-architect` und `research` werden im `claudecodeskills`-Repo gepflegt (Master, via `publish_skill.py`) und ins Framework-Repo **gespiegelt** (Vendoring). Bei einem Skill-Update gilt: erst Master in `claudecodeskills` aktualisieren, dann den Framework-Mirror nachziehen. Details: `references/skills-setup.md` §Sync-Konvention.
 
 ### Skill-Auswahl
 
 ```
 Welche Skills installieren?
-  a) Minimum (ideation, implement, backlog, intent)
+  a) Minimum (ideation, implement, backlog, intent, research)
   b) Standard (+ architecture-review, sprint-review, security-architect, dpo, knowledge-onboarding)
   c) Voll (alle Framework-Skills: + grafana, cloud-system-engineer, visualize, pitch)
   d) Manuell auswaehlen
 ```
 
 > **Hinweis (BOO-69/74):** `dpo` und `security-architect` sind ab "Standard" dabei, weil das Privacy-Add-on (A.4) und die Security-Dimension auf sie angewiesen sind. Bei aktivem Privacy-Add-on werden beide unabhaengig von der Skill-Auswahl installiert (siehe Phase 4.4n).
-
-### Optionale Allzweck-Skills aus claudecodeskills
-
-```
-Zusaetzliche Allzweck-Skills aus claudecodeskills ergaenzen?
-(research, design-md-generator, setup-checklist, skill-creator — nicht im Framework-Bundle)
-[ja / nein (default)]
-```
-
-Bei `ja`: `claudecodeskills` ergaenzend in einen zweiten Temp-Ordner clonen und die gewaehlten Top-Level-Skills von dort kopieren.
 
 ### Kopieren
 
@@ -1504,16 +1496,6 @@ for skill in $SELECTED_SKILLS; do
   # cross-tool/unknown => beide
   cp -R "$SRC_PATH" "{PROJECT_PATH}/{TARGET_SKILLS_DIR}/$skill"
 done
-
-# Optionale Allzweck-Skills (nur bei "ja" oben):
-if [[ "$ADD_GENERAL_SKILLS" == "yes" ]]; then
-  GENERAL_SRC=$(mktemp -d)
-  git clone --depth 1 https://github.com/vibercoder79/claudecodeskills "$GENERAL_SRC"
-  for skill in $SELECTED_GENERAL_SKILLS; do
-    cp -R "$GENERAL_SRC/$skill" "{PROJECT_PATH}/{TARGET_SKILLS_DIR}/$skill"
-  done
-  rm -rf "$GENERAL_SRC"
-fi
 ```
 
 Ergebnis: Alle Skills landen **flach** in `.claude/skills/<skill>/` und/oder `.codex/skills/<skill>/`.

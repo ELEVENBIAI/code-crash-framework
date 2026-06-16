@@ -6,10 +6,10 @@ Skills are fetched from the official GitHub repo via `git clone` into a temp fol
 
 **Source guarantee:** All **bundle skills** (incl. `intent`) **always** come **from the `intentron` repo** — **never** from `claudecodeskills`. They live flat as top-level folders (no more `intentron/` nesting — that was the old pre-BOO-74 structure):
 
-- **`$SKILL_SRC/<skill>/`** (intentron clone) — all bundle skills: `architecture-review`, `backlog`, `bootstrap`, `cloud-system-engineer`, `dpo`, `grafana`, `ideation`, `implement`, `intent`, `pitch`, `security-architect`, `sprint-review`, `visualize`.
-- **`claudecodeskills` (separate, optional clone)** — **only** the general-purpose skills `research`, `design-md-generator`, `setup-checklist`, `skill-creator`. **No** bundle skill.
+- **`$SKILL_SRC/<skill>/`** (intentron clone) — all bundle skills: `architecture-review`, `backlog`, `bootstrap`, `cloud-system-engineer`, `dpo`, `grafana`, `ideation`, `implement`, `intent`, `knowledge-onboarding`, `pitch`, `research`, `security-architect`, `sprint-review`, `visualize`.
+- **No optional `claudecodeskills` clone question anymore (BOO-219):** `setup-checklist` is its own public repo (BOO-113); `design-md-generator`/`skill-creator` stay global/standalone and are not sourced by the framework.
 
-> **Master vs. mirror:** `dpo` and `security-architect` are maintained in `claudecodeskills` (master) but live as a **mirror** in the intentron bundle — bootstrap installs them from intentron. **Regression guard:** `bootstrap/scripts/check-skill-sources.sh` (CI: `skill-sources.yml`) verifies mirror completeness + that no bundle skill is sourced against `claudecodeskills`. **Operator note:** keep the local `bootstrap` skill current (`git pull` in the intentron clone), otherwise stale source paths (pre-BOO-74) apply.
+> **Master vs. mirror:** `dpo`, `security-architect` and `research` are maintained in `claudecodeskills` (master) but live as a **mirror** in the intentron bundle — bootstrap installs them from intentron. **Regression guard:** `bootstrap/scripts/check-skill-sources.sh` (CI: `skill-sources.yml`) verifies mirror completeness + that no bundle skill is sourced against `claudecodeskills`. **Operator note:** keep the local `bootstrap` skill current (`git pull` in the intentron clone), otherwise stale source paths (pre-BOO-74) apply.
 
 ## Installation (standard flow)
 
@@ -17,24 +17,16 @@ Skills are fetched from the official GitHub repo via `git clone` into a temp fol
 # Temp folder
 SKILL_SRC=$(mktemp -d)
 
-# Clone current skills repo (shallow)
-git clone --depth 1 https://github.com/vibercoder79/claudecodeskills "$SKILL_SRC"
+# Clone the framework repo (shallow) — ALL bundle skills live here (BOO-74/121/219)
+git clone --depth 1 https://github.com/vibercoder79/intentron "$SKILL_SRC"
 
 # Create skills directory in project
 cd {PROJECT_PATH}
 mkdir -p .claude/skills
 
-# Sub-skills live under intentron/ in the repo
-BOOTSTRAPPING_SUBSKILLS="architecture-review backlog cloud-system-engineer grafana ideation implement sprint-review visualize"
-
-# Copy selected skills (path mapping)
-for skill in ideation implement backlog; do
-  if echo "$BOOTSTRAPPING_SUBSKILLS" | grep -qw "$skill"; then
-    SRC_PATH="$SKILL_SRC/intentron/$skill"
-  else
-    SRC_PATH="$SKILL_SRC/$skill"
-  fi
-  cp -R "$SRC_PATH" ".claude/skills/$skill"
+# All bundle skills are flat top-level folders — no path mapping needed anymore
+for skill in ideation implement backlog intent research; do
+  cp -R "$SKILL_SRC/$skill" ".claude/skills/$skill"
 done
 
 # Cleanup
@@ -49,23 +41,21 @@ rm -rf "$SKILL_SRC"
 | `implement` | Implementation workflow with governance gates | Minimum |
 | `backlog` | Sprint planning + backlog overview | Minimum |
 | `intent` | Pipeline entry: intent capture (Perceive of the 4P) | Minimum |
+| `research` | Deep research via WebSearch + Perplexity (engine of the mandatory Phase 4.10) | Minimum |
 | `architecture-review` | Architecture review (standard dimensions + active add-ons) | Standard |
 | `knowledge-onboarding` | Existing-doc routing into governance artefacts (rubric + manifest, BOO-137) | Standard |
 | `sprint-review` | Periodic audit + **learning-loop entry** (see `learning-loop.en.md`) | Standard |
-| `research` | Deep research via WebSearch + Perplexity | Standard |
 | `security-architect` | Security review (STRIDE/OWASP) | Standard |
-| `skill-creator` | Create and package new skills | Standard |
 | `grafana` | Grafana dashboard development | Optional |
 | `cloud-system-engineer` | VPS infrastructure | Optional |
 | `visualize` | Architecture diagrams in Miro | Optional |
-| `design-md-generator` | Extract DESIGN.md from website/PDF | Optional |
 
 ## Skill tier selection in bootstrap
 
 ```
 Which skills to install?
-  a) Minimum   (ideation, implement, backlog, intent)
-  b) Standard  (+ architecture-review, sprint-review, research, security-architect, skill-creator)
+  a) Minimum   (ideation, implement, backlog, intent, research)
+  b) Standard  (+ architecture-review, sprint-review, knowledge-onboarding, security-architect)
   c) Full      (all available)
   d) Manual    (operator selects individually)
 ```
@@ -88,18 +78,10 @@ If a master skill gets an update:
 
 ```bash
 SKILL_SRC=$(mktemp -d)
-git clone --depth 1 https://github.com/vibercoder79/claudecodeskills "$SKILL_SRC"
+git clone --depth 1 https://github.com/vibercoder79/intentron "$SKILL_SRC"
 
-# Resolve repo path (intentron/ vs. top-level) — see "Repo structure" above
-BOOTSTRAPPING_SUBSKILLS="architecture-review backlog cloud-system-engineer grafana ideation implement sprint-review visualize"
-if echo "$BOOTSTRAPPING_SUBSKILLS" | grep -qw "<skill>"; then
-  SRC_PATH="$SKILL_SRC/intentron/<skill>"
-else
-  SRC_PATH="$SKILL_SRC/<skill>"
-fi
-
-# Show diff before overwrite
-diff -r "$SRC_PATH" ".claude/skills/<skill>"
+# Show diff before overwrite — all bundle skills are flat top-level (BOO-219)
+diff -r "$SKILL_SRC/<skill>" ".claude/skills/<skill>"
 
 # Apply updates selectively — operator decides per file
 ```
@@ -113,8 +95,7 @@ diff -r "$SRC_PATH" ".claude/skills/<skill>"
 5. `architecture-review` — needs dimensions reference
 6. `security-architect` — standalone
 7. `sprint-review` — needs `learning-loop.en.md` if learning loop active
-8. Optional (full tier): `grafana`, `cloud-system-engineer`, `visualize`, `design-md-generator`
-9. `skill-creator` — standalone
+8. Optional (full tier): `grafana`, `cloud-system-engineer`, `visualize`
 
 ## ISSUE_WRITING_GUIDELINES.md
 
@@ -141,18 +122,20 @@ When Block D = L1/L2/L3:
 
 Activation: `.learning-loop` file in project root with content `L1`, `L2` or `L3`.
 
-## Sync convention: vendored skills (BOO-74)
+## Sync convention: vendored skills (BOO-74/219)
 
-Since BOO-74 (Wave M), `dpo` and `security-architect` live as **vendored bundle skills** in the `intentron` repo. Bootstrap therefore installs them from the same repo as all other bundle skills (Phase 5). But: the **master** of these two skills remains the `claudecodeskills` repo.
+Since BOO-74 (Wave M), `dpo` and `security-architect` live as **vendored bundle skills** in the `intentron` repo; since BOO-219 also `research`. Bootstrap therefore installs them from the same repo as all other bundle skills (Phase 5). But: the **master** of these skills remains the `claudecodeskills` repo.
 
 ### Master vs. mirror
 
 | Role | Repo | Maintenance |
 |------|------|-------------|
 | Master | `claudecodeskills` | `publish_skill.py <skill>` — source of truth, also for solo operators without the framework |
-| Mirror | `intentron` | vendored 1:1 copy (`dpo/`, `security-architect/`), the one Bootstrap installs from |
+| Mirror | `intentron` | vendored 1:1 copy (`dpo/`, `security-architect/`, `research/`), the one Bootstrap installs from |
 
-### Mandatory on every DPO or security-architect update
+> **Note (BOO-219):** the `research` master in `claudecodeskills` currently carries no `SKILL.en.md`/`README*`. The intentron mirror adds those (the framework's DE+EN requirement). On the next `publish_skill.py research`, backfill the master accordingly so the mirror is not overwritten (drift risk, see below).
+
+### Mandatory on every dpo, security-architect or research update
 
 1. Change the skill locally in `~/.claude/skills/<skill>/`.
 2. `python3 ~/.claude/skills/skill-creator/scripts/publish_skill.py <skill> -m "..."` — updates the master in `claudecodeskills` + SecondBrain docs.

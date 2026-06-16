@@ -54,12 +54,10 @@ Artefakt: `docs/MONITORING.md` oder eine klar markierte Sektion in `GOVERNANCE.m
 Bootstrap fragt:
 
 ```text
-Soll der Research-Skill installiert werden?
-Quelle:
-  a) in INTENTRON enthalten
-  b) Companion-Skill aus claudecodeskills/research
-  c) bereits global installiert
-  d) nicht installieren
+Research-Skill-Quelle (seit BOO-219 vendored Bundle-Skill, im Minimum-Set):
+  a) in INTENTRON enthalten (Default — wird in Phase 5 installiert)
+  b) bereits global installiert
+  c) nicht installieren
 
 Provider:
   a) Perplexity MCP lokal

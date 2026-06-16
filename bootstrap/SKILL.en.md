@@ -1313,6 +1313,8 @@ If `B.2 == no/c` (no GitHub wanted): skip phase 4.4k completely — branch prote
 
 **Purpose:** persist domain knowledge before stories get written. AI operator teams have no distributed subject-matter team knowledge — this step compensates systematically (Schrader ch. 2 §Differentiation crisis).
 
+> **Skill source (BOO-219):** `/research` is a **vendored bundle skill** living directly in the `intentron` repo (in the Minimum set, Phase 5). This makes the mandatory phase fulfillable without an external repo dependency — no `claudecodeskills` clone needed.
+
 **Steps:**
 
 1. Ask the operator: "Which industry / which subject-matter domain context applies to this project?"
@@ -1379,33 +1381,23 @@ git clone --depth 1 https://github.com/vibercoder79/intentron "$SKILL_SRC"
 
 The `intentron` repo holds **all** bundle skills flat as top-level folders — no more `intentron/` nesting (that was the old `claudecodeskills` structure):
 
-- **`$SKILL_SRC/<skill>/`** — all framework skills: `architecture-review`, `backlog`, `bootstrap`, `cloud-system-engineer`, `grafana`, `ideation`, `implement`, `intent`, `knowledge-onboarding`, `pitch`, `sprint-review`, `visualize` **plus `dpo` and `security-architect`** (vendored, BOO-74). `knowledge-onboarding` is existing-doc-onboarding (BOO-137) — install only, no auto-run.
+- **`$SKILL_SRC/<skill>/`** — all framework skills: `architecture-review`, `backlog`, `bootstrap`, `cloud-system-engineer`, `grafana`, `ideation`, `implement`, `intent`, `knowledge-onboarding`, `pitch`, `sprint-review`, `visualize` **plus `dpo`, `security-architect` and `research`** (vendored, BOO-74/219). `knowledge-onboarding` is existing-doc-onboarding (BOO-137) — install only, no auto-run. `research` is the engine of the mandatory Phase 4.10 (Domain Deep Research) and has lived in the bundle since BOO-219, so a single `git clone` is self-contained.
 
-**Not in the framework repo:** general-purpose standalone skills like `research`, `design-md-generator`, `setup-checklist`, `skill-creator` stay in the `claudecodeskills` repo. They are only cloned additionally on request (see optional question below).
+**Not in the framework repo:** `setup-checklist` is its own public repo (BOO-113). `design-md-generator` and `skill-creator` stay global/standalone and are not sourced by the framework — no optional claudecodeskills clone question in bootstrap anymore (BOO-219).
 
-> **Master vs. mirror (BOO-74):** `dpo` and `security-architect` are maintained in the `claudecodeskills` repo (master, via `publish_skill.py`) and **mirrored** into the framework repo (vendoring). On a skill update: update the master in `claudecodeskills` first, then refresh the framework mirror. Details: `references/skills-setup.en.md` §sync convention.
+> **Master vs. mirror (BOO-74/219):** `dpo`, `security-architect` and `research` are maintained in the `claudecodeskills` repo (master, via `publish_skill.py`) and **mirrored** into the framework repo (vendoring). On a skill update: update the master in `claudecodeskills` first, then refresh the framework mirror. Details: `references/skills-setup.en.md` §sync convention.
 
 ### Skill selection
 
 ```
 Which skills to install?
-  a) Minimum (ideation, implement, backlog, intent)
+  a) Minimum (ideation, implement, backlog, intent, research)
   b) Standard (+ architecture-review, sprint-review, security-architect, dpo, knowledge-onboarding)
   c) Full (all framework skills: + grafana, cloud-system-engineer, visualize, pitch)
   d) Manual selection
 ```
 
 > **Note (BOO-69/74):** `dpo` and `security-architect` are included from "Standard" up, because the Privacy add-on (A.4) and the security dimension depend on them. With the Privacy add-on active, both are installed regardless of the skill selection (see Phase 4.4n).
-
-### Optional general-purpose skills from claudecodeskills
-
-```
-Add additional general-purpose skills from claudecodeskills?
-(research, design-md-generator, setup-checklist, skill-creator — not in the framework bundle)
-[yes / no (default)]
-```
-
-On `yes`: clone `claudecodeskills` into a second temp folder and copy the selected top-level skills from there.
 
 ### Copy
 
@@ -1420,16 +1412,6 @@ for skill in $SELECTED_SKILLS; do
   # cross-tool/unknown => both
   cp -R "$SRC_PATH" "{PROJECT_PATH}/{TARGET_SKILLS_DIR}/$skill"
 done
-
-# Optional general-purpose skills (only on "yes" above):
-if [[ "$ADD_GENERAL_SKILLS" == "yes" ]]; then
-  GENERAL_SRC=$(mktemp -d)
-  git clone --depth 1 https://github.com/vibercoder79/claudecodeskills "$GENERAL_SRC"
-  for skill in $SELECTED_GENERAL_SKILLS; do
-    cp -R "$GENERAL_SRC/$skill" "{PROJECT_PATH}/{TARGET_SKILLS_DIR}/$skill"
-  done
-  rm -rf "$GENERAL_SRC"
-fi
 ```
 
 Result: all skills land **flat** in `.claude/skills/<skill>/` and/or `.codex/skills/<skill>/`.

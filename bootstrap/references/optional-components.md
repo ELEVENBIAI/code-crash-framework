@@ -268,11 +268,11 @@ SonarQube Cloud — Verify:
 - `tools_available.sonarqube_cloud = false` in `environment.json`
 - Hinweis: "SonarQube Cloud kann spaeter aktiviert werden — `references/optional-components.md` §D.5"
 
-## D.6 — Research als Companion oder Framework-Skill
+## D.6 — Research-Skill: Quelle + Provider
 
-Research ist optional und wird getrennt bewertet:
+Research ist seit BOO-219 ein **vendored Bundle-Skill** (im Minimum-Set). Der Skill selbst ist damit immer im Framework enthalten; getrennt zu bewerten bleibt nur der **Provider**:
 
-- Skill-Quelle: im Framework enthalten, Companion aus `claudecodeskills/research`, global installiert, oder nicht genutzt.
+- Skill-Quelle: im Framework enthalten (Default), bereits global installiert, oder bewusst nicht genutzt. **Kein** `claudecodeskills`-Companion-Clone mehr.
 - Provider: Perplexity MCP, Perplexity API, OpenRouter oder kein Provider.
 - Status: Nur `OK`, wenn Skill-Quelle und Provider-Verifikation getrennt positiv bewertet wurden.
 

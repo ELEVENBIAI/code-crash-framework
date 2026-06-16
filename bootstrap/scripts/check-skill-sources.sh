@@ -22,10 +22,13 @@ SKILLS_SETUP="$BOOTSTRAP/references/skills-setup.md"
 
 # --- Single Source of Truth: die Bundle-Skill-Liste (alle aus intentron) ---
 BUNDLE_SKILLS=(architecture-review backlog bootstrap cloud-system-engineer dpo \
-  grafana ideation implement intent knowledge-onboarding pitch security-architect \
-  sprint-review visualize)
-# Optionale Allzweck-Skills (duerfen aus claudecodeskills kommen):
-GENERAL_SKILLS=(research design-md-generator setup-checklist skill-creator)
+  grafana ideation implement intent knowledge-onboarding pitch research \
+  security-architect sprint-review visualize)
+# Keine optionale claudecodeskills-Clone-Frage mehr im Bootstrap (BOO-219):
+# research ist seit BOO-219 vendored Bundle-Skill, setup-checklist ein eigenes
+# oeffentliches Repo (BOO-113), design-md-generator/skill-creator bleiben
+# global/standalone und werden nicht vom Framework gesourced.
+GENERAL_SKILLS=()
 
 fail=0
 err() { printf '  \xe2\x9c\x97 %s\n' "$1"; fail=1; }

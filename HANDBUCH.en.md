@@ -393,7 +393,7 @@ Claude creates files, initializes Git, sets up linting, installs governance hook
 
 ### Phase 5: Install skills (automatic)
 
-Skills are pulled from the `vibercoder79/intentron` framework repository via `git clone` into `.claude/skills/` — **no symlinks, no runtime dependency on the source repo**. The skill copies are local and portable. (Companion skills such as `research`/`skill-creator` live separately in `claudecodeskills` and are added only on demand.)
+Skills are pulled from the `vibercoder79/intentron` framework repository via `git clone` into `.claude/skills/` — **no symlinks, no runtime dependency on the source repo**. The skill copies are local and portable. (`research` is a vendored bundle skill in the framework repo since BOO-219; companion skills such as `skill-creator` live separately in `claudecodeskills` and are added only on demand.)
 
 Important distinction: VS Code plugins are workstation infrastructure; skills are project infrastructure. You install ESLint, SonarQube for IDE, Error Lens, Python/Ruff, etc. once in VS Code. Bootstrap checks and documents their availability per project, but does not reinstall those plugins for every project. Skills are different: every bootstrapped project gets its own local `.claude/skills/` copy (and, for Codex adapters, optionally `.codex/skills/`). That copy is the project-pinned runtime state. If you bootstrap a second project, the selected skills are copied into that second project as well; this is intentional, not duplicate global installation.
 
@@ -401,8 +401,8 @@ If a project already has `.claude/skills/<skill>/`, treat Phase 5 as an update/m
 
 ```
 Which skills to install?
-a) Minimum (ideation, implement, backlog, intent)   ← Ideal for the start
-b) Standard (+ architecture-review, sprint-review, research, breakfix)  ← Recommended
+a) Minimum (ideation, implement, backlog, intent, research)   ← Ideal for the start
+b) Standard (+ architecture-review, sprint-review, breakfix)  ← Recommended
 c) Full (all skills)                            ← Full arsenal
 d) Pick manually
 ```
@@ -4566,7 +4566,7 @@ The `/bootstrap` skill itself must live in the skill directory:
 cp -r /opt/claude/skills/_intentron-bundle/bootstrap ~/.claude/skills/bootstrap   # or into the system pool
 ```
 
-**Bundle vs. companion:** the `vibercoder79/intentron` repo holds the framework skills + the vendored bundle skills `dpo` and `security-architect` (one `git clone` is self-contained). Companion skills (`research`, `skill-creator`, …) live separately in `claudecodeskills` and are added only on demand.
+**Bundle vs. companion:** the `vibercoder79/intentron` repo holds the framework skills + the vendored bundle skills `dpo`, `security-architect` and `research` (one `git clone` is self-contained). Companion skills (`skill-creator`, …) live separately in `claudecodeskills` and are added only on demand.
 
 **Global Claude Code config:**
 
