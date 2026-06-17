@@ -14,6 +14,7 @@
 
 ## Versions-Overviews (real vorhanden, neueste zuerst)
 
+- **v0.12.0** — [`v0.12.0-overview.md`](v0.12.0-overview.md) — Sprint 5: Claude-Code-first, Schalter A/B/C + Implement-Migration (BOO-199–213) · Sprint-Note: [`sprint-5.md`](sprint-5.md)
 - **v0.11.0** — [`v0.11.0-overview.md`](v0.11.0-overview.md) — Sprint 3: Build-vs-Buy-Pivot, /sprint-run auf `/goal` (BOO-198–216) · Sprint-Note: [`sprint-3.md`](sprint-3.md)
 - **v0.10.1** — [`v0.10.1-overview.md`](v0.10.1-overview.md)
 - **v0.10.0** — [`v0.10.0-overview.md`](v0.10.0-overview.md) — /sprint-run: Sprint-Orchestrator (BOO-157)
@@ -34,7 +35,7 @@ Ab Sprint 3 wird **pro Sprint** eine Sammel-Release-Note auf eine **Minor-Versio
 | Sprint | Version | Note-Vorlage |
 |--------|---------|--------------|
 | Sprint 3 | **v0.11.0** ✓ | [`sprint-3.md`](sprint-3.md) (+ [`.en.md`](sprint-3.en.md)) · [`v0.11.0-overview.md`](v0.11.0-overview.md) |
-| Sprint 5 | **v0.12.0** | [`_template-sprint.md`](_template-sprint.md) |
+| Sprint 5 | **v0.12.0** ✓ | [`sprint-5.md`](sprint-5.md) · [`v0.12.0-overview.md`](v0.12.0-overview.md) |
 | Sprint 6 | **v0.13.0** | [`_template-sprint.md`](_template-sprint.md) |
 | nach Sprint 6 | **v1.0.0** | [`_template-major.md`](_template-major.md) |
 

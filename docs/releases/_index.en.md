@@ -14,6 +14,7 @@
 
 ## Version overviews (actually present, newest first)
 
+- **v0.12.0** — [`v0.12.0-overview.md`](v0.12.0-overview.md) — Sprint 5: Claude-Code-first, switches A/B/C + implement migration (BOO-199–213) · sprint note: [`sprint-5.md`](sprint-5.md)
 - **v0.11.0** — [`v0.11.0-overview.md`](v0.11.0-overview.md) — Sprint 3: build-vs-buy pivot, /sprint-run on `/goal` (BOO-198–216) · sprint note: [`sprint-3.en.md`](sprint-3.en.md)
 - **v0.10.1** — [`v0.10.1-overview.md`](v0.10.1-overview.md)
 - **v0.10.0** — [`v0.10.0-overview.md`](v0.10.0-overview.md) — /sprint-run: sprint orchestrator (BOO-157)
@@ -34,7 +35,7 @@ From Sprint 3 a roll-up release note is tagged **per sprint** on a **minor versi
 | Sprint | Version | Note template |
 |--------|---------|---------------|
 | Sprint 3 | **v0.11.0** ✓ | [`sprint-3.en.md`](sprint-3.en.md) (+ [`.md`](sprint-3.md)) · [`v0.11.0-overview.md`](v0.11.0-overview.md) |
-| Sprint 5 | **v0.12.0** | [`_template-sprint.en.md`](_template-sprint.en.md) |
+| Sprint 5 | **v0.12.0** ✓ | [`sprint-5.md`](sprint-5.md) · [`v0.12.0-overview.md`](v0.12.0-overview.md) |
 | Sprint 6 | **v0.13.0** | [`_template-sprint.en.md`](_template-sprint.en.md) |
 | after Sprint 6 | **v1.0.0** | [`_template-major.en.md`](_template-major.en.md) |
 
