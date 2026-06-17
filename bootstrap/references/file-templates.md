@@ -829,6 +829,11 @@ venv/
 # Werden NICHT committed — /sprint-review aggregiert sie in journal/sprint-{date}.md.
 journal/reports/local/
 
+# BOO-204: transiente Story-Subagent-Definitionen aus /implement Schritt 4b
+# (pro Lauf generiert als <STORY-ID>-<agent>.md, nicht Teil des Story-Diffs).
+# Praezise auf Issue-praefixierte Dateien — persistente Agents wie lint-fixer.md bleiben getrackt.
+.claude/agents/*-[0-9]*-*.md
+
 # BOO-151: NUR bei Multi-User-VPS (mehrere Menschen, ein Projekt) aktivieren —
 # Daily Notes sind dann persoenlich pro User -> lokal, nicht geteilt.
 # Bei Solo/Single-Operator bleibt journal/daily/ committet (= SecondBrain-Logbuch).

@@ -24,6 +24,7 @@
 9. [VS Code Setup](#9-vs-code-setup)
 10. [Governance für dein Projekt anpassen](#10-governance-für-dein-projekt-anpassen)
 11. [Tägliche Nutzung — ein typischer Workflow](#11-tägliche-nutzung--ein-typischer-workflow)
+11b. [Checkpoints & Rollback per /rewind](#11b-checkpoints--rollback-per-rewind-boo-208)
 12. [Häufige Fragen](#12-häufige-fragen) — inkl. Claude Agent SDK Migration
 13. [Anhänge — Wegweiser](#13-anhänge--wegweiser) — A bis AM im Überblick (AL: Schalter A / Native-Pfade · AM: Automemory vs Learning-Loop)
 
@@ -2195,6 +2196,16 @@ Schritt 3 — Prüfen:
 ```
 
 ---
+
+## 11b. Checkpoints & Rollback per /rewind (BOO-208)
+
+Anthropics `/rewind` (`Esc Esc`) spult **Claude-Edits innerhalb der laufenden Session** zurück — ein natives Sicherheitsnetz, das das Framework nutzt statt nachbaut (Build-vs-Buy, ADR-1).
+
+- **Checkpoint setzen:** Vor jedem `git commit` einen Checkpoint setzen, falls die Story einen Rollback brauchen könnte. So lässt sich ein missglückter Implementierungs-Schritt verwerfen, ohne den Git-Verlauf anzufassen.
+- **Grenze:** `/rewind` betrifft **nur Claude-Edits**. NICHT erfasst: manuelle Änderungen, Bash-/Tool-Outputs sowie bereits committete oder gepushte Stände — dafür bleibt Git (`git revert`, `git reset`) das Mittel.
+- **Abgrenzung zum Rollback-Marker:** Der Marker `// AI-generated: {STORY_ID}` (BOO-17) *identifiziert* AI-Code nachträglich; `/rewind` *spult* aktiv in-Session zurück. Beide ergänzen sich.
+
+Details im Skill: `/implement` Schritt 5 (Sektion „Rollback per `/rewind`").
 
 ## 12. Häufige Fragen
 

@@ -329,6 +329,11 @@ Thumbs.db
 # Claude Code local overrides
 CLAUDE.local.md
 
+# BOO-204: transient story-subagent definitions from /implement step 4b
+# (generated per run as <STORY-ID>-<agent>.md, not part of the story diff).
+# Precise to issue-prefixed files — persistent agents like lint-fixer.md stay tracked.
+.claude/agents/*-[0-9]*-*.md
+
 # Lock files (uncomment if multiple people work on the project)
 # .*.pid
 # *.lock

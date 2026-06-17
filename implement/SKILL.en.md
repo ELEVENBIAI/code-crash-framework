@@ -6,7 +6,7 @@ description: |
   to closing table including post-implement validation. Use when the operator says "go",
   wants to implement a story, or runs "/implement". Also used by the automation daemon
   (no human in the loop).
-version: 2.15.0
+version: 2.16.0
 language: en
 metadata:
   hermes:
@@ -139,6 +139,14 @@ git worktree add ../{repo}-{story}-{role} -b {story}-{role}
 
 Sub-agent briefings must include: role, task, allowed paths, forbidden paths and integration rule. The integration owner merges the lanes back into the main worktree after gates pass.
 
+### Step 0d: Read native-path flags (BOO-204, switch B)
+
+Read the `native_paths:` block (defined in BOO-199) from the project `CLAUDE.md`. Relevant for
+`/implement`: `prefer_native_subagents` (default **`true`** when the flag or block is missing).
+**Switch-A coupling:** applies only when `runtime_target: claude-code` (from `CONVENTIONS.md`, Step 0);
+for `codex` / `cross-tool` / `unknown` the flag is inactive → always the old pattern. The value read here
+drives Step 4b.
+
 ### Step 1: Identify the issue
 
 - `linear.getOpenIssues()` — load the full backlog
@@ -221,6 +229,42 @@ Validate the governance artifacts of the issue before drafting the plan (check s
 - **Wait for operator approval** (human in the loop)
 - In daemon execution (auto-execute): skip this step
 
+### Step 4b: Native subagent generation (BOO-204, switch B)
+
+Controls the *how* of story-internal subagents — not the *whether*. Two patterns:
+
+- **Old pattern** (`prefer_native_subagents: false`, `runtime_target ≠ claude-code`, or a spec **without**
+  a `## Subagents` section): subagents as a text-block briefing via the Agent tool in the **same context
+  window** as the orchestrator (simulated choreography). Existing behaviour, unchanged.
+- **New pattern** (`prefer_native_subagents: true` AND the spec has a `## Subagents` section):
+  `/implement` generates one `.claude/agents/<story>-<agent>.md` per entry before the code phase and lets
+  Anthropic do the choreography. Each agent gets its **own 200k context window**, its own tool
+  permissions, optionally its own model.
+
+**Source = the spec's `## Subagents` section** — the same SSoT that `/sprint-run` step 4.2 reads (one
+convention, not two). Format:
+
+```yaml
+# In specs/<story>.md, section "## Subagents" (optional — if absent, the story runs sequentially):
+- name: <slug>                  # -> .claude/agents/<story>-<slug>.md
+  role: <what the agent does>
+  model: opus | sonnet | haiku  # optional; default: code core stays Opus
+  tools: [Read, Edit, Bash]     # optional; default: skill permissions
+  write_scopes: [<path/glob>]   # required for execution_mode sub-agents/agentic
+```
+
+Per generated `.claude/agents/<story>-<slug>.md`: role, story ID, `write_scopes`, worktree path (if
+`execution_isolation: git-worktree`), gate list, model, tool permissions.
+
+**Orthogonal to isolation:** native subagents and `execution_isolation` / `worktree_strategy` (Step 0c)
+combine independently — the flag changes the agent *kind*, not the worktree strategy.
+
+**Hygiene:** generated story-agent files are transient (per run) and not part of the story diff —
+add `.claude/agents/<story>-*.md` to `.gitignore`.
+
+**lint-fixer (Step 6a):** runs under the same generator logic — the template
+`references/lint-fixer.agent.md` is the special case "one fixer agent, `model: haiku`".
+
 ### Step 5: Implementation (after approval)
 
 > **Secure-coding hint (shift-left at the prompt layer).** Write secure-by-default from the start — don't wait for the gates to correct it:
@@ -234,6 +278,8 @@ Validate the governance artifacts of the issue before drafting the plan (check s
 - Sub-tasks: before implementation → "In Progress", after completion → "Done"
 - Execute the plan fully
 - Mark all new functions, methods, and code paths with comment `// AI-generated: {STORY_ID}` (rollback identification, BOO-17). For Python: `# AI-generated: {STORY_ID}`.
+
+> **Rollback via `/rewind` (BOO-208).** The marker above identifies AI code *after* writing; for active rewinding *within the session* use Anthropic's `/rewind` (`Esc Esc`) — it rewinds Claude edits. **Recommendation:** set a checkpoint before every `git commit` in case the story needs a rollback. **Boundary:** `/rewind` only affects **Claude edits**, NOT manual changes, Bash/tool outputs, or already committed/pushed state (use Git for those). See HANDBUCH §11b "Checkpoints & rollback".
 - Update all doc files (CLAUDE.md, SYSTEM_ARCHITECTURE.md, etc.)
 - Git commit + push
 - **Write Session-Reference to Spec-File (BOO-19):**
