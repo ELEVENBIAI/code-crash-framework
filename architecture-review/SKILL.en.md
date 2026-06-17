@@ -5,7 +5,7 @@ description: |
   Architecture review for individual stories or the whole system. Checks the active
   architecture dimensions (8 standard + active add-ons) and identifies risks, tech debt and improvement potential.
   Use when the operator says "check architecture", "review", "does this fit architecturally" or "/architecture-review".
-version: 1.12.0
+version: 1.13.0
 language: en
 metadata:
   hermes:
@@ -26,6 +26,21 @@ Check the active dimensions (8 standard + active add-ons from `ARCHITECTURE_DESI
 3. Extract paths from `paths.*` as needed (e.g. `paths.reports_local`, `paths.lessons_l3`, `paths.specs`, `paths.architecture_design`, `paths.conventions`).
 4. Before any tool invocation, check `tools_available.<tool>`. If `false` or missing, the skill skips the call and notes it in the output.
 5. Missing-file fallback: assume the schema defaults (`journal/`, `journal/reports/local/`, `specs/`, `ARCHITECTURE_DESIGN.md`, `CONVENTIONS.md`) and add a note to the output: "Note: `.claude/environment.json` is missing — defaults active. Recommendation: re-run `/bootstrap` or create the file manually."
+
+## Step 0b: Ultraplan trigger (BOO-207, switch B)
+
+Read `native_paths.prefer_ultraplan` from the project `CLAUDE.md` (defined in BOO-199; model: `/implement`
+step 0d). Values: `auto` (default) | `always` | `never`. **Switch-A coupling:** active only when
+`runtime_target: claude-code` (from `CONVENTIONS.md`).
+
+- `auto`: suggest `/ultraplan` when the story is `>5 SP` OR there is an **architecture break** (new
+  layer/pattern, migration with conflict potential, cross-cutting change).
+- `always`: always suggest. `never`: never.
+
+`/ultraplan` is the native **code-level planning engine** (Anthropic; build-vs-buy/ADR-1 — use, don't
+rebuild). Its output complements the review and is stored in the `## Plan` section of `specs/<story>.md`.
+Advantage hierarchy: Linear story (WHAT) → spec (HOW) → sprint plan (ORDER) → ultraplan (CODE LEVEL).
+Details: HANDBUCH Appendix AN.
 
 ## Modes
 

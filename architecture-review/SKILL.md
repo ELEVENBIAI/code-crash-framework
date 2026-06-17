@@ -5,7 +5,7 @@ description: |
   Architektur-Review fuer einzelne Stories oder das Gesamtsystem. Prueft die aktiven
   Architektur-Dimensionen (8 Standard + aktive Add-ons) und identifiziert Risiken, Tech Debt und Verbesserungspotential.
   Verwenden wenn der Operator "Architektur pruefen", "Review", "passt das architektonisch" oder "/architecture-review" sagt.
-version: 1.12.0
+version: 1.13.0
 metadata:
   hermes:
     category: governance
@@ -25,6 +25,21 @@ Aktive Dimensionen (8 Standard + aktive Add-ons aus `ARCHITECTURE_DESIGN.md §5`
 3. Bei Bedarf Pfade extrahieren aus `paths.*` (z.B. `paths.reports_local`, `paths.lessons_l3`, `paths.specs`, `paths.architecture_design`, `paths.conventions`).
 4. Bei Tool-Aufruf pruefen: ist Tool in `tools_available.<tool>` aktiv? Bei `false` oder fehlendem Eintrag: Skill ueberspringt den Aufruf und gibt einen Hinweis im Output.
 5. Fallback bei fehlender Datei: Standard-Pfade aus dem Schema annehmen (`journal/`, `journal/reports/local/`, `specs/`, `ARCHITECTURE_DESIGN.md`, `CONVENTIONS.md`) und im Output vermerken: "Hinweis: `.claude/environment.json` fehlt — Defaults aktiv. Empfehlung: `/bootstrap` re-rennen oder die Datei manuell anlegen."
+
+## Schritt 0b: Ultraplan-Trigger (BOO-207, Schalter B)
+
+Lies `native_paths.prefer_ultraplan` aus der Projekt-`CLAUDE.md` (definiert in BOO-199; Vorbild:
+`/implement` Schritt 0d). Werte: `auto` (Default) | `always` | `never`. **Schalter-A-Kopplung:** nur
+aktiv bei `runtime_target: claude-code` (aus `CONVENTIONS.md`).
+
+- `auto`: Schlage `/ultraplan` vor, wenn die Story `>5 SP` ist ODER ein **Architektur-Bruch** vorliegt
+  (neue Schicht/Pattern, Migration mit Konfliktpotenzial, Cross-Cutting-Change).
+- `always`: immer vorschlagen. `never`: nie.
+
+`/ultraplan` ist die native **Code-Level-Planungs-Engine** (Anthropic; Build-vs-Buy/ADR-1 — nutzen,
+nicht nachbauen). Ihr Output ergaenzt das Review und wird in der `## Plan`-Sektion von `specs/<story>.md`
+abgelegt. Vorteil-Hierarchie: Linear-Story (WAS) → Spec (WIE) → Sprint-Plan (REIHENFOLGE) → Ultraplan
+(CODE-LEVEL). Details: HANDBUCH Anhang AN.
 
 ## Modi
 

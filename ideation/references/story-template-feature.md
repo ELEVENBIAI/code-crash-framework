@@ -27,6 +27,9 @@ Jede Feature-Story MUSS folgende Struktur haben.
 
 ### 5. Phasen-Plan
 - Phase 1 (kostenlos) → Phase 2 (Free APIs) → Phase 3 (Paid optional)
+- **`/ultraplan`-Output (BOO-207):** Wird bei einem Ultraplan-Lauf (Story `>5 SP` oder Architektur-Bruch,
+  `prefer_ultraplan`) der **Code-Level-Plan** erzeugt, landet er als eigene `## Plan`-Sektion in
+  `specs/<story>.md` — er ergaenzt den Phasen-Plan (gröbere Ebene), ersetzt ihn nicht.
 
 ### 6. Abhaengigkeiten (PFLICHT)
 ```markdown

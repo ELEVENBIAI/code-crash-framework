@@ -27,6 +27,9 @@ Every feature story MUST follow this structure.
 
 ### 5. Phased plan
 - Phase 1 (free) → Phase 2 (free APIs) → Phase 3 (paid optional)
+- **`/ultraplan` output (BOO-207):** when an ultraplan run produces the **code-level plan** (story `>5 SP`
+  or architecture break, `prefer_ultraplan`), it lands as its own `## Plan` section in
+  `specs/<story>.md` — it complements the phased plan (coarser level), doesn't replace it.
 
 ### 6. Dependencies (MANDATORY)
 ```markdown

@@ -6,7 +6,7 @@ description: |
   Learning-Loop-Eintrag (L1/L2/L3) als Pflicht-Schritt. Verwenden fuer periodische Reviews
   oder wenn der Operator "Sprint Review", "Architektur Audit", "Tech Debt", "Aufraumen"
   oder "/sprint-review" sagt.
-version: 2.7.0
+version: 2.8.0
 metadata:
   hermes:
     category: governance
@@ -337,6 +337,20 @@ Detaillierte Symptome + Gegenmittel: `intentron/references/anti-pattern-katalog.
 **Skip-Fall:** Wenn `PRIVACY.md` fehlt oder Cadence nicht erreicht → Schritt 7c ueberspringen, keine weiteren Konsequenzen.
 
 > **Issue-Referenz:** BOO-69 (Trigger) + BOO-87 (deterministischer Kontrollkatalog). DPO-Skill als Standalone unter `~/.claude/skills/dpo/`. Kataloge: `dpo/controls/`. Configuration: `environment.json.privacy_audit_cadence` (Default 4). HANDBUCH-Hintergrund: Anhang O Privacy by Design §AUDIT-Modus + §Deterministischer Kontrollkatalog (BOO-87).
+
+### Schritt 7d: Operator-Reflexion via insights-review (BOO-206, nur wenn complement_insights aktiv)
+
+> **Aktivierung:** Nur wenn `native_paths.complement_insights: true` in der Projekt-`CLAUDE.md` (BOO-199) UND `runtime_target: claude-code` (Schalter-A-Kopplung). Default `true`. Sonst Skip mit Log-Hinweis.
+
+**Zweck:** Operator-Arbeitsmuster dieser Sprint-Periode als abgegrenzte Reflexion erfassen — komplementaer zum Learning-Loop (Projekt-Wissen), nicht vermischt (ADR-3).
+
+**Schritte:**
+
+1. Flag + `runtime_target` pruefen. Nicht erfuellt → Schritt 7d ueberspringen.
+2. Den Skill **`insights-review`** anstossen: ruft Anthropics natives `/insights` auf (Operator bestaetigt; Operator-lokale Daten) und integriert den **Operator-Reflexions-Meta-Block** in `journal/sprint-{date}.md` — getrennt vom Learning-Loop-Eintrag (Schritt 8). Faellt `/insights` aus oder lehnt der Operator ab → Skip, kein Hard-Block.
+3. Im Sprint-Report (Schritt 6) auf den Meta-Block verweisen.
+
+Grenze: `/sprint-review` = Projekt-Lesson (Repo); `/insights` = Operator-Reflexion (lokal). Doku: HANDBUCH Anhang AO (BOO-211); Skill: `insights-review/SKILL.md`.
 
 ### Schritt 8: Learning-Loop-Eintrag (PFLICHT wenn Learning-Loop aktiv)
 

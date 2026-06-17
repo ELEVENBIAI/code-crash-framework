@@ -26,7 +26,7 @@
 11. [Daily Usage — A Typical Workflow](#11-daily-usage--a-typical-workflow)
 11b. [Checkpoints & rollback via /rewind](#11b-checkpoints--rollback-via-rewind-boo-208)
 12. [FAQ](#12-faq) — incl. Claude Agent SDK migration
-13. [Appendices — signpost](#13-appendices--signpost) — A through AM at a glance (AL: Switch A / native paths · AM: Automemory vs Learning-Loop)
+13. [Appendices — signpost](#13-appendices--signpost) — A through AO at a glance (AL: Switch A / native paths · AM: Automemory vs Learning-Loop · AN: Cloud-engine /ultraplan · AO: Sprint Review vs /insights)
 
 ---
 
@@ -2242,7 +2242,7 @@ Two further runbooks cover concrete setup tasks:
 
 ---
 
-The handbook has 39 appendices (A–Z + AA through AM). They are a **reference and deep-dive layer** — you don't need to read them front to back. This table tells you **when which appendix is relevant**. A–M are the foundations/tooling layer, N–AM the themes from v0.2.0 onward (waves J–BI, Sprint 3–5a): efficiency, privacy, deployment, scaling, verification, edit bodyguard, contribute-back, ubiquitous language, VPS/cloud team runbook, customer onboarding, SonarCloud setup, Linear MCP on VPS, knowledge onboarding, sprint configurator, slopsquatting wordlist maintenance, quality-gate audit, build-vs-buy doctrine, /goal engine, doc consistency, release convention, financials, Switch A / native paths, Automemory vs Learning-Loop.
+The handbook has 41 appendices (A–Z + AA through AO). They are a **reference and deep-dive layer** — you don't need to read them front to back. This table tells you **when which appendix is relevant**. A–M are the foundations/tooling layer, N–AM the themes from v0.2.0 onward (waves J–BI, Sprint 3–5a): efficiency, privacy, deployment, scaling, verification, edit bodyguard, contribute-back, ubiquitous language, VPS/cloud team runbook, customer onboarding, SonarCloud setup, Linear MCP on VPS, knowledge onboarding, sprint configurator, slopsquatting wordlist maintenance, quality-gate audit, build-vs-buy doctrine, /goal engine, doc consistency, release convention, financials, Switch A / native paths, Automemory vs Learning-Loop.
 
 | Appendix | Topic | When relevant |
 |----------|-------|---------------|
@@ -2285,6 +2285,8 @@ The handbook has 39 appendices (A–Z + AA through AM). They are a **reference a
 | **AK** | Financials & Worker-Equivalent | optional ROI/budget module — AI cost vs human-equivalent cost, activation in `/bootstrap` A.9 |
 | **AL** | Switch A — Claude-Code-first & native paths | `runtime_target` (default `claude-code` since BOO-199) + the four `native_paths` flags; migration via `migrate_boo_199()`; config surface only (behaviour migrates Sprint 5b) |
 | **AM** | Two memories — Automemory vs Learning-Loop | distinction operator preference (Automemory, local) vs project lesson (Learning-Loop, in repo); decision heuristic, ADR-3 |
+| **AN** | Cloud-engine /ultraplan | native code-level planning — /architecture-review + /ideation trigger at >5 SP or architecture break; output in specs `## Plan`; `prefer_ultraplan` auto\|always\|never |
+| **AO** | Sprint Review vs /insights | complementary native features — /sprint-review (project lesson, repo) vs /insights (operator reflection, local); `complement_insights`, insights-review skill |
 
 ---
 
@@ -5417,6 +5419,65 @@ The full rationale for the split is documented in ADR-3.
 ### Bootstrap creates the header (BOO-200)
 
 So nobody accidentally writes project knowledge into operator-local automemory, Bootstrap (block D.4b) prepends a short boundary header to the automemory index file `~/.claude/projects/<project>/memory/MEMORY.md` — non-destructive (marker `automemory-vs-learning-loop:`, existing entries stay). Existing projects pull it via `intentron migrate` (`migrate_boo_200`); `verify-setup.sh` §4c checks its presence.
+
+---
+
+## Appendix AN: Cloud-engine /ultraplan (BOO-207)
+
+> Source: ADR-2 switch B (`prefer_ultraplan`). Sibling to Appendix AH (`/goal`): `/goal` **terminates**, `/ultraplan` **plans at code level**.
+
+`/ultraplan` is Anthropic's native **code-level planning engine**. `/architecture-review` and `/ideation` suggest it rather than rebuilding it (build-vs-buy, ADR-1).
+
+**Advantage hierarchy** — who answers what:
+
+| Level | Artifact | Question |
+|---|---|---|
+| Linear story | Issue | WHAT (outcome) |
+| Spec | `specs/<story>.md` | HOW at skill level |
+| Sprint plan | `Sprints.md` | ORDER |
+| Ultraplan | `## Plan` in the spec | CODE LEVEL (phases, schemas, migration, conflict risk) |
+
+**Flag `prefer_ultraplan`** (in the CLAUDE.md `native_paths` block, BOO-199):
+
+- `auto` (default) — suggest only when story `>5 SP` OR architecture break (new layer/pattern, migration with conflict potential, cross-cutting change).
+- `always` — always suggest. `never` — never.
+- Active only when `runtime_target: claude-code` (switch-A coupling).
+
+**Output** lands in the `## Plan` section of `specs/<story>.md` (complements the ADD/phased plan, doesn't replace them).
+
+**Example** (dpo control catalog as YAML): ultraplan returns "Phase A: YAML schema, Phase B: migration script, Phase C: loader. Conflict risk: 47 references in nDSG prose must migrate along."
+
+Triggered in `/architecture-review` (step 0b) and `/ideation` (step 3b).
+
+---
+
+## Appendix AO: Sprint Review vs /insights — complementary native features (BOO-211)
+
+> Source: ADR-2 switch B (`complement_insights`) + ADR-3 (Automemory vs Learning-Loop). `/sprint-review` and `/insights` sound similar but answer different questions — this appendix separates them.
+
+| Dimension | `/sprint-review` | `/insights` |
+|---|---|---|
+| Question | What did the **project** learn? | How did the **operator** work? |
+| Source | Story outputs, learning loop L1/L2/L3 | Local usage logs |
+| Output | `journal/sprint-{date}.md`, audit-ready | Pattern report, session-based |
+| Persistence | In the repo, versioned | Local |
+| Frequency | Per sprint | Monthly or on demand |
+
+**How `complement_insights: true` combines them:** `/sprint-review` writes the learning-loop entry (step 8); when the flag is active, step 7d additionally triggers the `insights-review` skill, which calls `/insights` and prepends a **separated** operator-reflection meta block — without mixing it into the learning loop (ADR-3). Example excerpt from `journal/sprint-{date}.md`:
+
+```markdown
+## Operator reflection (/insights — complement_insights)
+> Operator working patterns — local, not project knowledge (ADR-3).
+- Working patterns: many short implement iterations, little batching
+- Friction points: context reload after every sprint switch
+- Next operator change: read the spec bundle before sprint start
+
+## Learnings — Sprint {date} (learning loop, project knowledge)
+### What worked
+- native subagent migration (BOO-204) landed cleanly
+```
+
+Flag `complement_insights` in the CLAUDE.md `native_paths` block (BOO-199); active only when `runtime_target: claude-code`. Skill: `insights-review/` (BOO-206).
 
 ---
 

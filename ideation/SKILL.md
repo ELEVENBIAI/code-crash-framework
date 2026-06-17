@@ -6,7 +6,7 @@ description: |
   den Learning-Loop (falls aktiv) und warnt bei Anti-Pattern-Match. Verwenden wenn der Nutzer
   eine neue Idee hat, ein Feature vorschlaegt, oder "ideation" / "neue Story" sagt.
   Ausloeser sind Anfragen wie "ich hab eine Idee", "neues Feature", "wir brauchen X", "/ideation".
-version: 2.8.0
+version: 2.9.0
 metadata:
   hermes:
     category: coding
@@ -215,6 +215,16 @@ je nach Story-Typ Pflicht sind. Bug Fixes brauchen kein ADD.
 
 **Bei Agent Teams:** Architekt-Teammate und Cloud System Engineer erstellen
 das ADD kollaborativ und challengen sich gegenseitig.
+
+### Schritt 3b: Cloud-Engine-Vorschlag (/ultraplan, BOO-207, Schalter B)
+
+Nach dem ADD: Lies `native_paths.prefer_ultraplan` aus der `CLAUDE.md` (BOO-199; Vorbild `/implement`
+Schritt 0d). `auto` (Default) | `always` | `never`; nur aktiv bei `runtime_target: claude-code`.
+
+Bei `auto` + (Story `>5 SP` ODER Architektur-Bruch) → `/ultraplan` als **Code-Level-Planung**
+vorschlagen. Der Output wird in der `## Plan`-Sektion von `specs/<story>.md` abgelegt (ergaenzt das ADD,
+ersetzt es nicht). Vorteil-Hierarchie: Story (WAS) → Spec (WIE) → Sprint-Plan (REIHENFOLGE) → Ultraplan
+(CODE-LEVEL). `/ultraplan` ist nativ (ADR-1) — nutzen, nicht nachbauen. Details: HANDBUCH Anhang AN.
 
 ### Enforcement-Check (PFLICHT bei jedem neuen ADR oder Architektur-Entscheid)
 

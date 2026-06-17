@@ -4,7 +4,7 @@
 
 > Periodic system health check: active architecture dimensions · reports aggregation + metrics · tech debt inventory · backlog hygiene · process compliance · anti-pattern self-diagnosis · optional DPO audit trigger · learning-loop entry (L1/L2/L3). One run, one report, one action list — and a closed learning loop.
 
-**Version:** 2.7.0 · **Command:** `/sprint-review`
+**Version:** 2.8.0 · **Command:** `/sprint-review`
 
 > 🔗 Sprint automation: **`/sprint-run`** runs a whole sprint and orchestrates the chain `backlog → implement → sprint-review`. See [`sprint-run/`](../sprint-run/README.en.md) · HANDBUCH Appendix AD.
 

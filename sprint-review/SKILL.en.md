@@ -6,7 +6,7 @@ description: |
   a mandatory learning-loop entry (L1/L2/L3). Use for periodic reviews or when
   the operator says "sprint review", "architecture audit", "tech debt", "clean up"
   or "/sprint-review".
-version: 2.7.0
+version: 2.8.0
 language: en
 metadata:
   hermes:
@@ -338,6 +338,20 @@ Full symptoms + countermeasures: `intentron/references/anti-pattern-katalog.en.m
 **Skip case:** if `PRIVACY.md` is missing or cadence not reached → skip Step 7c, no further consequences.
 
 > **Issue reference:** BOO-69 (trigger) + BOO-87 (deterministic control catalog). DPO skill as standalone under `~/.claude/skills/dpo/`. Catalogs: `dpo/controls/`. Configuration: `environment.json.privacy_audit_cadence` (default 4). HANDBUCH background: Appendix O Privacy by Design §AUDIT mode + §Deterministic control catalog (BOO-87).
+
+### Step 7d: Operator reflection via insights-review (BOO-206, only if complement_insights active)
+
+> **Activation:** only when `native_paths.complement_insights: true` in the project `CLAUDE.md` (BOO-199) AND `runtime_target: claude-code` (switch-A coupling). Default `true`. Otherwise skip with a log note.
+
+**Purpose:** capture this sprint period's operator working patterns as a separated reflection — complementary to the learning loop (project knowledge), not mixed (ADR-3).
+
+**Steps:**
+
+1. Check flag + `runtime_target`. Not met → skip step 7d.
+2. Trigger the **`insights-review`** skill: it calls Anthropic's native `/insights` (operator confirms; operator-local data) and integrates the **operator-reflection meta block** into `journal/sprint-{date}.md` — separate from the learning-loop entry (step 8). If `/insights` fails or the operator declines → skip, no hard block.
+3. Reference the meta block in the sprint report (step 6).
+
+Boundary: `/sprint-review` = project lesson (repo); `/insights` = operator reflection (local). Docs: HANDBUCH Appendix AO (BOO-211); skill: `insights-review/SKILL.en.md`.
 
 ### Step 8: Learning-loop entry (mandatory if learning loop active)
 

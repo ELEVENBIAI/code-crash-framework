@@ -4,7 +4,7 @@
 
 > Periodischer System-Check: aktive Architektur-Dimensionen · Reports-Aggregation + Metriken · Tech-Debt-Inventur · Backlog-Hygiene · Prozess-Compliance · Anti-Pattern-Selbstdiagnose · optionaler DPO-Audit-Trigger · Learning-Loop-Eintrag (L1/L2/L3). Ein Durchlauf, ein Report, eine Action-Liste — und ein geschlossener Learning-Loop.
 
-**Version:** 2.7.0 · **Befehl:** `/sprint-review`
+**Version:** 2.8.0 · **Befehl:** `/sprint-review`
 
 > 🔗 Sprint-Automation: **`/sprint-run`** faehrt einen ganzen Sprint und orchestriert die Kette `backlog → implement → sprint-review`. Siehe [`sprint-run/`](../sprint-run/README.md) · HANDBUCH Anhang AD.
 
