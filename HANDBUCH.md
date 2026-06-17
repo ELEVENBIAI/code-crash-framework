@@ -26,7 +26,7 @@
 11. [Tägliche Nutzung — ein typischer Workflow](#11-tägliche-nutzung--ein-typischer-workflow)
 11b. [Checkpoints & Rollback per /rewind](#11b-checkpoints--rollback-per-rewind-boo-208)
 12. [Häufige Fragen](#12-häufige-fragen) — inkl. Claude Agent SDK Migration
-13. [Anhänge — Wegweiser](#13-anhänge--wegweiser) — A bis AO im Überblick (AL: Schalter A / Native-Pfade · AM: Automemory vs Learning-Loop · AN: Cloud-Engine /ultraplan · AO: Sprint Review vs /insights)
+13. [Anhänge — Wegweiser](#13-anhänge--wegweiser) — A bis AP im Überblick (AL: Schalter A / Native-Pfade · AM: Automemory vs Learning-Loop · AN: Cloud-Engine /ultraplan · AO: Sprint Review vs /insights · AP: USP — 13 Komponenten ohne Anthropic-Pendant)
 
 ---
 
@@ -1109,6 +1109,8 @@ git commit -m "v1.4.0 - neue Features"
 ```
 
 ### Guardrail 3: Self-Healing Agent
+
+> **Routinen über den Self-Healing-Agent hinaus (BOO-213):** terminierte Skill-Läufe (Backlog-Triage, Sprint-Review, Quality-/Doku-/Cost-Drift, Hermes-Health) richtest du nach dem Runbook `docs/runbooks/routinen-vernetzen.md` ein — drei Aufstellungen (Developer-VPS / MacBook / lokaler Server) + sieben kopierbereite Prompts (Schalter C, ADR-2).
 
 Ein Agent der alle 15 Minuten im Hintergrund prüft:
 
@@ -2372,7 +2374,7 @@ Zwei weitere Runbooks decken konkrete Setup-Aufgaben ab:
 
 ---
 
-Das Handbuch hat 41 Anhänge (A–Z + AA bis AO). Sie sind **Nachschlage- und Vertiefungs-Schicht** — du musst sie nicht von vorn bis hinten lesen. Diese Tabelle sagt dir, **wann welcher Anhang relevant ist**. Anhänge A–M sind die Grundlagen-/Tooling-Schicht, N–AM die Themen ab v0.2.0 (Wellen J–BI, Sprint 3–5a): Effizienz, Privacy, Deployment, Skalierung, Verifikation, Edit-Bodyguard, Contribute-Back, Ubiquitous Language, VPS/Cloud-Team-Runbook, Kunden-Onboarding, SonarCloud-Setup, Linear-MCP-auf-VPS, Knowledge-Onboarding, Sprint-Konfigurator, Slopsquatting-Wordlist-Pflege, Quality-Gate-Audit, Build-vs-Buy-Doktrin, /goal-Engine, Doku-Konsistenz, Release-Konvention, Financials, Schalter A / Native-Pfade, Automemory vs Learning-Loop.
+Das Handbuch hat 42 Anhänge (A–Z + AA bis AP). Sie sind **Nachschlage- und Vertiefungs-Schicht** — du musst sie nicht von vorn bis hinten lesen. Diese Tabelle sagt dir, **wann welcher Anhang relevant ist**. Anhänge A–M sind die Grundlagen-/Tooling-Schicht, N–AM die Themen ab v0.2.0 (Wellen J–BI, Sprint 3–5a): Effizienz, Privacy, Deployment, Skalierung, Verifikation, Edit-Bodyguard, Contribute-Back, Ubiquitous Language, VPS/Cloud-Team-Runbook, Kunden-Onboarding, SonarCloud-Setup, Linear-MCP-auf-VPS, Knowledge-Onboarding, Sprint-Konfigurator, Slopsquatting-Wordlist-Pflege, Quality-Gate-Audit, Build-vs-Buy-Doktrin, /goal-Engine, Doku-Konsistenz, Release-Konvention, Financials, Schalter A / Native-Pfade, Automemory vs Learning-Loop.
 
 | Anhang | Thema | Wann relevant |
 |--------|-------|---------------|
@@ -2417,6 +2419,7 @@ Das Handbuch hat 41 Anhänge (A–Z + AA bis AO). Sie sind **Nachschlage- und Ve
 | **AM** | Zwei Gedächtnisse — Automemory vs Learning-Loop | Abgrenzung Operator-Präferenz (Automemory, lokal) vs Projekt-Lesson (Learning-Loop, im Repo); Entscheidungs-Heuristik, ADR-3 |
 | **AN** | Cloud-Engine /ultraplan | native Code-Level-Planung — /architecture-review + /ideation triggern bei >5 SP oder Architektur-Bruch; Output in specs `## Plan`; `prefer_ultraplan` auto\|always\|never |
 | **AO** | Sprint Review vs /insights | komplementäre Native-Features — /sprint-review (Projekt-Lesson, Repo) vs /insights (Operator-Reflexion, lokal); `complement_insights`, insights-review-Skill |
+| **AP** | USP — 13 Komponenten ohne Anthropic-Pendant | Build-vs-Buy/ADR-1: die 13 Framework-Eigenbauten ohne Native-Pendant; kanonische Liste, Pitch/README/Vault spiegeln sie |
 
 ---
 
@@ -5572,6 +5575,26 @@ Getriggert in `/architecture-review` (Schritt 0b) und `/ideation` (Schritt 3b).
 ```
 
 Flag `complement_insights` im `native_paths`-Block der CLAUDE.md (BOO-199); nur aktiv bei `runtime_target: claude-code`. Skill: `insights-review/` (BOO-206).
+
+---
+
+## Anhang AP: USP — 13 Komponenten ohne Anthropic-Pendant (BOO-209)
+
+> Quelle: ADR-1 (Build-vs-Buy). Das Framework substituiert, wo Native-Features reichen, und **baut** nur, was Anthropic nicht nativ liefert. Diese 13 Komponenten sind dieser Build-Anteil — die eigentliche Markt-Differenzierung. **Kanonische Liste** (Pitch, README und Vault-MOC spiegeln sie).
+
+1. **`/intent` (Schraders 5-Schritte)** — Claude Code plant Code, erzwingt aber kein methodisches „Warum vor Spec". → [intent/SKILL.md](intent/SKILL.md)
+2. **`/pitch` (Demo-Pfad-Heuristik)** — kein natives Tool sammelt Stakeholder-Evidenz entlang eines Demo-Pfads. → [pitch/SKILL.md](pitch/SKILL.md)
+3. **Drei-Schicht-Quality-Gate-Architektur** — ein gestuftes Semgrep/Coverage/Slopsquatting-Gate-Gerüst gibt es nativ nicht. → §8d
+4. **Layer-0 PreToolUse-Bodyguard** — ein deterministischer Edit-Gate *vor* dem Schreiben existiert nativ nicht. → Anhang V
+5. **Spec-Gate als Git-Hook** — „kein Commit ohne Spec" wird nativ nicht maschinell erzwungen. → §8 (Guardrails)
+6. **dpo-Kontrollkatalog (nDSG/GDPR/NIST als YAML)** — Privacy-Compliance als deterministischer Katalog ist kein Native-Feature. → [dpo/SKILL.md](dpo/SKILL.md)
+7. **CONVENTIONS.md (tool-neutraler Compliance-Anker)** — ein tool-neutraler Adapter-Vertrag über Claude/Codex hinweg fehlt nativ. → [CONVENTIONS.md](CONVENTIONS.md)
+8. **AGENTS.md-Generator (BOO-69)** — Tool-Neutralität (portabler Codex-Einstieg) generiert Claude Code nicht. → [bootstrap/SKILL.md](bootstrap/SKILL.md)
+9. **Knowledge-Onboarding-Skill** — deterministisches Routing von Bestands-Doku in Framework-Artefakte gibt es nativ nicht. → [knowledge-onboarding/SKILL.md](knowledge-onboarding/SKILL.md)
+10. **DevContainer-Template (BOO-70)** — ein vorkonfigurierter, governance-fertiger DevContainer ist kein Native-Asset. → [bootstrap/references/devcontainer/devcontainer.json](bootstrap/references/devcontainer/devcontainer.json)
+11. **Quality-Gate-Self-Audit-Skill** — „sind die Gates wirklich verdrahtet?" prüft kein natives Tool. → [quality-gate-audit/SKILL.md](quality-gate-audit/SKILL.md)
+12. **`change_type: prototype` (Vibe-Coding-Fallback)** — eine bewusste Gate-Lockerung für Prototypen ohne Compliance-Bruch ist Framework-Logik. → §10 (Governance anpassen)
+13. **Vendored Querschnitts-Skills** — spezialisierte, mitgelieferte Experten-Skills sind kein Native-Bestandteil. → [security-architect/SKILL.md](security-architect/SKILL.md) · [dpo/SKILL.md](dpo/SKILL.md) · [cloud-system-engineer/SKILL.md](cloud-system-engineer/SKILL.md)
 
 ---
 

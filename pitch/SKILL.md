@@ -1,7 +1,7 @@
 ---
 name: pitch
 recommended_model: sonnet  # BOO-84 — tier mapping in bootstrap/references/model-tiers.json
-version: 1.1.0
+version: 1.2.0
 description: |
   Schliesst Schraders 4P-Pipeline (Perceive/Prompt/Produce/Pitch).
   Sammelt Evidenz (Metriken, Architektur-Diff, Intent-Erfuellung) als
@@ -143,6 +143,24 @@ Erst NACH dem Stakeholder-Termin vom Operator aufgerufen ("/pitch post" oder "Pi
 - **Keine Stakeholder-Mail** — Kommunikation ist menschliche Arbeit
 
 Wenn diese Features gewuenscht sind: separates Issue, nicht im BOO-37-Scope.
+
+## Differenzierende Komponenten — 13 ohne Anthropic-Pendant (BOO-209)
+
+Das Framework substituiert, wo Native-Features reichen (ADR-1 Build-vs-Buy), und baut nur, was Anthropic nicht nativ liefert. Diese 13 sind der USP fuer Stakeholder-Termine — kanonische Liste mit Quell-Links: [HANDBUCH Anhang AP](../HANDBUCH.md).
+
+1. **`/intent`** — methodisches „Warum vor Spec" erzwingt Claude Code nicht.
+2. **`/pitch`** — Stakeholder-Evidenz entlang eines Demo-Pfads sammelt kein natives Tool.
+3. **Drei-Schicht-Quality-Gate** — gestuftes Semgrep/Coverage/Slopsquatting-Geruest gibt es nativ nicht.
+4. **Layer-0 PreToolUse-Bodyguard** — deterministischer Edit-Gate vor dem Schreiben fehlt nativ.
+5. **Spec-Gate als Git-Hook** — „kein Commit ohne Spec" wird nativ nicht erzwungen.
+6. **dpo-Kontrollkatalog (YAML)** — Privacy-Compliance als deterministischer Katalog ist kein Native-Feature.
+7. **CONVENTIONS.md** — tool-neutraler Adapter-Vertrag ueber Claude/Codex fehlt nativ.
+8. **AGENTS.md-Generator** — portablen Codex-Einstieg generiert Claude Code nicht.
+9. **Knowledge-Onboarding** — deterministisches Doku-Routing gibt es nativ nicht.
+10. **DevContainer-Template** — governance-fertiger DevContainer ist kein Native-Asset.
+11. **Quality-Gate-Self-Audit** — „sind die Gates wirklich verdrahtet?" prueft kein natives Tool.
+12. **`change_type: prototype`** — bewusste Gate-Lockerung ohne Compliance-Bruch ist Framework-Logik.
+13. **Vendored Querschnitts-Skills** — security-architect, dpo, cloud-system-engineer mitgeliefert.
 
 ## Zeitliche Verortung
 

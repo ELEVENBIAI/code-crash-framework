@@ -26,7 +26,7 @@
 11. [Daily Usage — A Typical Workflow](#11-daily-usage--a-typical-workflow)
 11b. [Checkpoints & rollback via /rewind](#11b-checkpoints--rollback-via-rewind-boo-208)
 12. [FAQ](#12-faq) — incl. Claude Agent SDK migration
-13. [Appendices — signpost](#13-appendices--signpost) — A through AO at a glance (AL: Switch A / native paths · AM: Automemory vs Learning-Loop · AN: Cloud-engine /ultraplan · AO: Sprint Review vs /insights)
+13. [Appendices — signpost](#13-appendices--signpost) — A through AP at a glance (AL: Switch A / native paths · AM: Automemory vs Learning-Loop · AN: Cloud-engine /ultraplan · AO: Sprint Review vs /insights · AP: USP — 13 components without an Anthropic equivalent)
 
 ---
 
@@ -1039,6 +1039,8 @@ git commit -m "v1.4.0 - new features"
 ```
 
 ### Guardrail 3: Self-healing agent
+
+> **Routines beyond the self-healing agent (BOO-213):** scheduled skill runs (backlog triage, sprint review, quality/doc/cost drift, Hermes health) are set up via the runbook `docs/runbooks/routinen-vernetzen.en.md` — three setups (developer VPS / MacBook / local server) + seven copy-ready prompts (switch C, ADR-2).
 
 An agent that checks every 15 minutes in the background:
 
@@ -2242,7 +2244,7 @@ Two further runbooks cover concrete setup tasks:
 
 ---
 
-The handbook has 41 appendices (A–Z + AA through AO). They are a **reference and deep-dive layer** — you don't need to read them front to back. This table tells you **when which appendix is relevant**. A–M are the foundations/tooling layer, N–AM the themes from v0.2.0 onward (waves J–BI, Sprint 3–5a): efficiency, privacy, deployment, scaling, verification, edit bodyguard, contribute-back, ubiquitous language, VPS/cloud team runbook, customer onboarding, SonarCloud setup, Linear MCP on VPS, knowledge onboarding, sprint configurator, slopsquatting wordlist maintenance, quality-gate audit, build-vs-buy doctrine, /goal engine, doc consistency, release convention, financials, Switch A / native paths, Automemory vs Learning-Loop.
+The handbook has 42 appendices (A–Z + AA through AP). They are a **reference and deep-dive layer** — you don't need to read them front to back. This table tells you **when which appendix is relevant**. A–M are the foundations/tooling layer, N–AM the themes from v0.2.0 onward (waves J–BI, Sprint 3–5a): efficiency, privacy, deployment, scaling, verification, edit bodyguard, contribute-back, ubiquitous language, VPS/cloud team runbook, customer onboarding, SonarCloud setup, Linear MCP on VPS, knowledge onboarding, sprint configurator, slopsquatting wordlist maintenance, quality-gate audit, build-vs-buy doctrine, /goal engine, doc consistency, release convention, financials, Switch A / native paths, Automemory vs Learning-Loop.
 
 | Appendix | Topic | When relevant |
 |----------|-------|---------------|
@@ -2287,6 +2289,7 @@ The handbook has 41 appendices (A–Z + AA through AO). They are a **reference a
 | **AM** | Two memories — Automemory vs Learning-Loop | distinction operator preference (Automemory, local) vs project lesson (Learning-Loop, in repo); decision heuristic, ADR-3 |
 | **AN** | Cloud-engine /ultraplan | native code-level planning — /architecture-review + /ideation trigger at >5 SP or architecture break; output in specs `## Plan`; `prefer_ultraplan` auto\|always\|never |
 | **AO** | Sprint Review vs /insights | complementary native features — /sprint-review (project lesson, repo) vs /insights (operator reflection, local); `complement_insights`, insights-review skill |
+| **AP** | USP — 13 components without an Anthropic equivalent | build-vs-buy/ADR-1: the 13 framework-built components without a native equivalent; canonical list, pitch/README/vault mirror it |
 
 ---
 
@@ -5478,6 +5481,26 @@ Triggered in `/architecture-review` (step 0b) and `/ideation` (step 3b).
 ```
 
 Flag `complement_insights` in the CLAUDE.md `native_paths` block (BOO-199); active only when `runtime_target: claude-code`. Skill: `insights-review/` (BOO-206).
+
+---
+
+## Appendix AP: USP — 13 components without an Anthropic equivalent (BOO-209)
+
+> Source: ADR-1 (build-vs-buy). The framework substitutes where native features suffice, and **builds** only what Anthropic doesn't provide natively. These 13 components are that build share — the actual market differentiation. **Canonical list** (pitch, README, and the vault MOC mirror it).
+
+1. **`/intent` (Schrader's 5 steps)** — Claude Code plans code but doesn't enforce a methodical "why before spec". → [intent/SKILL.en.md](intent/SKILL.en.md)
+2. **`/pitch` (demo-path heuristic)** — no native tool collects stakeholder evidence along a demo path. → [pitch/SKILL.en.md](pitch/SKILL.en.md)
+3. **Three-layer quality-gate architecture** — a tiered Semgrep/coverage/slopsquatting gate scaffold does not exist natively. → §8d
+4. **Layer-0 PreToolUse bodyguard** — a deterministic edit gate *before* writing does not exist natively. → Appendix V
+5. **Spec-gate as a Git hook** — "no commit without a spec" is not machine-enforced natively. → §8 (guardrails)
+6. **dpo control catalog (nDSG/GDPR/NIST as YAML)** — privacy compliance as a deterministic catalog is not a native feature. → [dpo/SKILL.en.md](dpo/SKILL.en.md)
+7. **CONVENTIONS.md (tool-neutral compliance anchor)** — a tool-neutral adapter contract across Claude/Codex is missing natively. → [CONVENTIONS.md](CONVENTIONS.md)
+8. **AGENTS.md generator (BOO-69)** — tool neutrality (portable Codex entry) is not generated by Claude Code. → [bootstrap/SKILL.en.md](bootstrap/SKILL.en.md)
+9. **Knowledge-onboarding skill** — deterministic routing of existing docs into framework artifacts does not exist natively. → [knowledge-onboarding/SKILL.en.md](knowledge-onboarding/SKILL.en.md)
+10. **DevContainer template (BOO-70)** — a preconfigured, governance-ready DevContainer is not a native asset. → [bootstrap/references/devcontainer/devcontainer.json](bootstrap/references/devcontainer/devcontainer.json)
+11. **Quality-gate self-audit skill** — "are the gates actually wired?" is checked by no native tool. → [quality-gate-audit/SKILL.en.md](quality-gate-audit/SKILL.en.md)
+12. **`change_type: prototype` (vibe-coding fallback)** — a deliberate gate relaxation for prototypes without breaking compliance is framework logic. → §10 (tailoring governance)
+13. **Vendored cross-cutting skills** — specialized, bundled expert skills are not a native component. → [security-architect/SKILL.en.md](security-architect/SKILL.en.md) · [dpo/SKILL.en.md](dpo/SKILL.en.md) · [cloud-system-engineer/SKILL.en.md](cloud-system-engineer/SKILL.en.md)
 
 ---
 

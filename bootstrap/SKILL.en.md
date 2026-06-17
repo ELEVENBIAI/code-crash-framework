@@ -1,7 +1,7 @@
 ---
 name: bootstrap
 recommended_model: sonnet  # BOO-84 — tier mapping in bootstrap/references/model-tiers.json
-version: 3.42.0
+version: 3.43.0
 language: en
 description: Sets up a new project with a governance framework — interactive 4-block interview flow, docs architecture with automatic hub linking, optional learning loop L1/L2/L3. Use when the operator wants to set up a new project or says "/bootstrap".
 tools: [Read, Write, Edit, Bash, Glob, Grep]
@@ -1738,6 +1738,7 @@ Bootstrap done. Continue with:
   6. Fill SECURITY.md: run `security-architect` (DESIGN) — threat model (STRIDE) + mitigations (especially for governance standard/heavy).
   7. If existing docs / preliminary material present (block-B flag `bestands_doku_erkannt: true` or operator knows): run `/knowledge-onboarding` — routes GAP analyses, research, design files, plan, README etc. deterministically into the governance artefacts (rubric + manifest). Details: knowledge-onboarding/SKILL.en.md (BOO-137).
   8. Logging/monitoring a requirement? → enter the requirements in `observability.md` so `ARCHITECTURE_DESIGN.md` picks them up (runbook: docs/runbooks/logging-monitoring.md, concept: HANDBUCH §8d-ter).
+  9. Want to set up routines? → see runbook `docs/runbooks/routinen-vernetzen.en.md` (3 setups + 7 routines with copy-ready prompts; switch C, ADR-2). Bootstrap deliberately does NOT ask for routines defaults.
 ```
 
 > **Fill SECURITY.md (BOO-136):** the bootstrap scaffolds `SECURITY.md` only as a **skeleton**. `security-architect` (DESIGN mode) fills it based on the **STRIDE/OWASP review questions** — the operator needs no security expertise; the skill asks the questions.

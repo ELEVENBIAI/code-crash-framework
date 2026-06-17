@@ -4,7 +4,7 @@
 
 > Schliesst Schraders 4P-Pipeline (Perceive / Prompt / Produce / Pitch). Der Skill sammelt Metriken, Architektur-Diff und Intent-Erfuellung als Markdown-Briefing fuer Stakeholder-Termine. Keine Slides, kein Outcome-Text, kein Demo-Video — die Buehne bleibt menschlich.
 
-**Version:** 1.1.0 · **Befehl:** `/pitch`
+**Version:** 1.2.0 · **Befehl:** `/pitch`
 
 > **Claude-Code-Modus:** `/pitch` sammelt Evidenz und schreibt ein Briefing-File → beaufsichtigt **`acceptEdits`**. Kein unbeaufsichtigter Betrieb (du reviewst das Briefing vor dem Termin). Details: HANDBUCH §6 „Claude-Code-Modus".
 
