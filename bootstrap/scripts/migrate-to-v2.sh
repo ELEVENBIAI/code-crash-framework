@@ -2937,6 +2937,9 @@ migrate_all() {
     # Wave — Memory-Abgrenzung (BOO-200): Automemory-Header in MEMORY.md (ADR-3)
     migrate_boo_200
 
+    # Sprint 6 — Status-Line (BOO-205): statusline.sh + settings.json-Verdrahtung (Schalter A)
+    migrate_boo_205
+
     log_info "DE: Migration abgeschlossen. Status pro Projekt in migration-status.md eintragen."
     log_info "EN: Migration finished. Record per-project status in migration-status.md."
 }
@@ -4496,6 +4499,179 @@ migrate_boo_200() {
         printf '%s' "$header" > "$mem"
     fi
     log_info "MEMORY.md-Header vorangestellt ($mem)"
+}
+
+migrate_boo_205() {
+    # BOO-205 — Status-Line-Custom-Script mit Worker-Equivalent live (Schalter A)
+    # https://linear.app/owlist/issue/BOO-205
+    #
+    # Ruestet die native Claude-Code-Status-Line nach. NUR bei runtime_target: claude-code
+    # (Schalter A) — bei codex/cross-tool/unknown wird nichts verdrahtet.
+    #   (1) .claude/statusline.sh — Skript, BYTE-IDENTISCH zur SSoT bootstrap/templates/statusline.sh
+    #       und zum Template-Block in bootstrap/references/file-templates.md (Triplikat, BOO-205).
+    #   (2) .claude/settings.json — nativer "statusLine"-Block (Claude Code rendert daraus). Idempotent:
+    #       nur wenn noch kein statusLine vorhanden. jq-Merge wenn verfuegbar, sonst minimal-Datei/MANUAL.
+    #   (3) .claude/environment.json — Manifest-Referenz "status_line" (AC#2; environment.json ist das
+    #       Framework-Manifest, settings.json die native Render-Verdrahtung). Nur wenn Datei existiert
+    #       und Feld fehlt; jq-Merge wenn verfuegbar, sonst MANUAL.
+    # Idempotent, nicht-destruktiv. Zweiter Lauf doppelt nichts.
+    log_info "BOO-205: Status-Line nachruesten (statusline.sh + settings.json-Verdrahtung)"
+
+    # --- Schalter-A-Gate: nur bei runtime_target: claude-code ---
+    local rt=""
+    [[ -f "CONVENTIONS.md" ]] && rt=$(grep -E '^runtime_target:' CONVENTIONS.md | head -1 | sed 's/runtime_target:[[:space:]]*//')
+    if [[ "$rt" != "claude-code" ]]; then
+        log_skip "runtime_target=${rt:-fehlend} (nicht claude-code) — Status-Line nicht verdrahtet (Schalter A inaktiv)"
+        return 0
+    fi
+
+    # --- 1. .claude/statusline.sh (byte-identisch zur SSoT bootstrap/templates/statusline.sh) ---
+    local sl=".claude/statusline.sh"
+    if [[ -f "$sl" ]]; then
+        log_skip "$sl existiert — nicht ueberschrieben (idempotent)"
+    elif [[ "$DRY_RUN" == "true" ]]; then
+        log_dry "write $sl (byte-identisch zu bootstrap/templates/statusline.sh) + chmod +x"
+    else
+        ensure_dir ".claude"
+        cat > "$sl" <<'STATUSLINE_SH_EOF'
+#!/usr/bin/env bash
+# statusline.sh — INTENTRON Custom-Status-Line mit Worker-Equivalent (BOO-205).
+#
+# Native Claude-Code-Status-Line: liest das von Claude Code auf stdin uebergebene
+# JSON und rendert EINE Zeile auf stdout. Aktiv NUR bei runtime_target: claude-code
+# (Schalter A) — verdrahtet ueber .claude/settings.json ("statusLine"). Build-vs-Buy
+# (ADR-1): native Status-Line statt Eigenbau-UI; dieses Skript reichert nur an.
+#
+# Beispiel-Ausgabe:
+#   Sonnet 4.7 | 142k/200k ctx | Worker-Equiv: 2.5h / 16h | Story BOO-205 | $4.20
+#
+# Felder & Quellen:
+#   Modell        .model.display_name                       (nativ, stdin)
+#   ctx           .context_window.total_input_tokens /      (nativ, stdin)
+#                 .context_window.context_window_size
+#   Worker-Equiv  effort_ai_hours / effort_human_equiv_hours aus specs/<story>.md
+#                 (Framework-Anreicherung — Execution-Isolation-Block, BOO-193)
+#   Story         BOO-<n> aus .worktree.branch / .workspace.git_worktree / git branch
+#   $-Kosten      .cost.total_cost_usd                      (nativ, stdin; Schattenpreis
+#                 bei Max-Pro, Echtkosten bei API)
+#
+# Defensiv: jedes Feld ist optional. Fehlt eine Quelle (kein jq, kein Spec, kein Wert),
+# wird das Feld weggelassen — das Skript endet IMMER mit Exit 0 (nie ein Render-Fehler
+# in der Status-Line). Keine Secrets; keine Netzwerk-Calls.
+
+set -uo pipefail
+
+INPUT="$(cat 2>/dev/null || true)"
+
+# Repo-Wurzel: bevorzugt aus dem stdin-JSON, sonst aktuelles Verzeichnis.
+parse() {
+  # parse <jq-pfad> — liest einen Wert aus $INPUT; leer bei Fehler/null/fehlendem jq.
+  command -v jq >/dev/null 2>&1 || return 0
+  printf '%s' "$INPUT" | jq -r "$1 // empty" 2>/dev/null
+}
+
+CWD="$(parse '.workspace.current_dir')"
+[[ -z "$CWD" ]] && CWD="$(parse '.workspace.project_dir')"
+[[ -z "$CWD" ]] && CWD="$PWD"
+
+PARTS=()
+
+# --- 1. Modell ---------------------------------------------------------------
+MODEL="$(parse '.model.display_name')"
+[[ -n "$MODEL" ]] && PARTS+=("$MODEL")
+
+# --- 2. Context-Fenster (Nk/Mk ctx) -----------------------------------------
+USED="$(parse '.context_window.total_input_tokens')"
+SIZE="$(parse '.context_window.context_window_size')"
+if [[ "$USED" =~ ^[0-9]+$ && "$SIZE" =~ ^[0-9]+$ && "$SIZE" -gt 0 ]]; then
+  PARTS+=("$((USED / 1000))k/$((SIZE / 1000))k ctx")
+fi
+
+# --- 3. Story-ID aus Branch / Worktree --------------------------------------
+BRANCH="$(parse '.worktree.branch')"
+[[ -z "$BRANCH" ]] && BRANCH="$(parse '.workspace.git_worktree')"
+if [[ -z "$BRANCH" ]] && command -v git >/dev/null 2>&1; then
+  BRANCH="$(git -C "$CWD" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+fi
+STORY=""
+if [[ "$BRANCH" =~ [Bb][Oo][Oo]-([0-9]+) ]]; then
+  STORY="BOO-${BASH_REMATCH[1]}"
+fi
+
+# --- 4. Worker-Equivalent (h/h) aus der Story-Spec --------------------------
+if [[ -n "$STORY" ]]; then
+  SPEC="$CWD/specs/$STORY.md"
+  if [[ -f "$SPEC" ]]; then
+    AI_H="$(grep -E '^[[:space:]]*effort_ai_hours:' "$SPEC" | head -1 | sed -E 's/.*:[[:space:]]*//; s/[[:space:]]*(#.*)?$//')"
+    HUM_H="$(grep -E '^[[:space:]]*effort_human_equiv_hours:' "$SPEC" | head -1 | sed -E 's/.*:[[:space:]]*//; s/[[:space:]]*(#.*)?$//')"
+    if [[ "$AI_H" =~ ^[0-9.]+$ && "$HUM_H" =~ ^[0-9.]+$ ]]; then
+      PARTS+=("Worker-Equiv: ${AI_H}h / ${HUM_H}h")
+    fi
+  fi
+  PARTS+=("Story $STORY")
+fi
+
+# --- 5. Kosten ($) -----------------------------------------------------------
+COST="$(parse '.cost.total_cost_usd')"
+if [[ "$COST" =~ ^[0-9.]+$ ]]; then
+  PARTS+=("$(printf '$%.2f' "$COST")")
+fi
+
+# --- Render: eine Zeile, Felder mit " | " getrennt, leere weggelassen --------
+OUT=""
+for p in "${PARTS[@]:-}"; do
+  [[ -z "$p" ]] && continue
+  if [[ -z "$OUT" ]]; then OUT="$p"; else OUT="$OUT | $p"; fi
+done
+printf '%s' "$OUT"
+
+exit 0
+STATUSLINE_SH_EOF
+        chmod +x "$sl"
+        log_info "created $sl (byte-identisch zur SSoT) + chmod +x"
+    fi
+
+    # --- 2. .claude/settings.json — nativer statusLine-Block ---
+    local settings=".claude/settings.json"
+    if [[ -f "$settings" ]] && grep -q '"statusLine"' "$settings"; then
+        log_skip "$settings hat bereits einen statusLine-Block — nicht dupliziert"
+    elif [[ "$DRY_RUN" == "true" ]]; then
+        log_dry "wire statusLine in $settings (command: bash .claude/statusline.sh)"
+    elif command -v jq >/dev/null 2>&1; then
+        ensure_dir ".claude"
+        [[ -f "$settings" ]] || printf '{}\n' > "$settings"
+        local tmp; tmp=$(mktemp)
+        if jq '.statusLine = {"type":"command","command":"bash .claude/statusline.sh","padding":0}' "$settings" > "$tmp" 2>/dev/null; then
+            mv "$tmp" "$settings"
+            log_info "statusLine in $settings verdrahtet (jq-Merge)"
+        else
+            rm -f "$tmp"
+            log_manual "$settings konnte nicht per jq gemerged werden — statusLine-Block manuell ergaenzen (HANDBUCH Anhang AQ)"
+        fi
+    else
+        log_manual "kein jq — statusLine-Block manuell in $settings ergaenzen: {\"type\":\"command\",\"command\":\"bash .claude/statusline.sh\"} (HANDBUCH Anhang AQ)"
+    fi
+
+    # --- 3. .claude/environment.json — Manifest-Referenz (AC#2) ---
+    local envf=".claude/environment.json"
+    if [[ ! -f "$envf" ]]; then
+        log_skip "$envf fehlt — Manifest-Referenz uebersprungen (generate-environment-json.sh)"
+    elif grep -q '"status_line"' "$envf"; then
+        log_skip "$envf hat bereits status_line-Referenz"
+    elif [[ "$DRY_RUN" == "true" ]]; then
+        log_dry "add status_line reference to $envf"
+    elif command -v jq >/dev/null 2>&1; then
+        local tmp; tmp=$(mktemp)
+        if jq '.status_line = ".claude/statusline.sh"' "$envf" > "$tmp" 2>/dev/null; then
+            mv "$tmp" "$envf"
+            log_info "status_line-Referenz in $envf ergaenzt (AC#2)"
+        else
+            rm -f "$tmp"
+            log_manual "$envf: status_line-Referenz manuell ergaenzen (\"status_line\": \".claude/statusline.sh\")"
+        fi
+    else
+        log_manual "kein jq — \"status_line\": \".claude/statusline.sh\" manuell in $envf ergaenzen"
+    fi
 }
 
 migrate_boo_199() {

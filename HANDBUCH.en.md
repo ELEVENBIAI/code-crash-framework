@@ -26,7 +26,7 @@
 11. [Daily Usage — A Typical Workflow](#11-daily-usage--a-typical-workflow)
 11b. [Checkpoints & rollback via /rewind](#11b-checkpoints--rollback-via-rewind-boo-208)
 12. [FAQ](#12-faq) — incl. Claude Agent SDK migration
-13. [Appendices — signpost](#13-appendices--signpost) — A through AP at a glance (AL: Switch A / native paths · AM: Automemory vs Learning-Loop · AN: Cloud-engine /ultraplan · AO: Sprint Review vs /insights · AP: USP — 13 components without an Anthropic equivalent)
+13. [Appendices — signpost](#13-appendices--signpost) — A through AQ at a glance (AL: Switch A / native paths · AM: Automemory vs Learning-Loop · AN: Cloud-engine /ultraplan · AO: Sprint Review vs /insights · AP: USP — 13 components without an Anthropic equivalent · AQ: Status line — worker-equivalent live)
 
 ---
 
@@ -2244,7 +2244,7 @@ Two further runbooks cover concrete setup tasks:
 
 ---
 
-The handbook has 42 appendices (A–Z + AA through AP). They are a **reference and deep-dive layer** — you don't need to read them front to back. This table tells you **when which appendix is relevant**. A–M are the foundations/tooling layer, N–AM the themes from v0.2.0 onward (waves J–BI, Sprint 3–5a): efficiency, privacy, deployment, scaling, verification, edit bodyguard, contribute-back, ubiquitous language, VPS/cloud team runbook, customer onboarding, SonarCloud setup, Linear MCP on VPS, knowledge onboarding, sprint configurator, slopsquatting wordlist maintenance, quality-gate audit, build-vs-buy doctrine, /goal engine, doc consistency, release convention, financials, Switch A / native paths, Automemory vs Learning-Loop.
+The handbook has 43 appendices (A–Z + AA through AQ). They are a **reference and deep-dive layer** — you don't need to read them front to back. This table tells you **when which appendix is relevant**. A–M are the foundations/tooling layer, N–AM the themes from v0.2.0 onward (waves J–BI, Sprint 3–5a): efficiency, privacy, deployment, scaling, verification, edit bodyguard, contribute-back, ubiquitous language, VPS/cloud team runbook, customer onboarding, SonarCloud setup, Linear MCP on VPS, knowledge onboarding, sprint configurator, slopsquatting wordlist maintenance, quality-gate audit, build-vs-buy doctrine, /goal engine, doc consistency, release convention, financials, Switch A / native paths, Automemory vs Learning-Loop.
 
 | Appendix | Topic | When relevant |
 |----------|-------|---------------|
@@ -2290,6 +2290,7 @@ The handbook has 42 appendices (A–Z + AA through AP). They are a **reference a
 | **AN** | Cloud-engine /ultraplan | native code-level planning — /architecture-review + /ideation trigger at >5 SP or architecture break; output in specs `## Plan`; `prefer_ultraplan` auto\|always\|never |
 | **AO** | Sprint Review vs /insights | complementary native features — /sprint-review (project lesson, repo) vs /insights (operator reflection, local); `complement_insights`, insights-review skill |
 | **AP** | USP — 13 components without an Anthropic equivalent | build-vs-buy/ADR-1: the 13 framework-built components without a native equivalent; canonical list, pitch/README/vault mirror it |
+| **AQ** | Status line — worker-equivalent live | native Claude Code status line: model, token budget, worker-equivalent (h/h) and story live in the prompt; wired in `settings.json`, only when `runtime_target=claude-code` (switch A) |
 
 ---
 
@@ -5501,6 +5502,42 @@ Flag `complement_insights` in the CLAUDE.md `native_paths` block (BOO-199); acti
 11. **Quality-gate self-audit skill** — "are the gates actually wired?" is checked by no native tool. → [quality-gate-audit/SKILL.en.md](quality-gate-audit/SKILL.en.md)
 12. **`change_type: prototype` (vibe-coding fallback)** — a deliberate gate relaxation for prototypes without breaking compliance is framework logic. → §10 (tailoring governance)
 13. **Vendored cross-cutting skills** — specialized, bundled expert skills are not a native component. → [security-architect/SKILL.en.md](security-architect/SKILL.en.md) · [dpo/SKILL.en.md](dpo/SKILL.en.md) · [cloud-system-engineer/SKILL.en.md](cloud-system-engineer/SKILL.en.md)
+
+---
+
+## Appendix AQ: Status line — worker-equivalent live (BOO-205)
+
+> **In short:** a native Claude Code status line shows model, token budget, worker-equivalent and story budget **live** in the prompt. Build-vs-buy (ADR-1, Appendix AG): native status line instead of a custom UI. Active only when `runtime_target: claude-code` (switch A, Appendix AL).
+
+**What it shows** (one line, fields separated by ` | `, empty ones omitted):
+
+```
+Sonnet 4.7 | 142k/200k ctx | Worker-Equiv: 2.5h / 16h | Story BOO-205 | $4.20
+```
+
+| Field | Source | Kind |
+|-------|--------|------|
+| Model | `.model.display_name` (stdin) | native |
+| `Nk/Mk ctx` | `.context_window.total_input_tokens` / `.context_window_size` (stdin) | native |
+| `Worker-Equiv: Xh / Yh` | `effort_ai_hours` / `effort_human_equiv_hours` from `specs/<story>.md` (BOO-193) | framework enrichment |
+| `Story BOO-<n>` | `.worktree.branch` or `git branch` | native/derived |
+| `$X.XX` | `.cost.total_cost_usd` (stdin) | native — shadow price (Max-Pro) / real cost (API) |
+
+**Why custom?** Model, ctx and cost are already provided natively by Claude Code on stdin. The **one** value that justifies the custom status line is the **worker-equivalent** (ADR-D, Appendix AK): the second steering dimension beside tokens, read from the story spec — otherwise only visible in the sprint report, now live in the moment of work.
+
+**Wiring.** Claude Code reads the status line **exclusively** from `.claude/settings.json`:
+
+```json
+{
+  "statusLine": { "type": "command", "command": "bash .claude/statusline.sh", "padding": 0 }
+}
+```
+
+`.claude/environment.json` is the framework **manifest**, not the native render path — `migrate_boo_205` additionally records `"status_line": ".claude/statusline.sh"` there as a reference (the manifest knows the script; rendering goes through `settings.json`).
+
+**Rollout.** `/bootstrap` creates `.claude/statusline.sh` (SSoT template `bootstrap/templates/statusline.sh`) and wires `settings.json` when `runtime_target: claude-code`. Existing projects: `intentron migrate` (`migrate_boo_205`, idempotent, switch-A-gated). `bootstrap/references/verify-setup.sh` §5c checks existence + executability + wiring.
+
+**Tailoring & limits.** The script is defensive (every field optional, always exits 0) and deliberately small — to reorder fields, edit `.claude/statusline.sh`; the worker-equivalent enrichment from the spec is the only framework-specific part. No render when `runtime_target ≠ claude-code`. The `$` value is a client-side estimate. Worker-equivalent only appears when the active story has a spec with the dual column (BOO-193).
 
 ---
 

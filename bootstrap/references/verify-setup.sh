@@ -165,6 +165,29 @@ else
   [[ $QUIET -eq 1 ]] || printf '  ----  Financials-Add-on nicht aktiv — uebersprungen\n'
 fi
 
+# --- 5c. Status-Line (BOO-205, nur bei runtime_target: claude-code) ---------
+section "5c. Status-Line (Worker-Equivalent live, BOO-205)"
+rt_sl=""
+[[ -f "CONVENTIONS.md" ]] && rt_sl=$(grep -E '^runtime_target:' CONVENTIONS.md | head -1 | sed 's/runtime_target:[[:space:]]*//')
+if [[ "$rt_sl" == "claude-code" ]]; then
+  if [[ -f ".claude/statusline.sh" ]]; then
+    if [[ -x ".claude/statusline.sh" ]]; then
+      c_pass ".claude/statusline.sh vorhanden + ausfuehrbar"
+    else
+      c_warn ".claude/statusline.sh vorhanden, aber nicht ausfuehrbar — 'chmod +x .claude/statusline.sh'"
+    fi
+    if [[ -f ".claude/settings.json" ]] && grep -q '"statusLine"' ".claude/settings.json"; then
+      c_pass "statusLine in .claude/settings.json verdrahtet"
+    else
+      c_warn "statusLine-Block fehlt in .claude/settings.json — 'intentron migrate' (migrate_boo_205) nachziehen"
+    fi
+  else
+    c_warn "runtime_target=claude-code, aber .claude/statusline.sh fehlt — 'intentron migrate' (migrate_boo_205) nachziehen"
+  fi
+else
+  [[ $QUIET -eq 1 ]] || printf '  ----  Status-Line nur bei runtime_target=claude-code — uebersprungen (aktuell: %s)\n' "${rt_sl:-fehlend}"
+fi
+
 # --- 6. Backlog-Adapter ----------------------------------------------------
 section "6. Backlog-Adapter"
 if [[ -f ".claude/ISSUE_WRITING_GUIDELINES.md" ]] || grep -q "backlog" "$ENV_FILE" 2>/dev/null; then

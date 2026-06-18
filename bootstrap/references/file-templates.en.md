@@ -1798,6 +1798,32 @@ token_cost_assumption: <optional> # falls KI-Token-Kosten separat budgetiert wer
 
 ---
 
+## .claude/statusline.sh (BOO-205 — status line with worker-equivalent)
+
+> Native Claude Code status line. **The SSoT is the real file `bootstrap/templates/statusline.sh`** — deliberately NO heredoc duplicate here (avoid triplicate maintenance, cf. `worker-equivalent-baseline.md`). `migrate_boo_205` installs it byte-identically as `.claude/statusline.sh` and wires it up. Active **only** when `runtime_target: claude-code` (switch A) — nothing is wired for `codex`/`cross-tool`/`unknown`.
+
+The script reads the JSON Claude Code passes on stdin (`.model.display_name`, `.context_window.total_input_tokens`/`.context_window_size`, `.cost.total_cost_usd`, `.worktree.branch`) and enriches it with the **worker-equivalent** (`effort_ai_hours` / `effort_human_equiv_hours` from `specs/<story>.md`, BOO-193). Defensive: every field optional, always exits 0. Output (one line):
+
+```
+Sonnet 4.7 | 142k/200k ctx | Worker-Equiv: 2.5h / 16h | Story BOO-205 | $4.20
+```
+
+Wiring in `.claude/settings.json` (the native render path — Claude Code reads the status line exclusively from here, **not** from `environment.json`):
+
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "bash .claude/statusline.sh",
+    "padding": 0
+  }
+}
+```
+
+`migrate_boo_205` additionally adds a manifest reference `"status_line": ".claude/statusline.sh"` to `.claude/environment.json` (AC#2 — the framework manifest knows the script; the render wiring stays in `settings.json`). Full documentation: HANDBUCH **Appendix AQ**.
+
+---
+
 ## hooks/pre-edit-bodyguard.sh (BOO-86 — Layer-0 Edit-Bodyguard)
 
 **Layer-0 gate since BOO-86:** a Claude Code **PreToolUse hook** on `Edit|Write` that

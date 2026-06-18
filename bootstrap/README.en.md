@@ -4,7 +4,9 @@
 
 > A **portable bootstrap skill** for Claude Code, Codex, or cross-tool setups that sets up a complete AI-driven development governance framework for any new project — in 4 interview blocks (A-D) plus 7 setup phases, with zero external dependencies.
 
-**Version 3.0 (April 2026)** — generic, interview-friendly, with portable learning loop (L1/L2/L3). No project-type lock-in, no trading-specific residue.
+**Version:** 3.44.0 — generic, interview-friendly, with portable learning loop (L1/L2/L3). No project-type lock-in, no trading-specific residue.
+
+> 3.44.0 — Status line custom script with live worker-equivalent (BOO-205)
 **Foundation:** Claude Code Best Practice Checklist v10 (OWLIST GmbH, 2026) — context engineering, global settings, context protection, and agent patterns are integrated into the bootstrap process.
 
 > **Claude Code mode:** `/bootstrap` is an interview that then scaffolds many governance files → answer the questions, then **`acceptEdits`** for the scaffold phase. No unattended operation (setup is one-off + interactive). Details: HANDBUCH §6 "Claude Code mode".

@@ -26,7 +26,7 @@
 11. [Tägliche Nutzung — ein typischer Workflow](#11-tägliche-nutzung--ein-typischer-workflow)
 11b. [Checkpoints & Rollback per /rewind](#11b-checkpoints--rollback-per-rewind-boo-208)
 12. [Häufige Fragen](#12-häufige-fragen) — inkl. Claude Agent SDK Migration
-13. [Anhänge — Wegweiser](#13-anhänge--wegweiser) — A bis AP im Überblick (AL: Schalter A / Native-Pfade · AM: Automemory vs Learning-Loop · AN: Cloud-Engine /ultraplan · AO: Sprint Review vs /insights · AP: USP — 13 Komponenten ohne Anthropic-Pendant)
+13. [Anhänge — Wegweiser](#13-anhänge--wegweiser) — A bis AQ im Überblick (AL: Schalter A / Native-Pfade · AM: Automemory vs Learning-Loop · AN: Cloud-Engine /ultraplan · AO: Sprint Review vs /insights · AP: USP — 13 Komponenten ohne Anthropic-Pendant · AQ: Status Line — Worker-Equivalent live)
 
 ---
 
@@ -2374,7 +2374,7 @@ Zwei weitere Runbooks decken konkrete Setup-Aufgaben ab:
 
 ---
 
-Das Handbuch hat 42 Anhänge (A–Z + AA bis AP). Sie sind **Nachschlage- und Vertiefungs-Schicht** — du musst sie nicht von vorn bis hinten lesen. Diese Tabelle sagt dir, **wann welcher Anhang relevant ist**. Anhänge A–M sind die Grundlagen-/Tooling-Schicht, N–AM die Themen ab v0.2.0 (Wellen J–BI, Sprint 3–5a): Effizienz, Privacy, Deployment, Skalierung, Verifikation, Edit-Bodyguard, Contribute-Back, Ubiquitous Language, VPS/Cloud-Team-Runbook, Kunden-Onboarding, SonarCloud-Setup, Linear-MCP-auf-VPS, Knowledge-Onboarding, Sprint-Konfigurator, Slopsquatting-Wordlist-Pflege, Quality-Gate-Audit, Build-vs-Buy-Doktrin, /goal-Engine, Doku-Konsistenz, Release-Konvention, Financials, Schalter A / Native-Pfade, Automemory vs Learning-Loop.
+Das Handbuch hat 43 Anhänge (A–Z + AA bis AQ). Sie sind **Nachschlage- und Vertiefungs-Schicht** — du musst sie nicht von vorn bis hinten lesen. Diese Tabelle sagt dir, **wann welcher Anhang relevant ist**. Anhänge A–M sind die Grundlagen-/Tooling-Schicht, N–AM die Themen ab v0.2.0 (Wellen J–BI, Sprint 3–5a): Effizienz, Privacy, Deployment, Skalierung, Verifikation, Edit-Bodyguard, Contribute-Back, Ubiquitous Language, VPS/Cloud-Team-Runbook, Kunden-Onboarding, SonarCloud-Setup, Linear-MCP-auf-VPS, Knowledge-Onboarding, Sprint-Konfigurator, Slopsquatting-Wordlist-Pflege, Quality-Gate-Audit, Build-vs-Buy-Doktrin, /goal-Engine, Doku-Konsistenz, Release-Konvention, Financials, Schalter A / Native-Pfade, Automemory vs Learning-Loop.
 
 | Anhang | Thema | Wann relevant |
 |--------|-------|---------------|
@@ -2420,6 +2420,7 @@ Das Handbuch hat 42 Anhänge (A–Z + AA bis AP). Sie sind **Nachschlage- und Ve
 | **AN** | Cloud-Engine /ultraplan | native Code-Level-Planung — /architecture-review + /ideation triggern bei >5 SP oder Architektur-Bruch; Output in specs `## Plan`; `prefer_ultraplan` auto\|always\|never |
 | **AO** | Sprint Review vs /insights | komplementäre Native-Features — /sprint-review (Projekt-Lesson, Repo) vs /insights (Operator-Reflexion, lokal); `complement_insights`, insights-review-Skill |
 | **AP** | USP — 13 Komponenten ohne Anthropic-Pendant | Build-vs-Buy/ADR-1: die 13 Framework-Eigenbauten ohne Native-Pendant; kanonische Liste, Pitch/README/Vault spiegeln sie |
+| **AQ** | Status Line — Worker-Equivalent live | native Claude-Code-Status-Line: Modell, Token-Budget, Worker-Equivalent (h/h) und Story live im Prompt; Verdrahtung in `settings.json`, nur bei `runtime_target=claude-code` (Schalter A) |
 
 ---
 
@@ -5595,6 +5596,42 @@ Flag `complement_insights` im `native_paths`-Block der CLAUDE.md (BOO-199); nur 
 11. **Quality-Gate-Self-Audit-Skill** — „sind die Gates wirklich verdrahtet?" prüft kein natives Tool. → [quality-gate-audit/SKILL.md](quality-gate-audit/SKILL.md)
 12. **`change_type: prototype` (Vibe-Coding-Fallback)** — eine bewusste Gate-Lockerung für Prototypen ohne Compliance-Bruch ist Framework-Logik. → §10 (Governance anpassen)
 13. **Vendored Querschnitts-Skills** — spezialisierte, mitgelieferte Experten-Skills sind kein Native-Bestandteil. → [security-architect/SKILL.md](security-architect/SKILL.md) · [dpo/SKILL.md](dpo/SKILL.md) · [cloud-system-engineer/SKILL.md](cloud-system-engineer/SKILL.md)
+
+---
+
+## Anhang AQ: Status Line — Worker-Equivalent live (BOO-205)
+
+> **Kurz:** Eine native Claude-Code-Status-Line zeigt Modell, Token-Budget, Worker-Equivalent und Story-Budget **live** im Prompt. Build-vs-Buy (ADR-1, Anhang AG): native Status-Line statt Eigenbau-UI. Aktiv nur bei `runtime_target: claude-code` (Schalter A, Anhang AL).
+
+**Was sie zeigt** (eine Zeile, Felder mit ` | ` getrennt, leere weggelassen):
+
+```
+Sonnet 4.7 | 142k/200k ctx | Worker-Equiv: 2.5h / 16h | Story BOO-205 | $4.20
+```
+
+| Feld | Quelle | Art |
+|------|--------|-----|
+| Modell | `.model.display_name` (stdin) | nativ |
+| `Nk/Mk ctx` | `.context_window.total_input_tokens` / `.context_window_size` (stdin) | nativ |
+| `Worker-Equiv: Xh / Yh` | `effort_ai_hours` / `effort_human_equiv_hours` aus `specs/<story>.md` (BOO-193) | Framework-Anreicherung |
+| `Story BOO-<n>` | `.worktree.branch` bzw. `git branch` | nativ/abgeleitet |
+| `$X.XX` | `.cost.total_cost_usd` (stdin) | nativ — Schattenpreis (Max-Pro) / Echtkosten (API) |
+
+**Warum custom?** Modell, ctx und Kosten liefert Claude Code bereits nativ auf stdin. Der **eine** Mehrwert, der die Custom-Status-Line rechtfertigt, ist das **Worker-Equivalent** (ADR-D, Anhang AK): die zweite Steuerungs-Dimension neben Token, gelesen aus der Story-Spec — sonst nur im Sprint-Report sichtbar, jetzt live im Moment der Arbeit.
+
+**Verdrahtung.** Claude Code liest die Status-Line **ausschliesslich** aus `.claude/settings.json`:
+
+```json
+{
+  "statusLine": { "type": "command", "command": "bash .claude/statusline.sh", "padding": 0 }
+}
+```
+
+`.claude/environment.json` ist das Framework-**Manifest**, nicht der native Render-Pfad — `migrate_boo_205` hinterlegt dort zusaetzlich `"status_line": ".claude/statusline.sh"` als Referenz (das Manifest kennt das Skript; gerendert wird ueber `settings.json`).
+
+**Ausrollung.** `/bootstrap` legt bei `runtime_target: claude-code` `.claude/statusline.sh` an (SSoT-Template `bootstrap/templates/statusline.sh`) und verdrahtet `settings.json`. Bestandsprojekte: `intentron migrate` (`migrate_boo_205`, idempotent, Schalter-A-gated). `bootstrap/references/verify-setup.sh` §5c prueft Existenz + Ausfuehrbarkeit + Verdrahtung.
+
+**Anpassen & Grenzen.** Das Skript ist defensiv (jedes Feld optional, Exit immer 0) und bewusst klein — Felder umstellen heisst `.claude/statusline.sh` editieren; die Worker-Equiv-Anreicherung aus der Spec ist der einzige framework-spezifische Teil. Kein Render bei `runtime_target ≠ claude-code`. Der `$`-Wert ist eine client-seitige Schaetzung. Worker-Equiv erscheint nur, wenn die aktive Story eine Spec mit Doppelspalte (BOO-193) hat.
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: bootstrap
 recommended_model: sonnet  # BOO-84 — tier mapping in bootstrap/references/model-tiers.json
-version: 3.43.0
+version: 3.44.0
 language: en
 description: Sets up a new project with a governance framework — interactive 4-block interview flow, docs architecture with automatic hub linking, optional learning loop L1/L2/L3. Use when the operator wants to set up a new project or says "/bootstrap".
 tools: [Read, Write, Edit, Bash, Glob, Grep]
@@ -209,6 +209,8 @@ Roles:
 - `CONVENTIONS.md` = adapter contract: runtime, backlog adapter, governance mode, execution isolation, active gates, and postflight status.
 
 For `codex`, `cross-tool`, or `unknown`, always scaffold `AGENTS.md`. For `claude-code`, `AGENTS.md` may still be scaffolded as a portable Codex entry; skip it only on explicit operator request.
+
+For `RUNTIME_TARGET = claude-code`, the native **status line** is also rolled out (script `bootstrap/templates/statusline.sh` → installed as `.claude/statusline.sh`, wired via the `statusLine` key in `.claude/settings.json`). It shows the model, token budget, worker-equivalent (h/h), and story budget live. No separate question — activation follows from the Switch-A choice `claude-code`. Inactive for `codex`, `cross-tool`, or `unknown`. Details: HANDBOOK appendix AQ "Status Line"; existing projects pick it up via `migrate_boo_205`.
 
 ### A.2 Project identity (3 questions)
 
