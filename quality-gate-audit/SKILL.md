@@ -11,7 +11,7 @@ description: |
   Verwenden wenn der Operator "quality gate audit", "sind die gates verdrahtet", "pruef die
   quality gates", "gate wiring check" oder "/quality-gate-audit" sagt. Auch automatisch via
   Trigger post-install / pre-sprint / post-update.
-version: 1.0.0
+version: 1.1.0
 metadata:
   hermes:
     category: governance
@@ -129,6 +129,19 @@ Beispiel-Report: [docs/audits/2026-06-14-quality-gate-audit.md](../docs/audits/2
 > Sprint auf einem Projekt mit blinden Gates losfaehrt. Ein `blind`-Override ist immer
 > begruendungspflichtig (`--reason`) und landet im Audit-Trail (Frontmatter `overrides`).
 
+## Native-Feature-Beobachtung — ADR-5 Re-Eval-Trigger (monatlich, BOO-202)
+
+Zusaetzlich zum Wiring-Audit traegt der **monatliche** Lauf (Routine „Hermes-Health" in `docs/runbooks/routinen-vernetzen.md`) eine **Beobachtung** statt eines Gates: Ist Anthropics **Agent Teams** noch *experimentell*? ADR-5 (Vault: *Hermes-Layer vs Agent Teams — Re-Evaluations-Trigger*) haelt Hermes nur so lange fuer differenzierend, wie Agent Teams experimentell sind — **Re-Eval-Trigger 1** ist erfuellt, sobald sie auf [code.claude.com](https://code.claude.com) auf *stable* wechseln.
+
+**Verhalten:**
+
+- Der Lauf **erinnert** an die Pruefung des Agent-Teams-Status (code.claude.com / Release-Notes). Ob die Feststellung manuell (Operator schaut) oder via WebFetch passiert, bleibt leichtgewichtig offen — **nicht hart verdrahtet**.
+- **Trigger 1 erfuellt (stable)** → Meldung „ADR-5 Re-Eval-Trigger 1 erfuellt — neue ADR (ADR-6) zwischen Optionen A/B/C entscheiden". Kein Hard-Block.
+- **Unveraendert experimentell** → Notiz „Agent Teams unveraendert experimentell, Stand <Datum>" (kein Status erfinden — der Lauf prueft, er behauptet nicht).
+- Die zwei weiteren ADR-5-Trigger (Q4 2026 Soft-Deadline · Operator-Bedarf aus Konzern-Pilot) sind kalendarisch/bedarfsgetrieben und brauchen keinen Skill-Check.
+
+**Abgrenzung:** Dies ist ein **Watch**, kein Wiring-Gate — fliesst NICHT in die `verdrahtet`/`nominell`/`blind`-Wertung ein und blockt keinen Sprint. Phase-7-Stories (Hermes, BOO-31/32/33) bleiben „in Vorbereitung", nicht „in Umsetzung".
+
 ## Engine + Referenzen
 
 - **Engine:** [scripts/gate-checks.sh](scripts/gate-checks.sh) — deterministische Bash-Engine
@@ -162,7 +175,7 @@ Beispiel-Report: [docs/audits/2026-06-14-quality-gate-audit.md](../docs/audits/2
 
 ```
 quality-gate-audit/
-├── SKILL.md                              ← Skill-Definition (1.0.0, DE)
+├── SKILL.md                              ← Skill-Definition (1.1.0, DE)
 ├── scripts/
 │   ├── gate-checks.sh                    ← deterministische Audit-Engine (4 Gates)
 │   └── signal-tests/

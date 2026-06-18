@@ -9,7 +9,9 @@
 > `verdrahtet`, `nominell` oder `blind` ein. Er **diagnostiziert** und **repariert nicht** — er
 > stellt die Wahrheit fest und schreibt sie als Audit-Report.
 
-**Version:** 1.0.0 · **Befehl:** `/quality-gate-audit`
+**Version:** 1.1.0 · **Befehl:** `/quality-gate-audit`
+
+> **Neu in 1.1.0 (BOO-202):** monatliche **Native-Feature-Beobachtung** (ADR-5 Re-Eval-Trigger — ist Anthropics *Agent Teams* noch experimentell?). Ein **Watch**, kein Wiring-Gate — blockt keinen Sprint, fliesst nicht in `verdrahtet/nominell/blind` ein.
 
 ---
 

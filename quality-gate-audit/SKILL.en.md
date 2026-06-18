@@ -11,7 +11,7 @@ description: |
   Use when the operator says "quality gate audit", "are the gates wired", "check the
   quality gates", "gate wiring check" or "/quality-gate-audit". Also automatically via
   trigger post-install / pre-sprint / post-update.
-version: 1.0.0
+version: 1.1.0
 metadata:
   hermes:
     category: governance
@@ -128,6 +128,19 @@ Example report: [docs/audits/2026-06-14-quality-gate-audit.md](../docs/audits/20
 > project with blind gates. A `blind` override is always justification-bound (`--reason`) and lands
 > in the audit trail (frontmatter `overrides`).
 
+## Native-feature watch — ADR-5 re-eval trigger (monthly, BOO-202)
+
+Beyond the wiring audit, the **monthly** run (routine "Hermes-Health" in `docs/runbooks/routinen-vernetzen.md`) carries a **watch** rather than a gate: are Anthropic's **Agent Teams** still *experimental*? ADR-5 (vault: *Hermes-Layer vs Agent Teams — re-evaluation trigger*) holds Hermes differentiating only as long as Agent Teams are experimental — **re-eval trigger 1** is met once they flip to *stable* on [code.claude.com](https://code.claude.com).
+
+**Behavior:**
+
+- The run **reminds** to check the Agent Teams status (code.claude.com / release notes). Whether the determination is manual (operator looks) or via WebFetch stays lightweight-open — **not hard-wired**.
+- **Trigger 1 met (stable)** → message "ADR-5 re-eval trigger 1 met — decide a new ADR (ADR-6) between options A/B/C". No hard block.
+- **Still experimental** → note "Agent Teams unchanged experimental, as of <date>" (do not invent a status — the run checks, it does not assert).
+- The two other ADR-5 triggers (Q4 2026 soft deadline · operator need from an enterprise pilot) are calendar/demand-driven and need no skill check.
+
+**Boundary:** this is a **watch**, not a wiring gate — it does NOT feed into the `wired`/`nominal`/`blind` rating and blocks no sprint. Phase-7 stories (Hermes, BOO-31/32/33) stay "in preparation", not "in progress".
+
 ## Engine + references
 
 - **Engine:** [scripts/gate-checks.sh](scripts/gate-checks.sh) — deterministic bash engine
@@ -161,8 +174,8 @@ Example report: [docs/audits/2026-06-14-quality-gate-audit.md](../docs/audits/20
 
 ```
 quality-gate-audit/
-├── SKILL.md                              ← Skill definition (1.0.0, DE — primary)
-├── SKILL.en.md                           ← Skill definition (1.0.0, EN)
+├── SKILL.md                              ← Skill definition (1.1.0, DE — primary)
+├── SKILL.en.md                           ← Skill definition (1.1.0, EN)
 ├── README.md / README.en.md              ← README (DE + EN)
 ├── scripts/
 │   ├── gate-checks.sh                    ← deterministic audit engine (4 gates)

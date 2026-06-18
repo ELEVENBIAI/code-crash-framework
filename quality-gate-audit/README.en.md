@@ -9,7 +9,9 @@
 > `nominal` or `blind`. It **diagnoses** and **does not repair** — it establishes the truth and
 > writes it as an audit report.
 
-**Version:** 1.0.0 · **Command:** `/quality-gate-audit`
+**Version:** 1.1.0 · **Command:** `/quality-gate-audit`
+
+> **New in 1.1.0 (BOO-202):** monthly **native-feature watch** (ADR-5 re-eval trigger — are Anthropic's *Agent Teams* still experimental?). A **watch**, not a wiring gate — blocks no sprint, does not feed into `wired/nominal/blind`.
 
 ---
 
