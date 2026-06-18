@@ -4,11 +4,11 @@
 
 > Laedt das gesamte Backlog, mappt Abhaengigkeiten, respektiert DB-Schema-Ketten und schlaegt konkrete Reihenfolge vor. Schluss mit "welche Story als naechstes?" per Bauchgefuehl.
 
-**Version:** 1.7.0 · **Befehl:** `/backlog`
+**Version:** 1.8.0 · **Befehl:** `/backlog`
 
 > 🔗 Sprint-Automation: **`/sprint-run`** faehrt einen ganzen Sprint und orchestriert die Kette `backlog → implement → sprint-review`. Siehe [`sprint-run/`](../sprint-run/README.md) · HANDBUCH Anhang AD.
 
-> **Claude-Code-Modus:** `/backlog` liest und priorisiert nur (schreibt nichts) → **`plan`** (Plan Mode). Im `/sprint-run`-Daemon laeuft es read-only mit. Details: HANDBUCH §6 „Claude-Code-Modus".
+> **Claude-Code-Modus:** Die Priorisierung (Schritte 0–5) liest read-only → **`plan`** (Plan Mode); im `/sprint-run`-Daemon laeuft sie read-only mit. **Ausnahme — der Sprint-Plan-Sync (Schritt 6, BOO-194)** schreibt die Sprint-Zuordnung nach Linear: manueller Trigger (`/backlog sync`) + Dry-Run-Default, Schreiben erst nach Bestaetigung (**`acceptEdits`**). Details: HANDBUCH §6 „Claude-Code-Modus".
 
 ---
 
@@ -109,6 +109,7 @@ Bei der Ausgabe wird der Grund erklaert: "Story X priorisiert vor Y weil on-inte
 - **Schema-Chain-Report** — wer vor wem, und warum
 - **Hygiene-Vorschlaege** — Issues zum Schliessen, neu priorisieren, splitten
 - **Sprint-Forecast** (wenn Financials aktiv, BOO-192) — erwartete KI-Kosten, Mensch-Equivalent-Wert, Wall-Clock und ROI je geplanter Story + Sprint-Aggregat; persistiert unter `docs/financials/sprint-XX-forecast.md`, plus Forecast-vs-Ist-Drift gegen den Ist-Report (Signal, kein Block). Siehe HANDBUCH Anhang AK.
+- **Sprint-Plan-Sync** (Schritt 6, BOO-194 — schreibend) — traegt die freigegebene Sprint-Zuordnung als Label `sprint-N` nach Linear zurueck und gleicht AC-Listen gegen verlinkte Specs ab. Manueller Trigger (`/backlog sync`), Dry-Run-Default, Audit-Log unter `docs/audits/backlog-sync-YYYY-MM-DD.md`. Ersetzt den manuellen Click pro Story (Linear-Cycles bewusst inaktiv).
 
 ---
 

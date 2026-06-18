@@ -4,11 +4,11 @@
 
 > Loads the whole backlog, maps dependencies, honors DB schema chains, and proposes a concrete priority order. No more "which story next?" by gut feeling.
 
-**Version:** 1.7.0 · **Command:** `/backlog`
+**Version:** 1.8.0 · **Command:** `/backlog`
 
 > 🔗 Sprint automation: **`/sprint-run`** runs a whole sprint and orchestrates the chain `backlog → implement → sprint-review`. See [`sprint-run/`](../sprint-run/README.en.md) · HANDBUCH Appendix AD.
 
-> **Claude Code mode:** `/backlog` only reads and prioritizes (writes nothing) → **`plan`** (plan mode). It rides along read-only inside the `/sprint-run` daemon. Details: HANDBUCH §6 "Claude Code mode".
+> **Claude Code mode:** Prioritization (steps 0–5) reads read-only → **`plan`** (plan mode); it rides along read-only inside the `/sprint-run` daemon. **Exception — the sprint-plan sync (Step 6, BOO-194)** writes the sprint assignment to Linear: manual trigger (`/backlog sync`) + dry-run default, writing only after confirmation (**`acceptEdits`**). Details: HANDBUCH §6 "Claude Code mode".
 
 ---
 
@@ -109,6 +109,7 @@ The output explains the reason: "Story X prioritized over Y because on-intent at
 - **Schema chain report** — who goes before whom and why
 - **Hygiene suggestions** — issues to close, re-priority, or split
 - **Sprint forecast** (when Financials is active, BOO-192) — expected AI cost, human-equivalent value, wall clock and ROI per planned story + sprint aggregate; persisted under `docs/financials/sprint-XX-forecast.md`, plus forecast-vs-actual drift against the actual report (signal, no block). See HANDBUCH Appendix AK.
+- **Sprint-plan sync** (Step 6, BOO-194 — writing) — writes the approved sprint assignment back to Linear as a `sprint-N` label and reconciles AC lists against linked specs. Manual trigger (`/backlog sync`), dry-run default, audit log under `docs/audits/backlog-sync-YYYY-MM-DD.md`. Replaces the manual click per story (Linear cycles deliberately inactive).
 
 ---
 

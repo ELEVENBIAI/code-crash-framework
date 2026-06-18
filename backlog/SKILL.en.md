@@ -5,8 +5,11 @@ description: |
   Sprint planning and backlog overview. Loads all issues, analyzes dependencies
   and proposes a prioritized order.
   Validates the dual column effort_ai_hours / effort_human_equiv_hours on new stories.
-  Use when the operator says "what's up", "backlog", "sprint planning", "priorities" or "/backlog".
-version: 1.7.0
+  Writing sprint-plan sync mode (Step 6, manual trigger, dry-run default): writes the approved
+  sprint assignment back to Linear as a label and reconciles AC lists against specs.
+  Use when the operator says "what's up", "backlog", "sprint planning", "priorities", "/backlog"
+  or "sync the sprint plan" / "/backlog sync".
+version: 1.8.0
 language: en
 metadata:
   hermes:
@@ -219,3 +222,51 @@ If issues are detected:
 - Add missing dependencies
 - Report orphaned references
 - Suggest obsolete issues for the operator to close
+
+### Step 6: Sprint-plan sync (BOO-194 — writing, manual trigger, dry-run default)
+
+> **Boundary vs. the rest of the skill:** Steps 0–5 are **read-only** (read, prioritize, propose — they write nothing). Step 6 is the **only writing mode**: it writes the approved sprint assignment back to the backlog adapter (Linear). It runs **only on an explicit operator trigger** (`/backlog sync`, "sync the sprint plan", "write the sprint assignment") — NEVER automatically in the prioritization run.
+
+**Purpose:** Linear cycles are deliberately not active (no API lever, manual UI step). Instead of clicking per story, this mode sets the sprint assignment **deterministically + repeatably** from an approved sprint plan.
+
+#### 6.1 Read the sprint-plan source
+
+1. The source is a markdown table in `Sprints.md` format (columns incl. `Story`, `Sprint`/slice) — either a **file** (operator names the path, e.g. the vault `Sprints.md`) or the **skill output** of a prior planning run.
+2. **Table robustness (MANDATORY):** `Sprints.md` often contains several tables, including stale overview rows. The **authoritative source is the freshly planned detail section** of the target sprint (e.g. "### Sprint 6: …"), NOT the first matching table. When in doubt, have the operator confirm the exact section/file — do not guess.
+3. Per row extract: issue ID (`BOO-XXX`) + target sprint (number/name).
+
+#### 6.2 Plan the reconciliation (write nothing yet)
+
+Per story:
+1. **Sprint assignment:** determine the target label `sprint-N`. Since Linear has no active cycles, the **label** is the workable lever (use a dedicated sprint custom field only if it genuinely exists in the team — otherwise the label; do not invent a field name). **Append-only:** existing labels stay; a **differing** old `sprint-*` label is replaced only after confirmation.
+2. **AC reconciliation (only when a spec is linked):** if the story references a `specs/<id>.md`, diff the spec's `## Acceptance Criteria` list against the Linear description. Show the diff; **never** blindly overwrite the Linear description.
+
+#### 6.3 Dry-run preview (default)
+
+- **Default is dry-run:** show all planned changes (sprint labels, AC diffs, replaced old labels) as a list — **without** calling `save_issue`.
+- Per story: `BOO-XXX → +sprint-N` · `AC diff: +2/−1` · `replaces sprint-(old)?`.
+- Switch to write mode only on explicit operator confirmation (Linear writes need a manual trigger; afterwards no per-story re-prompt).
+
+#### 6.4 Write (after confirmation)
+
+1. Per story `linear.save_issue(id, labels: […, sprint-N])` (append). AC update only for **confirmed** diffs via `description`.
+2. Catch errors per story and record them in the audit log — one failed story does not abort the run.
+
+#### 6.5 Audit log (MANDATORY)
+
+Log every run (dry-run too) under `docs/audits/backlog-sync-YYYY-MM-DD.md` (frontmatter schema analogous to `docs/audits/<date>-quality-gate-audit.md`):
+
+```yaml
+---
+audit_id: <YYYY-MM-DD>-backlog-sync
+triggered_by: <operator>
+framework_version: <intentron-version>
+plan_source: <path-or-section>
+mode: dry-run | write
+summary: { stories: N, sprint_labels_set: N, ac_diffs: N, skipped: N, errors: N }
+---
+```
+
+Body: one table per story (`Issue | Sprint label | AC diff | Status` with `set`/`skip`/`error`), plus replaced old labels and error details. For dry-run, `mode: dry-run` — nothing written, the log documents the preview.
+
+**Backlog-adapter neutrality:** the mechanics are described here for Linear (the active tool); with another adapter (CONVENTIONS.md §3) the same pattern applies with that tool's write call. Without Linear MCP → skip Step 6 with a note; prioritization (Steps 0–5) stays valid.

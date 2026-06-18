@@ -5,8 +5,11 @@ description: |
   Sprint Planning und Backlog-Uebersicht. Laedt alle Issues,
   analysiert Abhaengigkeiten und schlaegt priorisierte Reihenfolge vor.
   Validiert die Doppelspalte effort_ai_hours / effort_human_equiv_hours bei neuen Stories.
-  Verwenden wenn der Operator "was steht an", "Backlog", "Sprint Planning", "Prioritaeten" oder "/backlog" sagt.
-version: 1.7.0
+  Schreibender Sprint-Plan-Sync-Modus (Schritt 6, manueller Trigger, Dry-Run-Default): traegt die
+  freigegebene Sprint-Zuordnung als Label zurueck nach Linear und gleicht AC-Listen gegen Specs ab.
+  Verwenden wenn der Operator "was steht an", "Backlog", "Sprint Planning", "Prioritaeten", "/backlog"
+  oder "sync den Sprint-Plan" / "/backlog sync" sagt.
+version: 1.8.0
 metadata:
   hermes:
     category: coding
@@ -219,3 +222,51 @@ Falls Probleme erkannt:
 - Fehlende Abhaengigkeiten nachtragen
 - Verwaiste Referenzen melden
 - Obsolete Issues dem Operator zum Schliessen vorschlagen
+
+### Schritt 6: Sprint-Plan-Sync (BOO-194 — schreibend, manueller Trigger, Dry-Run-Default)
+
+> **Abgrenzung zum Rest des Skills:** Schritte 0–5 sind **read-only** (lesen, priorisieren, vorschlagen — schreiben nichts). Schritt 6 ist der **einzige schreibende Modus**: er traegt die freigegebene Sprint-Zuordnung in den Backlog-Adapter (Linear) zurueck. Er laeuft **nur auf expliziten Operator-Trigger** (`/backlog sync`, „sync den Sprint-Plan", „schreib die Sprint-Zuordnung") — NIE automatisch im Priorisierungslauf.
+
+**Zweck:** Linear-Cycles sind bewusst nicht aktiv (kein API-Hebel, manueller UI-Schritt). Statt Click pro Story setzt dieser Modus die Sprint-Zuordnung **deterministisch + wiederholbar** aus einem freigegebenen Sprint-Plan.
+
+#### 6.1 Sprint-Plan-Quelle lesen
+
+1. Quelle ist eine Markdown-Tabelle im `Sprints.md`-Format (Spalten u.a. `Story`, `Sprint`/Slice) — entweder eine **Datei** (Operator nennt den Pfad, z.B. die Vault-`Sprints.md`) oder der **Skill-Output** eines vorherigen Planungslaufs.
+2. **Tabellen-Robustheit (PFLICHT):** `Sprints.md` enthaelt oft mehrere Tabellen, darunter veraltete Uebersichtszeilen. Die **massgebliche Quelle ist die frisch geplante Detail-Sektion** des Ziel-Sprints (z.B. „### Sprint 6: …"), NICHT die erste Treffer-Tabelle. Im Zweifel den genauen Abschnitt/die Datei vom Operator bestaetigen lassen — nicht raten.
+3. Pro Zeile extrahieren: Issue-ID (`BOO-XXX`) + Ziel-Sprint (Nummer/Name).
+
+#### 6.2 Abgleich planen (noch nichts schreiben)
+
+Pro Story:
+1. **Sprint-Zuordnung:** Ziel-Label `sprint-N` ermitteln. Da Linear keine aktiven Cycles hat, ist das **Label** der tragfaehige Hebel (ein dediziertes Sprint-Custom-Field nur nutzen, wenn im Team real vorhanden — sonst Label; keinen Feldnamen erfinden). **Append-only:** bestehende Labels bleiben; ein **abweichendes** altes `sprint-*`-Label wird nur nach Bestaetigung ersetzt.
+2. **AC-Abgleich (nur wenn Spec verlinkt):** Verweist die Story auf eine `specs/<id>.md`, die `## Acceptance Criteria`-Liste der Spec gegen die Linear-Description diffen. Diff anzeigen; die Linear-Description **NIE blind** ueberschreiben.
+
+#### 6.3 Dry-Run-Preview (Default)
+
+- **Default ist Dry-Run:** alle geplanten Aenderungen (Sprint-Labels, AC-Diffs, ersetzte Alt-Labels) als Liste zeigen — **ohne** `save_issue` aufzurufen.
+- Pro Story: `BOO-XXX → +sprint-N` · `AC-Diff: +2/−1` · `ersetzt sprint-(alt)?`.
+- Erst auf explizite Operator-Bestaetigung in den Schreibmodus wechseln (Linear-Schreibaktionen brauchen manuellen Trigger; danach ohne Einzel-Rueckfrage pro Story).
+
+#### 6.4 Schreiben (nach Bestaetigung)
+
+1. Pro Story `linear.save_issue(id, labels: […, sprint-N])` (append). AC-Update nur fuer **bestaetigte** Diffs via `description`.
+2. Fehler je Story einzeln fangen und im Audit-Log vermerken — eine fehlgeschlagene Story bricht den Lauf nicht ab.
+
+#### 6.5 Audit-Log (PFLICHT)
+
+Jeden Lauf (auch Dry-Run) protokollieren unter `docs/audits/backlog-sync-YYYY-MM-DD.md` (Frontmatter-Schema analog `docs/audits/<date>-quality-gate-audit.md`):
+
+```yaml
+---
+audit_id: <YYYY-MM-DD>-backlog-sync
+triggered_by: <operator>
+framework_version: <intentron-version>
+plan_source: <pfad-oder-abschnitt>
+mode: dry-run | write
+summary: { stories: N, sprint_labels_set: N, ac_diffs: N, skipped: N, errors: N }
+---
+```
+
+Body: eine Tabelle pro Story (`Issue | Sprint-Label | AC-Diff | Status` mit `set`/`skip`/`error`), plus ersetzte Alt-Labels und Fehlerdetails. Bei Dry-Run `mode: dry-run` — nichts geschrieben, der Log dokumentiert die Vorschau.
+
+**Backlog-Adapter-Neutralitaet:** Die Mechanik ist hier fuer Linear (aktives Tool) beschrieben; bei anderem Adapter (CONVENTIONS.md §3) gilt dasselbe Muster mit dem jeweiligen Schreib-Call. Ohne Linear-MCP → Schritt 6 mit Hinweis ueberspringen, Priorisierung (Schritte 0–5) bleibt gueltig.
