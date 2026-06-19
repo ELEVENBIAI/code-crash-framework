@@ -37,6 +37,7 @@ The **Languages** column shows whether a document is bilingual (`DE+EN`) or Germ
 | [Pitch](./pitch/README.md) | Description of the standalone 30-minute pitch presentation in OWLIST layout. | Sales, operator | DE |
 | [Q&A](./qa.md) | Collection of operational practice questions complementing the handbook. | Operator, developers | DE |
 | [README](../README.md) | Framework entry page with overview and navigation. | Everyone | DE |
+| [Connect routines (runbook)](./runbooks/routinen-vernetzen.md) | Three setup options for recurring routines with copy-ready prompt templates (switch C). | Operator | DE+EN |
 | [SECURITY](../SECURITY.md) | Security policy of the framework (vulnerability reporting, scope). | Everyone, security | DE |
 | [How this framework documents](./how-we-document.md) | Explains the doc model: versioned Markdown in the repo, enforced by hooks. | Operator, doc author | DE+EN |
 | [Catch up SecondBrain setup (runbook)](./runbooks/secondbrain-nachziehen.md) | Add the SecondBrain integration to an existing project without re-bootstrapping. | Operator | DE+EN |

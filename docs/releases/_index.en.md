@@ -14,6 +14,7 @@
 
 ## Version overviews (actually present, newest first)
 
+- **v0.13.0** — [`v0.13.0-overview.md`](v0.13.0-overview.md) — Sprint 6: status line + validation + remaining clarifications (BOO-205–217) · sprint note: [`sprint-6.md`](sprint-6.md)
 - **v0.12.0** — [`v0.12.0-overview.md`](v0.12.0-overview.md) — Sprint 5: Claude-Code-first, switches A/B/C + implement migration (BOO-199–213) · sprint note: [`sprint-5.md`](sprint-5.md)
 - **v0.11.0** — [`v0.11.0-overview.md`](v0.11.0-overview.md) — Sprint 3: build-vs-buy pivot, /sprint-run on `/goal` (BOO-198–216) · sprint note: [`sprint-3.en.md`](sprint-3.en.md)
 - **v0.10.1** — [`v0.10.1-overview.md`](v0.10.1-overview.md)
@@ -36,8 +37,8 @@ From Sprint 3 a roll-up release note is tagged **per sprint** on a **minor versi
 |--------|---------|---------------|
 | Sprint 3 | **v0.11.0** ✓ | [`sprint-3.en.md`](sprint-3.en.md) (+ [`.md`](sprint-3.md)) · [`v0.11.0-overview.md`](v0.11.0-overview.md) |
 | Sprint 5 | **v0.12.0** ✓ | [`sprint-5.md`](sprint-5.md) · [`v0.12.0-overview.md`](v0.12.0-overview.md) |
-| Sprint 6 | **v0.13.0** | [`_template-sprint.en.md`](_template-sprint.en.md) |
-| after Sprint 6 | **v1.0.0** | [`_template-major.en.md`](_template-major.en.md) |
+| Sprint 6 | **v0.13.0** ✓ | [`sprint-6.md`](sprint-6.md) · [`v0.13.0-overview.md`](v0.13.0-overview.md) |
+| after Sprint 6 | **v1.0.0** | [`v1.0-native-pivot.md`](v1.0-native-pivot.md) (DE+EN single file · doc in Sprint 6 · tag/rollout post-Sprint-6, BOO-9) |
 
 Patches (`vX.Y.Z`) within a sprint for catch-ups. Workflow (tag → `gh release create --notes-file …`) as described in [`README.en.md`](README.en.md).
 

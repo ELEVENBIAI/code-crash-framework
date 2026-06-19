@@ -130,7 +130,7 @@ If these features are wanted: separate issue, not BOO-37's scope.
 
 ## Differentiating components — 13 without an Anthropic equivalent (BOO-209)
 
-The framework substitutes where native features suffice (ADR-1, build-vs-buy) and builds only what Anthropic doesn't provide natively. These 13 are the USP for stakeholder meetings — canonical list with source links: [HANDBUCH Appendix AP](../HANDBUCH.en.md).
+The framework substitutes where native features suffice (ADR-1, build-vs-buy) and builds only what Anthropic doesn't provide natively. These 13 are the USP for stakeholder meetings — canonical list with source links: [HANDBUCH Appendix AP](../HANDBUCH.en.md). Marketing/pitch synthesis (native pivot, before/after, migration path): [v1.0-native-pivot.md](../docs/releases/v1.0-native-pivot.md).
 
 1. **`/intent`** — Claude Code doesn't enforce a methodical "why before spec".
 2. **`/pitch`** — no native tool collects stakeholder evidence along a demo path.

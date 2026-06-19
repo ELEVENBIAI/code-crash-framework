@@ -44,6 +44,18 @@
 - **MCP** (Model Context Protocol) — the standardized "plug" through which the AI gets secure connections to tools/data (e.g. Linear, GitHub). *Analogy:* the USB standard for AI tools.
 - **Agent / sub-agent** — an AI instance that handles a bounded task on its own. *Analogy:* a specialist with a clear assignment.
 
+## Strategy & native paths (from Sprint 3)
+
+- **Build-vs-buy doctrine** — the guiding rule to *use* capabilities the AI vendor (Anthropic) ships natively instead of rebuilding them in the framework. *Analogy:* don't build your own power plant when there's a reliable grid connection. (ADR-1)
+- **Claude-Code-first / native paths (switches A/B/C)** — three switches that flip the framework onto native Claude Code features instead of running its own rebuilds. *Analogy:* setting the defaults to "manufacturer original parts".
+- **`/goal` (termination engine)** — the native feature that repeats an automated run until the goal (all checks green) is reached, then stops cleanly. *Analogy:* cruise control that only switches off once you've arrived.
+- **Native subagent** — a standalone AI instance with its own fresh memory (context window) that handles a sub-task independently. *Analogy:* a specialist with their own empty desk rather than one sharing the same cluttered table.
+- **Ultraplan** — an especially thorough planning run in the cloud, suggested automatically for large stories (over 5 story points). *Analogy:* having the architect plan at length before a big remodel instead of swinging the hammer right away.
+- **`/insights`** — a native end-of-sprint analysis that complements the framework's own sprint review. *Analogy:* a second opinion after your own retrospective. (skill `insights-review`)
+- **Worker-equivalent** — the conversion of AI effort into "this many human work hours it would have cost", as an ROI anchor alongside raw token cost. *Analogy:* the exchange rate between AI time and person-days.
+- **Status line** — Claude Code's native status line, here enriched with model, budget and worker-equivalent — the live dashboard of the work. *Analogy:* the dashboard showing speed and fuel at a glance.
+- **Native-feature watch** — a monthly reminder that flags when a rebuilt feature has become natively available and should be re-evaluated. *Analogy:* the note "check whether you can now buy this off the shelf" before you keep tinkering.
+
 ## References
 
 Technical short definitions: HANDBUCH **Appendix C**. How it's all documented together: [`how-we-document.en.md`](how-we-document.en.md).

@@ -37,6 +37,7 @@ Die Spalte **Sprachen** zeigt, ob ein Dokument zweisprachig vorliegt (`DE+EN`) o
 | [Pitch](./pitch/README.md) | Beschreibung der standalone 30-Minuten-Pitch-Präsentation im OWLIST-Layout. | Vertrieb, Operator | DE |
 | [Q&A](./qa.md) | Sammlung operativer Praxisfragen ergänzend zum Handbuch. | Operator, Entwickler | DE |
 | [README](../README.md) | Einstiegsseite des Frameworks mit Überblick und Navigation. | Alle | DE |
+| [Routinen vernetzen (Runbook)](./runbooks/routinen-vernetzen.md) | Drei Aufstellungs-Optionen für wiederkehrende Routinen mit kopierfertigen Prompt-Templates (Schalter C). | Operator | DE+EN |
 | [SECURITY](../SECURITY.md) | Security-Policy des Frameworks (Vulnerability-Reporting, Scope). | Alle, Security | DE |
 | [So dokumentiert dieses Framework](./how-we-document.md) | Erklärt das Doku-Modell: versionierter Markdown im Repo, per Hook erzwungen. | Operator, Doku-Autor | DE+EN |
 | [SecondBrain-Setup nachziehen (Runbook)](./runbooks/secondbrain-nachziehen.md) | SecondBrain-Anbindung ohne Re-Bootstrap in einem Bestandsprojekt nachziehen. | Operator | DE+EN |

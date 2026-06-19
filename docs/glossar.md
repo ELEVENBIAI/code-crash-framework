@@ -44,6 +44,18 @@
 - **MCP** (Model Context Protocol) — der genormte „Stecker", über den die KI sichere Verbindungen zu Tools/Daten bekommt (z. B. Linear, GitHub). *Analogie:* die USB-Norm für KI-Werkzeuge.
 - **Agent / Sub-Agent** — eine KI-Instanz, die eine abgegrenzte Aufgabe eigenständig erledigt. *Analogie:* eine Fachkraft mit klarem Auftrag.
 
+## Strategie & Native-Pfade (ab Sprint 3)
+
+- **Build-vs-Buy-Doktrin** — die Leitregel, Fähigkeiten, die der KI-Anbieter (Anthropic) selbst nativ liefert, zu *nutzen* statt sie im Framework nachzubauen. *Analogie:* kein eigenes Kraftwerk bauen, wenn es einen zuverlässigen Stromanschluss gibt. (ADR-1)
+- **Claude-Code-first / Native Pfade (Schalter A/B/C)** — drei Schalter, die das Framework auf die nativen Claude-Code-Funktionen umstellen, statt eigene Nachbauten zu fahren. *Analogie:* die Werkseinstellung auf „Hersteller-Originalteile" stellen.
+- **`/goal` (Termination-Engine)** — die native Funktion, die einen automatischen Lauf so lange wiederholt, bis das Ziel (alle Prüfungen grün) erreicht ist, und dann sauber stoppt. *Analogie:* der Tempomat, der erst abschaltet, wenn das Ziel erreicht ist.
+- **Native Subagent** — eine eigenständige KI-Instanz mit eigenem, frischem Arbeitsspeicher (Kontextfenster), die eine Teilaufgabe unabhängig erledigt. *Analogie:* eine Fachkraft mit eigenem, leerem Schreibtisch statt einer, die sich denselben überfüllten Tisch teilt.
+- **Ultraplan** — ein besonders gründlicher Planungs-Lauf in der Cloud, der bei großen Stories (über 5 Story Points) automatisch vorgeschlagen wird. *Analogie:* vor dem großen Umbau erst den Architekten lange planen lassen, statt sofort loszuschlagen.
+- **`/insights`** — eine native Auswertung am Sprint-Ende, die den eigenen Sprint-Review ergänzt. *Analogie:* die zweite Meinung nach dem eigenen Rückblick. (Skill `insights-review`)
+- **Worker-Equivalent** — die Umrechnung des KI-Aufwands in „so viele Menschen-Arbeitsstunden hätte das gekostet", als ROI-Anker neben den reinen Token-Kosten. *Analogie:* der Wechselkurs zwischen KI-Zeit und Personentagen.
+- **Status Line** — die native Statuszeile von Claude Code, hier angereichert um Modell, Budget und Worker-Equivalent — der Live-Tacho der Arbeit. *Analogie:* das Armaturenbrett, das Tempo und Tankstand auf einen Blick zeigt.
+- **Native-Feature-Beobachtung** — eine monatliche Erinnerung, die meldet, sobald eine nachgebaute Funktion inzwischen nativ verfügbar ist und neu bewertet werden sollte. *Analogie:* die Notiz „prüfen, ob es das jetzt fertig zu kaufen gibt", bevor man weiter selbst bastelt.
+
 ## Verweise
 
 Technische Kurz-Definitionen: HANDBUCH **Anhang C**. Wie das alles zusammen dokumentiert wird: [`how-we-document.md`](how-we-document.md).

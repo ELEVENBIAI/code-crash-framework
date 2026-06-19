@@ -146,7 +146,7 @@ Wenn diese Features gewuenscht sind: separates Issue, nicht im BOO-37-Scope.
 
 ## Differenzierende Komponenten — 13 ohne Anthropic-Pendant (BOO-209)
 
-Das Framework substituiert, wo Native-Features reichen (ADR-1 Build-vs-Buy), und baut nur, was Anthropic nicht nativ liefert. Diese 13 sind der USP fuer Stakeholder-Termine — kanonische Liste mit Quell-Links: [HANDBUCH Anhang AP](../HANDBUCH.md).
+Das Framework substituiert, wo Native-Features reichen (ADR-1 Build-vs-Buy), und baut nur, was Anthropic nicht nativ liefert. Diese 13 sind der USP fuer Stakeholder-Termine — kanonische Liste mit Quell-Links: [HANDBUCH Anhang AP](../HANDBUCH.md). Vermarktungs-/Pitch-Synthese (Native-Pivot, Vorher/Nachher, Migrations-Pfad): [v1.0-native-pivot.md](../docs/releases/v1.0-native-pivot.md).
 
 1. **`/intent`** — methodisches „Warum vor Spec" erzwingt Claude Code nicht.
 2. **`/pitch`** — Stakeholder-Evidenz entlang eines Demo-Pfads sammelt kein natives Tool.
