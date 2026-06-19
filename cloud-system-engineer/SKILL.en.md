@@ -7,7 +7,7 @@ description: |
   agent teams (ideation, implementation) or standalone for infrastructure tasks.
   Use when the operator says "check environment", "infrastructure", "cloud", "firewall",
   "server status", "VPS", "Hostinger" or "/cloud-system-engineer".
-version: 1.1.0
+version: 1.2.0
 language: en
 requires_mcp:
   - name: hostinger-mcp
@@ -74,8 +74,11 @@ Pulled in by `/ideation` or `/implement` as a teammate.
    - Docker changes needed (new containers, volumes)?
    - DNS changes needed?
    - New external services/APIs that need to be allowlisted?
-3. **Assess infrastructure dimensions:**
-   See [references/infrastructure-dimensions.en.md](references/infrastructure-dimensions.en.md)
+3. **Assess infrastructure layers:**
+   - Stack-neutral 13-layer decision grid (mandatory questions, failure modes, anti-patterns):
+     [references/infrastructure-dimensions.en.md](references/infrastructure-dimensions.en.md)
+   - Concrete VPS operations/hardening checklist:
+     [references/vps-ops-checklist.en.md](references/vps-ops-checklist.en.md)
 4. **Report recommendations back to the lead/architect**
 
 ### Mode C: Execute configuration

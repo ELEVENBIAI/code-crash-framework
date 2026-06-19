@@ -4,7 +4,7 @@
 
 > Treats cloud infrastructure as a teammate: runs health checks on VPS and containers, audits firewall rules, manages DNS, estimates infra cost. Three modes — standalone check, architecture consultation (as teammate), or executing changes with operator approval.
 
-**Version:** 1.1.0 · **Command:** `/cloud-system-engineer`
+**Version:** 1.2.0 · **Command:** `/cloud-system-engineer`
 
 > **Claude Code mode:** check / consultation (mode A/B) are read-only → **`plan`**; executing changes (mode C: firewall/DNS/Docker, remotely irreversible) → **`default`** (ask before edits), approve each action deliberately — **never** `acceptEdits`/`dontAsk`/unattended. Details: HANDBUCH §6 "Claude Code mode".
 
@@ -144,7 +144,8 @@ cp -r cloud-system-engineer ~/.claude/skills/cloud-system-engineer
 cloud-system-engineer/
 ├── SKILL.md                                ← Skill definition
 └── references/
-    └── infrastructure-dimensions.md        ← Per-dimension checks (Reliability, Security, Cost, …)
+    ├── infrastructure-dimensions.md        ← Stack-neutral 13-layer decision grid (questions/risks/anti-patterns)
+    └── vps-ops-checklist.md                ← Concrete VPS operations/hardening checklist (SSH, Docker, firewall, backup)
 ```
 
 ---

@@ -7,7 +7,7 @@ description: |
   eingesetzt werden (Ideation, Implementation) oder standalone fuer Infrastruktur-Aufgaben.
   Verwenden wenn der Operator "Umgebung pruefen", "Infrastruktur", "Cloud", "Firewall",
   "Server Status", "VPS", "Hostinger" oder "/cloud-system-engineer" sagt.
-version: 1.1.0
+version: 1.2.0
 requires_mcp:
   - name: hostinger-mcp
     description: Hostinger MCP Server fuer VPS API-Zugriff (optional — kann auch via Shell ersetzt werden)
@@ -73,8 +73,11 @@ Wird von `/ideation` oder `/implement` als Teammate hinzugezogen.
    - Docker-Aenderungen noetig (neue Container, Volumes)?
    - DNS-Aenderungen noetig?
    - Neue externe Services/APIs die freigeschaltet werden muessen?
-3. **Infrastruktur-Dimensionen bewerten:**
-   Siehe [references/infrastructure-dimensions.md](references/infrastructure-dimensions.md)
+3. **Infrastruktur-Layer bewerten:**
+   - Stack-neutrales 13-Layer-Entscheidungsraster (Pflichtfragen, Failure-Modes, Anti-Patterns):
+     [references/infrastructure-dimensions.md](references/infrastructure-dimensions.md)
+   - Konkrete VPS-Betriebs-/Härtungs-Checkliste:
+     [references/vps-ops-checklist.md](references/vps-ops-checklist.md)
 4. **Empfehlungen an den Lead/Architekten zurueckmelden**
 
 ### Modus C: Konfiguration ausfuehren
