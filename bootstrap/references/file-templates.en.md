@@ -428,6 +428,37 @@ journal/*.jsonl
 
 ---
 
+## API_INVENTORY.md (minimum)
+
+```markdown
+# {{PROJECT_NAME}} — API Inventory
+
+**Version:** {{VERSION_START}} | **As of:** {{TODAY}}
+
+> SSoT for all external and internal interfaces of the project. **Maintenance duty:** on every interface change (new/changed API) update this file — `/implement` reminds you (post-implement check).
+> **NO secrets:** document only the auth *method* (type), never keys/tokens/passwords. Secrets belong in `.env` / a secret manager.
+
+## External APIs (consumed)
+
+| Interface | Purpose | Base URL / endpoint | Auth method (type) | Data classes | Owner | As of |
+|---|---|---|---|---|---|---|
+| [e.g. payment provider] | [payments] | [https://api.example.com] | [API key in header] | [payment data / PII] | [team/person] | {{TODAY}} |
+
+## Provided APIs (own, exposed)
+
+| Endpoint | Method | Purpose | Auth | Rate limit | Versioning | As of |
+|---|---|---|---|---|---|---|
+| [e.g. /v1/...] | [POST] | [...] | [Bearer / OIDC] | [100/min] | [/v1] | {{TODAY}} |
+
+## Internal interfaces (service-to-service)
+
+| From → To | Protocol | Purpose | Auth | As of |
+|---|---|---|---|---|
+| [svc-a → svc-b] | [REST / gRPC / queue] | [...] | [mTLS / workload identity] | {{TODAY}} |
+```
+
+---
+
 ## CHANGELOG.md (initial)
 
 ```markdown

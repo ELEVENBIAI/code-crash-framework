@@ -322,9 +322,41 @@ Das Framework ist zuerst eine sequenzielle Engineering-Pipeline mit Quality-Gate
 | `COMPONENT_INVENTORY.md` | Alle Komponenten mit Status |
 | `GOVERNANCE.md` | Entwicklungs-Prozess, Governance-Regeln |
 | `SECURITY.md` | Security-Policy, API-Key-Regeln |
+| `API_INVENTORY.md` | Externe + interne Schnittstellen (Update-Pflicht, keine Secrets) |
 | `CHANGELOG.md` | Version-History |
 | `lib/config.js` | SSoT alle Parameter |
 | `specs/TEMPLATE.md` | Story-Template |
+```
+
+---
+
+## API_INVENTORY.md (Minimum)
+
+```markdown
+# {{PROJECT_NAME}} — API Inventory
+
+**Version:** {{VERSION_START}} | **Stand:** {{TODAY}}
+
+> SSoT für alle externen und internen Schnittstellen des Projekts. **Pflege-Pflicht:** bei jeder Schnittstellen-Änderung (neue/geänderte API) hier nachziehen — `/implement` erinnert daran (Post-Implement-Check).
+> **KEINE Secrets:** nur die Auth-*Methode* (Typ) dokumentieren, niemals Keys/Tokens/Passwörter. Secrets gehören in `.env` / Secret Manager.
+
+## Externe APIs (konsumiert)
+
+| Schnittstelle | Zweck | Base-URL / Endpoint | Auth-Methode (Typ) | Datenklassen | Owner | Stand |
+|---|---|---|---|---|---|---|
+| [z. B. Zahlungs-Provider] | [Zahlungen] | [https://api.example.com] | [API-Key im Header] | [Zahlungsdaten / PII] | [Team/Person] | {{TODAY}} |
+
+## Bereitgestellte APIs (eigene, exponiert)
+
+| Endpoint | Methode | Zweck | Auth | Rate-Limit | Versionierung | Stand |
+|---|---|---|---|---|---|---|
+| [z. B. /v1/...] | [POST] | [...] | [Bearer / OIDC] | [100/min] | [/v1] | {{TODAY}} |
+
+## Interne Schnittstellen (Service-zu-Service)
+
+| Von → Nach | Protokoll | Zweck | Auth | Stand |
+|---|---|---|---|---|
+| [svc-a → svc-b] | [REST / gRPC / Queue] | [...] | [mTLS / Workload-Identity] | {{TODAY}} |
 ```
 
 ---

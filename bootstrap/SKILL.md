@@ -1,7 +1,7 @@
 ---
 name: bootstrap
 recommended_model: sonnet  # BOO-84 — tier mapping in bootstrap/references/model-tiers.json
-version: 3.45.0
+version: 3.46.0
 description: Setzt ein neues Projekt mit Governance-Framework auf — interaktiver Block-Interview-Flow in 4 Schritten, Doku-Architektur mit Hub-Auto-Verlinkung, optionaler Learning-Loop L1/L2/L3. Verwenden wenn der Operator ein neues Projekt aufsetzen will oder "/bootstrap" sagt.
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 metadata:
@@ -715,6 +715,7 @@ Aus `references/issue-writing-guidelines-template.md` (Version 3.1, BOO-30):
 Zusaetzlich Skelette:
 - `DEVELOPMENT_PROCESS.md` — Verweis auf GOVERNANCE.md
 - `SECURITY.md` — Minimales Skelett (Add-on-Sektionen: Privacy/Compliance falls aktiviert)
+- `API_INVENTORY.md` — Minimal-Skelett aus `references/file-templates.md` §`API_INVENTORY.md (Minimum)` (externe + interne Schnittstellen; **keine Secrets**). SSoT fuer Schnittstellen; `/implement` haelt es ueber den Post-Implement-Check aktuell. Referenziert in `ARCHITECTURE_DESIGN.md §6`.
 
 > **KERN-REGEL im Runtime-Einstieg (`AGENTS.md`/`CLAUDE.md`):** Jede neue Datei MUSS sofort in `ARCHITECTURE_DESIGN.md §9 Referenzen` UND `INDEX.md` eingetragen werden — vor dem git commit.
 
