@@ -247,6 +247,7 @@ INTENTRON substitutes where native features suffice (ADR-1, build-vs-buy) and bu
 | **[pitch](pitch/)** | `/pitch` | Closes the 4P pipeline — gathers evidence (metrics, architecture diff, intent fulfillment) as a Markdown cheat sheet. No slides, human runs the demo. |
 | **[grafana](grafana/)** | `/grafana` | Grafana Cloud dashboards via MCP — panels, PromQL, alert rules. |
 | **[cloud-system-engineer](cloud-system-engineer/)** | `/cloud-system-engineer` | VPS/Docker infrastructure: health checks, firewall, DNS, resources. |
+| **[infrastructure-onboarding](infrastructure-onboarding/)** | `/infrastructure-onboarding` | Guided 13-layer infrastructure reconciliation (propose-and-confirm): reads project context (intent, ARCHITECTURE_DESIGN §5b, CONVENTIONS, environment.json, catalog), proposes per layer, operator confirms, writes the §5b table. Idempotent re-run. Post-bootstrap (BOO-223). |
 | **[visualize](visualize/)** | `/visualize` | Generate architecture diagrams in Miro from existing documentation. |
 
 ### Specialist bundle skills (this folder, vendored — BOO-74/219)
@@ -638,6 +639,7 @@ INTENTRON substituiert, wo Native-Features reichen (ADR-1, Build-vs-Buy), und ba
 | **[pitch](pitch/)** | `/pitch` | Schliesst die 4P-Pipeline — sammelt Evidenz (Metriken, Architektur-Diff, Intent-Erfuellung) als Markdown-Spickzettel. Keine Slides, Mensch macht die Demo. |
 | **[grafana](grafana/)** | `/grafana` | Grafana Cloud Dashboards via MCP — Panels, PromQL, Alert Rules. |
 | **[cloud-system-engineer](cloud-system-engineer/)** | `/cloud-system-engineer` | VPS/Docker-Infrastruktur: Health-Check, Firewall, DNS, Ressourcen. |
+| **[infrastructure-onboarding](infrastructure-onboarding/)** | `/infrastructure-onboarding` | Gefuehrter 13-Layer-Infrastruktur-Abgleich (propose-and-confirm): liest Projekt-Kontext (Intent, ARCHITECTURE_DESIGN §5b, CONVENTIONS, environment.json, Katalog), schlaegt pro Layer konkret vor, Operator bestaetigt, schreibt die §5b-Tabelle. Idempotenter Re-Run. Post-Bootstrap (BOO-223). |
 | **[visualize](visualize/)** | `/visualize` | Architektur-Diagramme in Miro aus bestehenden Doku-Dateien generieren. |
 
 ### Spezialisten-Bundle-Skills (dieser Ordner, vendored — BOO-74/219)

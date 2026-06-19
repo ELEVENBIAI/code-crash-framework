@@ -55,6 +55,7 @@
 - **Worker-equivalent** — the conversion of AI effort into "this many human work hours it would have cost", as an ROI anchor alongside raw token cost. *Analogy:* the exchange rate between AI time and person-days.
 - **Status line** — Claude Code's native status line, here enriched with model, budget and worker-equivalent — the live dashboard of the work. *Analogy:* the dashboard showing speed and fuel at a glance.
 - **Native-feature watch** — a monthly reminder that flags when a rebuilt feature has become natively available and should be re-evaluated. *Analogy:* the note "check whether you can now buy this off the shelf" before you keep tinkering.
+- **Propose-and-confirm** — a working pattern where the AI makes **concrete proposals** (checked against a reference) and the human only **confirms or overrides** — instead of filling in an empty questionnaire. *Analogy:* the architect hands you a finished draft, you nod it through or change one line, rather than starting from scratch. (e.g. `/infrastructure-onboarding`)
 
 ## References
 

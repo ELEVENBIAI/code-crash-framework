@@ -55,6 +55,7 @@
 - **Worker-Equivalent** — die Umrechnung des KI-Aufwands in „so viele Menschen-Arbeitsstunden hätte das gekostet", als ROI-Anker neben den reinen Token-Kosten. *Analogie:* der Wechselkurs zwischen KI-Zeit und Personentagen.
 - **Status Line** — die native Statuszeile von Claude Code, hier angereichert um Modell, Budget und Worker-Equivalent — der Live-Tacho der Arbeit. *Analogie:* das Armaturenbrett, das Tempo und Tankstand auf einen Blick zeigt.
 - **Native-Feature-Beobachtung** — eine monatliche Erinnerung, die meldet, sobald eine nachgebaute Funktion inzwischen nativ verfügbar ist und neu bewertet werden sollte. *Analogie:* die Notiz „prüfen, ob es das jetzt fertig zu kaufen gibt", bevor man weiter selbst bastelt.
+- **Propose-and-confirm** — ein Arbeitsmuster, bei dem die KI **konkrete Vorschläge** macht (geprüft gegen eine Referenz) und der Mensch nur **bestätigt oder überschreibt** — statt einen leeren Fragebogen auszufüllen. *Analogie:* der Architekt legt einen fertigen Entwurf vor, du nickst ihn ab oder änderst eine Zeile, statt selbst bei null anzufangen. (z.B. `/infrastructure-onboarding`)
 
 ## Verweise
 
