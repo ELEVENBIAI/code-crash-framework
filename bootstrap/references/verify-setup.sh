@@ -101,6 +101,11 @@ for d in specs journal; do
   if [[ -d "$d" ]]; then c_pass "$d/ vorhanden"; else c_warn "$d/ fehlt (wird beim ersten /ideation bzw. /implement angelegt)"; fi
 done
 if [[ -f "DEVELOPER_ONBOARDING.md" ]]; then c_pass "DEVELOPER_ONBOARDING.md vorhanden"; else c_warn "DEVELOPER_ONBOARDING.md fehlt im Repo-Root (kanonischer Name, BOO-134) — bei Obsidian-SSoT liegt das Onboarding im Vault (dann ok); bei repo-docs hier anlegen"; fi
+if [[ -f "scripts/doc-drift-check.sh" ]]; then
+  if [[ -x "scripts/doc-drift-check.sh" ]]; then c_pass "scripts/doc-drift-check.sh vorhanden + ausfuehrbar (Doku-Drift-Check, BOO-229)"; else c_warn "scripts/doc-drift-check.sh vorhanden, aber nicht ausfuehrbar — 'chmod +x scripts/doc-drift-check.sh'"; fi
+else
+  c_warn "scripts/doc-drift-check.sh fehlt — 'intentron migrate' (migrate_boo_229) nachziehen (Doku-Drift-Check, BOO-229)"
+fi
 
 # --- 4b. Claude-Code-first: runtime_target + Native-Pfade (ADR-2 / BOO-199) -
 section "4b. Claude-Code-first (runtime_target + Native-Pfade, ADR-2)"

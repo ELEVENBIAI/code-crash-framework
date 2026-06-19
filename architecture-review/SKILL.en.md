@@ -5,7 +5,7 @@ description: |
   Architecture review for individual stories or the whole system. Checks the active
   architecture dimensions (8 standard + active add-ons) and identifies risks, tech debt and improvement potential.
   Use when the operator says "check architecture", "review", "does this fit architecturally" or "/architecture-review".
-version: 1.14.0
+version: 1.15.0
 language: en
 metadata:
   hermes:
@@ -26,6 +26,14 @@ Check the active dimensions (8 standard + active add-ons from `ARCHITECTURE_DESI
 3. Extract paths from `paths.*` as needed (e.g. `paths.reports_local`, `paths.lessons_l3`, `paths.specs`, `paths.architecture_design`, `paths.conventions`).
 4. Before any tool invocation, check `tools_available.<tool>`. If `false` or missing, the skill skips the call and notes it in the output.
 5. Missing-file fallback: assume the schema defaults (`journal/`, `journal/reports/local/`, `specs/`, `ARCHITECTURE_DESIGN.md`, `CONVENTIONS.md`) and add a note to the output: "Note: `.claude/environment.json` is missing — defaults active. Recommendation: re-run `/bootstrap` or create the file manually."
+
+## Step 0a: Doc-drift pre-flight (BOO-229, soft)
+
+Before the review, call the shared drift checker (if present):
+```bash
+bash scripts/doc-drift-check.sh
+```
+It reads `ARCHITECTURE_DESIGN.md §References` + `INDEX.md` as the **single source of truth** and reports completeness, freshness and local-vs-remote drift. **Core point against "drift between the skills":** the artifact list this review checks for currency (§6 References, checklist item §6) is the **same SSoT** the checker reads — not a skill-own, separately maintained catalog. **Warn-only at this stage** — the finding feeds the review result as a recommendation, no abort. If the script is missing (project predating BOO-229): catch up with `intentron migrate --issue BOO-229`; the review continues. The compliance **hard gate** (drift blocks) is an opt-in add-on and lands as BOO-229 B2.
 
 ## Step 0b: Ultraplan trigger (BOO-207, switch B)
 

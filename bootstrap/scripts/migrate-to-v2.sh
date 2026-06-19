@@ -2940,6 +2940,9 @@ migrate_all() {
     # Sprint 6 — Status-Line (BOO-205): statusline.sh + settings.json-Verdrahtung (Schalter A)
     migrate_boo_205
 
+    # Sprint 7+ — Doku-Drift-Checker (BOO-229): doc-drift-check.sh ins Projekt
+    migrate_boo_229
+
     log_info "DE: Migration abgeschlossen. Status pro Projekt in migration-status.md eintragen."
     log_info "EN: Migration finished. Record per-project status in migration-status.md."
 }
@@ -3291,6 +3294,38 @@ migrate_boo_79() {
     log_info "BOO-79: Operator-Schritt: 'bash scripts/verify-setup.sh' ausfuehren — PASS/WARN/FAIL-Report."
     log_info "BOO-79: Manuelle Checkliste: HANDBUCH Anhang T. Check 5 (Skill schreibt Artefakte) bleibt manueller /implement-Probelauf."
     log_info "BOO-79 done."
+}
+
+# -----------------------------------------------------------------------------
+# BOO-229 — Gemeinsamer Doku-Drift-Checker (doc-drift-check.sh ins Projekt)
+# -----------------------------------------------------------------------------
+migrate_boo_229() {
+    log_info "BOO-229: Doku-Drift-Checker — doc-drift-check.sh ins Projekt kopieren"
+    log_info "BOO-229: doc drift checker — copy doc-drift-check.sh into the project"
+
+    local script_dir framework_root src
+    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    framework_root="$(cd "${script_dir}/../.." && pwd)"
+    src="${framework_root}/bootstrap/references/doc-drift-check.sh"
+
+    if [[ ! -f "$src" ]]; then
+        log_warn "BOO-229: ${src} nicht gefunden — Repo-Stand pruefen."
+        return 1
+    fi
+
+    local dst="scripts/doc-drift-check.sh"
+    if [[ -f "$dst" ]]; then
+        log_info "BOO-229: ${dst} existiert bereits — keine Aenderung."
+    elif [[ "$DRY_RUN" == "true" ]]; then
+        log_info "[dry-run] ${src} -> ${dst} kopieren + chmod +x"
+    else
+        mkdir -p scripts
+        cp "$src" "$dst" && chmod +x "$dst" && log_info "BOO-229: ${dst} angelegt (ausfuehrbar)."
+    fi
+
+    log_info "BOO-229: Operator-Schritt: 'bash scripts/doc-drift-check.sh' ausfuehren — PASS/WARN/FAIL-Report (§Referenzen/INDEX als SSoT)."
+    log_info "BOO-229: /implement, /ideation, /architecture-review rufen das Skript im Pre-Flight (warn-only in dieser Stufe; Compliance-Hard-Gate = BOO-229 B2)."
+    log_info "BOO-229 done."
 }
 
 # -----------------------------------------------------------------------------
@@ -4871,6 +4906,7 @@ ALL_ISSUES=(
     BOO-177
     BOO-180
     BOO-190
+    BOO-229
 )
 
 print_help() {

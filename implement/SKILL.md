@@ -6,7 +6,7 @@ description: |
   bis Ergebnis-Tabelle inkl. Post-Implement Validation. Verwenden wenn der Operator "los" sagt,
   eine Story umsetzen will, oder "/implement" ausfuehrt. Wird auch vom Automation Daemon genutzt
   (ohne Human-in-the-Loop).
-version: 2.17.0
+version: 2.18.0
 metadata:
   hermes:
     category: coding
@@ -163,6 +163,19 @@ Lies aus der Projekt-`CLAUDE.md` den `native_paths:`-Block (definiert in BOO-199
 **Schalter-A-Kopplung:** gilt nur bei `runtime_target: claude-code` (aus `CONVENTIONS.md`, Schritt 0);
 bei `codex` / `cross-tool` / `unknown` ist der Flag inaktiv → immer altes Pattern. Der gelesene Wert
 steuert Schritt 4b.
+
+### Schritt 0e: Doku-Drift-Pre-Flight (BOO-229, weich)
+
+Vor der Umsetzung den gemeinsamen Drift-Checker aufrufen (falls vorhanden):
+```bash
+bash scripts/doc-drift-check.sh
+```
+Er liest `ARCHITECTURE_DESIGN.md §Referenzen` + `INDEX.md` als **Single Source of Truth** und meldet
+Vollstaendigkeits-, Frische- und lokal-vs-remote-Drift. Der Befund fliesst als Hinweis in den Lauf —
+**warn-only in dieser Stufe** (kein Abbruch). Dieselbe SSoT-Liste steuert den Post-Implement-Doku-Check
+in Schritt 6e (keine skill-eigene, hartkodierte Datei-Liste mehr). Fehlt das Skript (Projekt vor BOO-229):
+`intentron migrate --issue BOO-229` nachziehen; der Lauf geht weiter. Das Compliance-**Hard-Gate**
+(Drift blockiert `/implement`) ist ein Opt-in-Add-on und folgt als BOO-229 B2.
 
 ### Schritt 1: Issue identifizieren
 
@@ -865,7 +878,7 @@ Schritt 2 — Syntax & Laufzeit:
 - Offene Risiken die akzeptiert wurden?
 - Bei LOW-Risk Stories genuegt: "Security: Keine neuen Angriffsvektoren"
 - Abgleich mit `## Security Validation` aus der Story: Jede versprochene Validierung braucht Evidenz oder eine dokumentierte Ausnahme.
-- Pruefen ob `SECURITY.md`, `API_INVENTORY.md`, `.semgrep.yml`, `.claude/sensitive-paths.json`, `.codex/hooks.json`, `ARCHITECTURE_DESIGN.md` oder `CONVENTIONS.md` durch die Aenderung aktualisiert werden muessen.
+- **Doku-Artefakte (SSoT-abgeleitet, BOO-229):** pruefen, welche der in `ARCHITECTURE_DESIGN.md §Referenzen` + `INDEX.md` registrierten Dateien durch die Aenderung aktualisiert werden muessen — die Liste kommt aus der **Single Source of Truth**, NICHT aus einer hier hartkodierten Aufzaehlung (frueheres Drift-Risiko: neue Artefakte wie `API_INVENTORY.md` mussten in jeder Skill-Liste nachgezogen werden). `bash scripts/doc-drift-check.sh` zeigt den Drift (registrierte Datei fehlt, erwartbares Artefakt unregistriert, Frische, lokal-vs-remote). Zusaetzlich die **nicht-Doku-Security-Konfig** pruefen, die nicht in der §Referenzen/INDEX-Tabelle steht: `.semgrep.yml`, `.claude/sensitive-paths.json`, `.codex/hooks.json`.
 
 *Privacy-Block (PFLICHT bei `personal_data: true`, BOO-69):*
 - Was wurde geprueft (Datenminimierung, Pseudonymisierung, Logging keine PII, Loeschmechanik, Consent)?

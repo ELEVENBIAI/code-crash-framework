@@ -126,3 +126,5 @@ Postflight gibt `FAIL`, wenn:
 - der Primaerpfad nicht validierbar ist und kein Fallback erzeugt wurde,
 - Dateien ohne Zustimmung ueberschrieben wuerden,
 - ein Secret in einer Ziel-Datei erkannt wird.
+
+> **Laufende Drift-Prüfung (BOO-229):** Die Kriterien oben sind die *Einmal*-Prüfung beim Bootstrap. Den *laufenden* Abgleich der Doku-Landkarte übernimmt `scripts/doc-drift-check.sh` — es liest `ARCHITECTURE_DESIGN.md §Referenzen` + `INDEX.md` als SSoT und prüft Vollständigkeit, Frische und lokal-vs-remote. `/ideation`, `/architecture-review` und `/implement` rufen es im Pre-Flight (warn-only; Compliance-Hard-Gate = Opt-in-Add-on `compliance_doc_gate`, BOO-229 B2). Details: HANDBUCH Anhang AS.

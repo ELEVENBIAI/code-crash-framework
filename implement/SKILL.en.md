@@ -6,7 +6,7 @@ description: |
   to closing table including post-implement validation. Use when the operator says "go",
   wants to implement a story, or runs "/implement". Also used by the automation daemon
   (no human in the loop).
-version: 2.17.0
+version: 2.18.0
 language: en
 metadata:
   hermes:
@@ -146,6 +146,19 @@ Read the `native_paths:` block (defined in BOO-199) from the project `CLAUDE.md`
 **Switch-A coupling:** applies only when `runtime_target: claude-code` (from `CONVENTIONS.md`, Step 0);
 for `codex` / `cross-tool` / `unknown` the flag is inactive → always the old pattern. The value read here
 drives Step 4b.
+
+### Step 0e: Doc-drift pre-flight (BOO-229, soft)
+
+Before implementing, call the shared drift checker (if present):
+```bash
+bash scripts/doc-drift-check.sh
+```
+It reads `ARCHITECTURE_DESIGN.md §References` + `INDEX.md` as the **single source of truth** and reports
+completeness, freshness and local-vs-remote drift. The finding feeds the run as a note —
+**warn-only at this stage** (no abort). The same SSoT list drives the post-implement doc check in
+Step 6e (no skill-own, hard-coded file list anymore). If the script is missing (project predating BOO-229):
+catch up with `intentron migrate --issue BOO-229`; the run continues. The compliance **hard gate**
+(drift blocks `/implement`) is an opt-in add-on and lands as BOO-229 B2.
 
 ### Step 1: Identify the issue
 
@@ -813,7 +826,7 @@ Step 2 — syntax & runtime:
 - Open risks that were accepted?
 - For LOW-risk stories: "Security: no new attack vectors" is enough
 - Cross-check against `## Security Validation` from the story: every promised validation needs evidence or a documented exception.
-- Check whether `SECURITY.md`, `API_INVENTORY.md`, `.semgrep.yml`, `.claude/sensitive-paths.json`, `.codex/hooks.json`, `ARCHITECTURE_DESIGN.md`, or `CONVENTIONS.md` must be updated by the change.
+- **Doc artifacts (SSoT-derived, BOO-229):** check which files registered in `ARCHITECTURE_DESIGN.md §References` + `INDEX.md` must be updated by the change — the list comes from the **single source of truth**, NOT from a list hard-coded here (former drift risk: new artifacts like `API_INVENTORY.md` had to be caught up in every skill's list). `bash scripts/doc-drift-check.sh` surfaces the drift (registered file missing, expected artifact unregistered, freshness, local-vs-remote). Additionally check the **non-doc security config** that does not live in the §References/INDEX table: `.semgrep.yml`, `.claude/sensitive-paths.json`, `.codex/hooks.json`.
 
 *Privacy block (MANDATORY on `personal_data: true`, BOO-69):*
 - What was checked (data minimisation, pseudonymisation, no PII in logs, deletion mechanics, consent)?

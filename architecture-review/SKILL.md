@@ -5,7 +5,7 @@ description: |
   Architektur-Review fuer einzelne Stories oder das Gesamtsystem. Prueft die aktiven
   Architektur-Dimensionen (8 Standard + aktive Add-ons) und identifiziert Risiken, Tech Debt und Verbesserungspotential.
   Verwenden wenn der Operator "Architektur pruefen", "Review", "passt das architektonisch" oder "/architecture-review" sagt.
-version: 1.14.0
+version: 1.15.0
 metadata:
   hermes:
     category: governance
@@ -25,6 +25,14 @@ Aktive Dimensionen (8 Standard + aktive Add-ons aus `ARCHITECTURE_DESIGN.md §5`
 3. Bei Bedarf Pfade extrahieren aus `paths.*` (z.B. `paths.reports_local`, `paths.lessons_l3`, `paths.specs`, `paths.architecture_design`, `paths.conventions`).
 4. Bei Tool-Aufruf pruefen: ist Tool in `tools_available.<tool>` aktiv? Bei `false` oder fehlendem Eintrag: Skill ueberspringt den Aufruf und gibt einen Hinweis im Output.
 5. Fallback bei fehlender Datei: Standard-Pfade aus dem Schema annehmen (`journal/`, `journal/reports/local/`, `specs/`, `ARCHITECTURE_DESIGN.md`, `CONVENTIONS.md`) und im Output vermerken: "Hinweis: `.claude/environment.json` fehlt — Defaults aktiv. Empfehlung: `/bootstrap` re-rennen oder die Datei manuell anlegen."
+
+## Schritt 0a: Doku-Drift-Pre-Flight (BOO-229, weich)
+
+Vor dem Review den gemeinsamen Drift-Checker aufrufen (falls vorhanden):
+```bash
+bash scripts/doc-drift-check.sh
+```
+Er liest `ARCHITECTURE_DESIGN.md §Referenzen` + `INDEX.md` als **Single Source of Truth** und meldet Vollstaendigkeits-, Frische- und lokal-vs-remote-Drift. **Kernpunkt gegen „Drift zwischen den Skills":** die Artefakt-Liste, die dieses Review auf Aktualitaet prueft (§6 Referenzen, Schritt-Checkliste Punkt §6), ist **dieselbe SSoT**, die der Checker liest — kein skill-eigener, separat gepflegter Katalog. **Warn-only in dieser Stufe** — der Befund fliesst als Empfehlung ins Review-Ergebnis, kein Abbruch. Fehlt das Skript (Projekt vor BOO-229): `intentron migrate --issue BOO-229` nachziehen; das Review laeuft weiter. Das Compliance-**Hard-Gate** (Drift blockiert) ist ein Opt-in-Add-on und folgt als BOO-229 B2.
 
 ## Schritt 0b: Ultraplan-Trigger (BOO-207, Schalter B)
 

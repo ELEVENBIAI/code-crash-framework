@@ -26,7 +26,7 @@
 11. [Daily Usage — A Typical Workflow](#11-daily-usage--a-typical-workflow)
 11b. [Checkpoints & rollback via /rewind](#11b-checkpoints--rollback-via-rewind-boo-208)
 12. [FAQ](#12-faq) — incl. Claude Agent SDK migration
-13. [Appendices — signpost](#13-appendices--signpost) — A through AR at a glance (AL: Switch A / native paths · AM: Automemory vs Learning-Loop · AN: Cloud-engine /ultraplan · AO: Sprint Review vs /insights · AP: USP — 13 components without an Anthropic equivalent · AQ: Status line — worker-equivalent live · AR: Infra-layer onboarding — the second architecture axis)
+13. [Appendices — signpost](#13-appendices--signpost) — A through AS at a glance (AL: Switch A / native paths · AM: Automemory vs Learning-Loop · AN: Cloud-engine /ultraplan · AO: Sprint Review vs /insights · AP: USP — 13 components without an Anthropic equivalent · AQ: Status line — worker-equivalent live · AR: Infra-layer onboarding — the second architecture axis · AS: Doc-drift + compliance-doc gate)
 
 ---
 
@@ -744,6 +744,7 @@ Rules · architecture · process · history.
 | `SYSTEM_ARCHITECTURE.md` | Overview of components, data flow | bootstrap + `/implement` | every skill |
 | `ARCHITECTURE_DESIGN.md` | Lead document — all ADRs, 8 sections | bootstrap + `/ideation` | `/implement`, `/architecture-review`, `/sprint-review` |
 | `INDEX.md` | File index | bootstrap + `/implement` | every skill |
+| `scripts/doc-drift-check.sh` | Doc-drift checker (§References/INDEX as SSoT, BOO-229) | bootstrap + `migrate_boo_229` | `/ideation`, `/architecture-review`, `/implement` (pre-flight) |
 | `COMPONENT_INVENTORY.md` | Component inventory | bootstrap + `/implement` | self-healing (Check U) |
 | `DEVELOPMENT_PROCESS.md` | Process reference | bootstrap | reference |
 | `SECURITY.md` | Security policy | bootstrap + `/security-architect` | `/implement`, `/sprint-review` |
@@ -5558,6 +5559,23 @@ Sonnet 4.7 | 142k/200k ctx | Worker-Equiv: 2.5h / 16h | Story BOO-205 | $4.20
 - **At `/implement`:** cross-check spec ↔ affected layer row (soft).
 
 **Two axes, no duplication.** §5 (quality) remains the SSoT of the quality axis unchanged. Layers that primarily realize a quality property (security, monitoring, reliability) **cross-reference** the matching §5 dimension in their §5b row. The layer × quality matrix in the catalog makes this explicit.
+
+## Appendix AS: Doc-drift + compliance-doc gate (BOO-229)
+
+> **In brief:** A **shared** doc-drift checker `scripts/doc-drift-check.sh` reads `ARCHITECTURE_DESIGN.md §References` + `INDEX.md` as the **single source of truth** (SSoT) and checks whether the doc map still matches reality. `/ideation`, `/architecture-review` and `/implement` all call the same script in their pre-flight — so by construction there can no longer be drift *between* the skills.
+
+**The problem.** The more doc artifacts the framework carries (recently `API_INVENTORY.md`, BOO-222; the `§5b` infra table, BOO-221), the higher the risk that the skills hold *different* ideas of what to check. `/implement` used to carry a **hard-coded** file list in its post-implement check (step 6e) — a new artifact had to be caught up in every skill's list.
+
+**Three checks** (read-only, PASS/WARN/FAIL, `rc=1` on FAIL):
+1. **Completeness** — does every file registered in §References/INDEX exist (FAIL if missing)? Does an expected doc artifact exist that is *not* registered (WARN — operationalizes the core rule "register every new file in §References + INDEX immediately")?
+2. **Freshness** — is `ARCHITECTURE_DESIGN.md` older than `thresholds.architecture_doc_freshness_days` (default 30)?
+3. **Local vs. remote** — does a tracked doc lag behind `origin` (`git fetch` comparison)? Bridge to BOO-224 (centrally changed artifacts not pulled locally).
+
+**Two severity levels.**
+- **Standard (default):** finding = **WARN**, the skill continues. Standard projects stay untouched (lightweight design principle).
+- **Compliance (opt-in add-on `compliance_doc_gate`):** finding = **FAIL blocks** — the skill does not start until the drift is consciously resolved. For audit-bound contexts (ISO 27001 / DORA / PCI / SOC 2). Orthogonal to `governance_mode = lite|standard|heavy`, like the privacy / EU-AI-Act add-ons. **Status:** the flag, the bootstrap question and the autopilot-pause behavior land in **BOO-229 B2** — B1 delivers the script, the SSoT derivation and the **warn-only** wiring of the three skills.
+
+**Boundary.** `scripts/doc-drift-check.sh` checks the **customer project**. The repo-internal `.github/scripts/docs_drift_check.py` still checks the **framework repo** itself (SKILL.md↔README versions) — a different thing, not bootstrapped. Scaffold: bootstrap phase 7.3b + `migrate_boo_229` for existing projects; `verify-setup.sh` §4 checks its presence.
 
 ---
 

@@ -126,3 +126,5 @@ Postflight returns `FAIL` when:
 - the primary path cannot be validated and no fallback was created,
 - files would be overwritten without confirmation,
 - a secret is detected in a target file.
+
+> **Ongoing drift check (BOO-229):** the criteria above are the *one-time* check at bootstrap. The *ongoing* reconciliation of the doc map is handled by `scripts/doc-drift-check.sh` — it reads `ARCHITECTURE_DESIGN.md §References` + `INDEX.md` as the SSoT and checks completeness, freshness and local-vs-remote. `/ideation`, `/architecture-review` and `/implement` call it in their pre-flight (warn-only; compliance hard gate = opt-in add-on `compliance_doc_gate`, BOO-229 B2). Details: HANDBUCH Appendix AS.

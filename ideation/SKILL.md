@@ -6,7 +6,7 @@ description: |
   den Learning-Loop (falls aktiv) und warnt bei Anti-Pattern-Match. Verwenden wenn der Nutzer
   eine neue Idee hat, ein Feature vorschlaegt, oder "ideation" / "neue Story" sagt.
   Ausloeser sind Anfragen wie "ich hab eine Idee", "neues Feature", "wir brauchen X", "/ideation".
-version: 2.10.0
+version: 2.11.0
 metadata:
   hermes:
     category: coding
@@ -29,33 +29,30 @@ Neue Ideen systematisch recherchieren, gegen Architektur + Backlog + Learnings a
 4. Bei Tool-Aufruf pruefen: ist Tool in `tools_available.<tool>` aktiv? Bei `false` oder fehlendem Eintrag: Skill ueberspringt den Aufruf und gibt einen Hinweis im Output.
 5. Fallback bei fehlender Datei: Standard-Pfade aus dem Schema annehmen (`journal/`, `journal/reports/local/`, `specs/`, `ARCHITECTURE_DESIGN.md`, `CONVENTIONS.md`) und im Output vermerken: "Hinweis: `.claude/environment.json` fehlt — Defaults aktiv. Empfehlung: `/bootstrap` re-rennen oder die Datei manuell anlegen."
 
-### Schritt 0a: Architektur-Doku-Aktualitaet pruefen (Pre-Flight, weich)
+### Schritt 0a: Doku-Drift-Pre-Flight pruefen (weich, BOO-229)
 
 > **Aktivierung:** Dieser Schritt laeuft immer wenn `ARCHITECTURE_DESIGN.md` im Projekt-Root existiert. Fehlt die Datei: ueberspringen ohne Warnung (Projekt ist noch nicht weit genug).
 
-**Ziel:** Warnen bevor Stories gegen eine moeglicherweise veraltete Architektur-Doku angelegt werden. **Kein Hard-Gate** — der Operator kann jederzeit "ja" sagen und weiter.
+**Ziel:** Warnen bevor Stories gegen eine driftende Doku-Landkarte angelegt werden (veraltete Architektur-Doku, fehlende/unregistrierte Dateien, lokal-vs-remote). **Kein Hard-Gate** — der Operator kann jederzeit "ja" sagen und weiter.
 
-1. Letzten Aenderungs-Zeitstempel der `ARCHITECTURE_DESIGN.md` lesen:
+1. **Gemeinsamen Drift-Checker aufrufen** (falls vorhanden):
    ```bash
-   git log -1 --format=%cd --date=iso ARCHITECTURE_DESIGN.md
+   bash scripts/doc-drift-check.sh
    ```
-   Bei nicht-versionierter Datei (kein Git-Log): `stat` als Fallback verwenden.
-2. Threshold aus `.claude/environment.json` lesen: `thresholds.architecture_doc_freshness_days` (Default `30`, wenn Feld oder Datei fehlt).
-3. Differenz in Tagen berechnen (heute minus letzter Aenderungstag).
-4. Wenn Differenz `>` Threshold:
+   Das Skript (BOO-229) liest `ARCHITECTURE_DESIGN.md §Referenzen` + `INDEX.md` als **Single Source of Truth** und prueft (1) Vollstaendigkeit, (2) Frische (`thresholds.architecture_doc_freshness_days`, Default `30`) und (3) lokal-vs-remote (`git fetch`). Es ersetzt die frueher hier hartkodierte Frische-Berechnung — Schwelle und SSoT-Liste leben jetzt zentral im Skript, nicht als skill-eigene Logik.
+   - **Fallback** (Skript fehlt, z.B. Projekt vor BOO-229 — `intentron migrate --issue BOO-229` zieht es nach): Frische inline pruefen — `git log -1 --format=%cd --date=iso ARCHITECTURE_DESIGN.md` (bzw. `stat`), Schwelle aus `.claude/environment.json`.
+2. Bei **WARN/FAIL** des Checkers:
    ```
-   Warnung: ARCHITECTURE_DESIGN.md wurde seit X Tagen nicht aktualisiert
-   (Threshold: Y Tage).
-
-   Empfehlung: /architecture-review ausfuehren, bevor neue Stories gegen
-   eine evtl. veraltete Architektur angelegt werden.
+   Doku-Drift erkannt (siehe doc-drift-check.sh-Ausgabe oben).
+   Empfehlung: /architecture-review ausfuehren bzw. §Referenzen/INDEX
+   korrigieren, bevor neue Stories angelegt werden.
 
    Trotzdem fortfahren? [ja/nein]
    ```
-5. Bei `nein`: Skill stoppt mit Hinweis "Operator-Entscheidung: erst /architecture-review". Kein Issue wird angelegt.
-6. Bei `ja`: weiter zu Schritt 0.5/0.6/1. Die Entscheidung wird in der Story unter `Current State` dokumentiert (`Architektur-Doku Z Tage alt — Operator-Override`).
+3. Bei `nein`: Skill stoppt mit Hinweis "Operator-Entscheidung: erst /architecture-review bzw. Doku-Drift aufloesen". Kein Issue wird angelegt.
+4. Bei `ja`: weiter zu Schritt 0.5/0.6/1. Die Entscheidung wird in der Story unter `Current State` dokumentiert (`Doku-Drift bewusst akzeptiert — Operator-Override`).
 
-**Warum weich, kein Hard-Block?** Ein Hard-Gate wuerde `/ideation` bei jedem laenger nicht angefassten Projekt blockieren. Realistisch ist die Doku haeufig „alt genug zum Warnen, aber noch valide" — der Operator entscheidet pro Story. Threshold ist konfigurierbar: ein schnell evolvierendes System setzt 14 Tage, ein stabiles System 90 Tage.
+**Warum weich, kein Hard-Block?** Ein Hard-Gate wuerde `/ideation` bei jedem laenger nicht angefassten Projekt blockieren. Realistisch ist die Doku haeufig „alt genug zum Warnen, aber noch valide" — der Operator entscheidet pro Story. Threshold ist konfigurierbar: ein schnell evolvierendes System setzt 14 Tage, ein stabiles System 90 Tage. Das **Compliance-Hard-Gate** (Drift blockiert den Skill) ist ein Opt-in-Add-on und folgt als BOO-229 B2.
 
 ### Schritt 0.5: Learnings-Kontext (wenn Learning-Loop aktiv)
 

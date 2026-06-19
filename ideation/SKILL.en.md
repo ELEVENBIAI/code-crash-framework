@@ -6,7 +6,7 @@ description: |
   learning loop (if active) and warns on anti-pattern matches. Use when the user has a new idea,
   suggests a feature, or says "ideation" / "new story".
   Triggers: "I have an idea", "new feature", "we need X", "/ideation".
-version: 2.10.0
+version: 2.11.0
 language: en
 metadata:
   hermes:
@@ -30,33 +30,30 @@ Systematically research new ideas, cross-check against architecture + backlog + 
 4. Before any tool invocation, check `tools_available.<tool>`. If `false` or missing, the skill skips the call and notes it in the output.
 5. Missing-file fallback: assume the schema defaults (`journal/`, `journal/reports/local/`, `specs/`, `ARCHITECTURE_DESIGN.md`, `CONVENTIONS.md`) and add a note to the output: "Note: `.claude/environment.json` is missing — defaults active. Recommendation: re-run `/bootstrap` or create the file manually."
 
-### Step 0a: Check architecture-doc freshness (pre-flight, soft)
+### Step 0a: Doc-drift pre-flight (soft, BOO-229)
 
 > **Activation:** this step always runs when `ARCHITECTURE_DESIGN.md` exists in the project root. If the file is missing: skip without warning (project not yet far enough along).
 
-**Goal:** warn before stories are written against a potentially stale architecture doc. **Not a hard gate** — the operator can always say "yes" and continue.
+**Goal:** warn before stories are written against a drifting doc map (stale architecture doc, missing/unregistered files, local-vs-remote). **Not a hard gate** — the operator can always say "yes" and continue.
 
-1. Read the last modification timestamp of `ARCHITECTURE_DESIGN.md`:
+1. **Call the shared drift checker** (if present):
    ```bash
-   git log -1 --format=%cd --date=iso ARCHITECTURE_DESIGN.md
+   bash scripts/doc-drift-check.sh
    ```
-   For non-versioned files (no git log): fall back to `stat`.
-2. Read the threshold from `.claude/environment.json`: `thresholds.architecture_doc_freshness_days` (default `30` if the field or file is missing).
-3. Compute the age in days (today minus last-changed date).
-4. If age `>` threshold:
+   The script (BOO-229) reads `ARCHITECTURE_DESIGN.md §References` + `INDEX.md` as the **single source of truth** and checks (1) completeness, (2) freshness (`thresholds.architecture_doc_freshness_days`, default `30`) and (3) local-vs-remote (`git fetch`). It replaces the freshness math previously hard-coded here — the threshold and SSoT list now live centrally in the script, not as skill-own logic.
+   - **Fallback** (script missing, e.g. a project predating BOO-229 — `intentron migrate --issue BOO-229` adds it): check freshness inline — `git log -1 --format=%cd --date=iso ARCHITECTURE_DESIGN.md` (or `stat`), threshold from `.claude/environment.json`.
+2. On the checker's **WARN/FAIL**:
    ```
-   Warning: ARCHITECTURE_DESIGN.md has not been updated in X days
-   (threshold: Y days).
-
-   Recommendation: run /architecture-review before writing new stories
-   against a possibly stale architecture.
+   Doc drift detected (see doc-drift-check.sh output above).
+   Recommendation: run /architecture-review or fix §References/INDEX
+   before writing new stories.
 
    Continue anyway? [yes/no]
    ```
-5. On `no`: the skill stops with the note "Operator decision: run /architecture-review first". No issue is created.
-6. On `yes`: continue to step 0.5/0.6/1. The decision is recorded in the story under `Current State` (`Architecture doc Z days old — operator override`).
+3. On `no`: the skill stops with the note "Operator decision: run /architecture-review or resolve the doc drift first". No issue is created.
+4. On `yes`: continue to step 0.5/0.6/1. The decision is recorded in the story under `Current State` (`Doc drift deliberately accepted — operator override`).
 
-**Why soft, not hard-block?** A hard gate would block `/ideation` on every project that hasn't been touched in a while. In practice the doc is often "old enough to warn about, but still valid" — the operator decides per story. The threshold is configurable: a fast-evolving system sets 14 days, a stable system 90 days.
+**Why soft, not hard-block?** A hard gate would block `/ideation` on every project that hasn't been touched in a while. In practice the doc is often "old enough to warn about, but still valid" — the operator decides per story. The threshold is configurable: a fast-evolving system sets 14 days, a stable system 90 days. The **compliance hard gate** (drift blocks the skill) is an opt-in add-on and lands as BOO-229 B2.
 
 ### Step 0.5: Learnings context (if learning loop active)
 

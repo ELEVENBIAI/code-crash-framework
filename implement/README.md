@@ -4,7 +4,7 @@
 
 > Macht aus einem Linear-Issue produktionsreifen Code ueber ein nicht-ueberspringbares 8-Schritte-Protokoll: Identifizieren → Abhaengigkeiten → Kontext → Governance-Validation → Spec-Gate → Plan → Implementieren → Post-Validation. Kein Schritt optional, keine Abkuerzungen. Auch vom Automation-Daemon ohne Human-in-the-Loop nutzbar.
 
-**Version:** 2.17.0 · **Befehl:** `/implement`
+**Version:** 2.18.0 · **Befehl:** `/implement`
 
 > **Native Subagents (BOO-204, Schalter B):** Bei `prefer_native_subagents: true` generiert `/implement` aus der `## Subagents`-Sektion der Spec echte `.claude/agents/<story>-<agent>.md` — jeder Subagent mit eigenem 200k-Fenster, eigenen Tools/Permissions, optional eigenem Modell (Schritt 0d + 4b). Ohne Flag/Sektion: bisheriges Text-Block-Pattern im gleichen Fenster.
 

@@ -1,7 +1,7 @@
 ---
 name: bootstrap
 recommended_model: sonnet  # BOO-84 — tier mapping in bootstrap/references/model-tiers.json
-version: 3.46.0
+version: 3.47.0
 language: en
 description: Sets up a new project with a governance framework — interactive 4-block interview flow, docs architecture with automatic hub linking, optional learning loop L1/L2/L3. Use when the operator wants to set up a new project or says "/bootstrap".
 tools: [Read, Write, Edit, Bash, Glob, Grep]
@@ -1633,6 +1633,8 @@ Before the final commit, deliver the **proof** that the scaffold is complete and
 2. Run it in the project root: `bash scripts/verify-setup.sh`.
 3. The script checks read-only: environment.json, toolchain reachability, git hooks (per repo!), core artifacts (CONVENTIONS.md, ARCHITECTURE_DESIGN.md, specs/, journal/), privacy add-on (if active), backlog adapter. Output PASS/WARN/FAIL + exit code (1 on FAIL).
 4. **Fix FAIL items before finishing.** Present WARN items to the operator (often intentional, e.g. no test framework in a docs project).
+
+> **Doc-drift check (BOO-229):** also copy `references/doc-drift-check.sh` to `{PROJECT_PATH}/scripts/doc-drift-check.sh` and run `bash scripts/doc-drift-check.sh` — read-only, checks the doc map against reality, using `ARCHITECTURE_DESIGN.md §References` + `INDEX.md` as the **single source of truth**: (1) **completeness** (every registered file exists; expected artifacts are registered), (2) **freshness** (`ARCHITECTURE_DESIGN.md` not older than `thresholds.architecture_doc_freshness_days`), (3) **local-vs-remote** (`git fetch` comparison against `origin`). **Warn-only at this stage** — the operator reviews WARN/FAIL, no abort; `/implement`, `/ideation` and `/architecture-review` call the same script in their pre-flight. The compliance **hard gate** (skill blocks on drift) is an opt-in add-on and lands as BOO-229 B2. Boundary: this is the **project** script — the repo-internal `.github/scripts/docs_drift_check.py` checks the framework repo itself. Background: HANDBUCH Appendix AS.
 
 **Tool-install guidance for missing tools (BOO-115):** When `verify-setup.sh` (or the pre-flight gate, phase 0.2) reports a missing tool, the bootstrap emits **tool name + deeplink** — not just a WARN — and uses the `INSTALL_DEFAULT` from A.7:
 

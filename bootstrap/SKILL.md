@@ -1,7 +1,7 @@
 ---
 name: bootstrap
 recommended_model: sonnet  # BOO-84 — tier mapping in bootstrap/references/model-tiers.json
-version: 3.46.0
+version: 3.47.0
 description: Setzt ein neues Projekt mit Governance-Framework auf — interaktiver Block-Interview-Flow in 4 Schritten, Doku-Architektur mit Hub-Auto-Verlinkung, optionaler Learning-Loop L1/L2/L3. Verwenden wenn der Operator ein neues Projekt aufsetzen will oder "/bootstrap" sagt.
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 metadata:
@@ -1717,6 +1717,8 @@ Vor dem finalen Commit den **Proof** liefern, dass das Geruest komplett + funkti
 2. Im Projekt-Root ausfuehren: `bash scripts/verify-setup.sh`.
 3. Das Skript prueft read-only: environment.json, Toolchain-Erreichbarkeit, Git-Hooks (pro Repo!), Kern-Artefakte (CONVENTIONS.md, ARCHITECTURE_DESIGN.md, specs/, journal/), Privacy-Add-on (falls aktiv), Backlog-Adapter. Ausgabe PASS/WARN/FAIL + Exit-Code (1 bei FAIL).
 4. **FAIL-Punkte vor dem Abschluss beheben.** WARN-Punkte dem Operator vorlegen (oft bewusst, z.B. kein Test-Framework in einem Doku-Projekt).
+
+> **Doku-Drift-Check (BOO-229):** zusaetzlich `references/doc-drift-check.sh` nach `{PROJECT_PATH}/scripts/doc-drift-check.sh` kopieren und `bash scripts/doc-drift-check.sh` ausfuehren — read-only, prueft die Doku-Landkarte gegen die Realitaet, mit `ARCHITECTURE_DESIGN.md §Referenzen` + `INDEX.md` als **Single Source of Truth**: (1) **Vollstaendigkeit** (jede registrierte Datei existiert; erwartbare Artefakte sind registriert), (2) **Frische** (`ARCHITECTURE_DESIGN.md` nicht aelter als `thresholds.architecture_doc_freshness_days`), (3) **lokal-vs-remote** (`git fetch`-Vergleich gegen `origin`). **Warn-only in dieser Stufe** — der Operator prueft WARN/FAIL, kein Abbruch; `/implement`, `/ideation` und `/architecture-review` rufen dasselbe Skript im Pre-Flight. Das Compliance-**Hard-Gate** (Skill blockiert bei Drift) ist ein Opt-in-Add-on und folgt als BOO-229 B2. Abgrenzung: dies ist das **Projekt**-Skript — das repo-interne `.github/scripts/docs_drift_check.py` prueft das Framework-Repo selbst. Hintergrund: HANDBUCH Anhang AS.
 
 **Tool-Install-Fuehrung bei fehlenden Tools (BOO-115):** Meldet `verify-setup.sh` (oder das Pre-Flight-Gate, Phase 0.2) ein fehlendes Tool, gibt der Bootstrap **Tool-Name + Deeplink** aus — nicht nur WARN — und nutzt den `INSTALL_DEFAULT` aus A.7:
 
