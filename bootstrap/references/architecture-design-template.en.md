@@ -108,6 +108,38 @@ Answers "Why did we build X like this?" for new engineers and AI assistants.]
 
 ---
 
+## §5b Infra layers (13-layer decision grid)
+
+> **Second axis next to §5.** §5 is the **quality axis** (what the system must be able to do); this table is the
+> **infra axis** (which infrastructure decision is made per layer). **Single entry point** for this project's infra state —
+> one row per layer. Mandatory questions, failure modes and anti-patterns per layer live in the stack-neutral catalog
+> `cloud-system-engineer/references/infrastructure-dimensions.en.md` (the "Reference" column points there). No duplication
+> with §5: where a layer primarily realizes a quality property (security, monitoring, performance), the row cross-references
+> the matching §5 dimension instead of restating it.
+>
+> **Status:** `ok` (decided + implemented) · `n.ok` (open / to rework) · `n/a (deliberate)` (deliberately irrelevant for
+> this project, with a one-sentence rationale). **Lazy-fill allowed:** empty rows are fine, `/architecture-review` finds
+> them and nudges for rework. Depth **on-demand**: "Reference" may point to a project sub-MD (e.g. `DB_SCHEMA.md`,
+> `IAM_POLICY.md`, `RECOVERY_PLAN.md`) — only when needed, no scaffolding upfront.
+
+| # | Layer | Decision (1 sentence) | Status | Reference |
+|---|-------|-----------------------|--------|-----------|
+| 1 | Frontend | [fill in / n/a (deliberate)] | n.ok | [catalog §1](cloud-system-engineer/references/infrastructure-dimensions.en.md) |
+| 2 | APIs & Backend | [fill in] | n.ok | [catalog §2](cloud-system-engineer/references/infrastructure-dimensions.en.md) |
+| 3 | Database & Storage | [fill in] | n.ok | [catalog §3](cloud-system-engineer/references/infrastructure-dimensions.en.md) |
+| 4 | Caching & CDN | [fill in] | n.ok | [catalog §4](cloud-system-engineer/references/infrastructure-dimensions.en.md) |
+| 5 | Hosting & Deployment | [fill in] | n.ok | [catalog §5](cloud-system-engineer/references/infrastructure-dimensions.en.md) |
+| 6 | Cloud & Compute | [fill in] | n.ok | [catalog §6](cloud-system-engineer/references/infrastructure-dimensions.en.md) |
+| 7 | CI/CD & Version Control | [fill in] | n.ok | [catalog §7](cloud-system-engineer/references/infrastructure-dimensions.en.md) |
+| 8 | Rate Limiting | [fill in] | n.ok | [catalog §8](cloud-system-engineer/references/infrastructure-dimensions.en.md) |
+| 9 | IAM / RBAC / Permissions | [fill in] | n.ok | [catalog §9](cloud-system-engineer/references/infrastructure-dimensions.en.md) · Q: §5 Security |
+| 10 | Security & RLS | [fill in] | n.ok | [catalog §10](cloud-system-engineer/references/infrastructure-dimensions.en.md) · Q: §5 Security |
+| 11 | Monitoring / Logs / Alerts | [fill in] | n.ok | [catalog §11](cloud-system-engineer/references/infrastructure-dimensions.en.md) · Q: §5 Observability |
+| 12 | Rollback & Recovery | [fill in] | n.ok | [catalog §12](cloud-system-engineer/references/infrastructure-dimensions.en.md) · Q: §5 Reliability |
+| 13 | Audit / Compliance & SLAs | [fill in] | n.ok | [catalog §13](cloud-system-engineer/references/infrastructure-dimensions.en.md) |
+
+---
+
 ## §6 References
 
 > Links to all connected architecture documents — SSoT for cross-references.

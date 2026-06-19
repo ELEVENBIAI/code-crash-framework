@@ -5,7 +5,7 @@ description: |
   Architektur-Review fuer einzelne Stories oder das Gesamtsystem. Prueft die aktiven
   Architektur-Dimensionen (8 Standard + aktive Add-ons) und identifiziert Risiken, Tech Debt und Verbesserungspotential.
   Verwenden wenn der Operator "Architektur pruefen", "Review", "passt das architektonisch" oder "/architecture-review" sagt.
-version: 1.13.0
+version: 1.14.0
 metadata:
   hermes:
     category: governance
@@ -81,6 +81,7 @@ Eine einzelne Story oder geplante Aenderung architektonisch bewerten.
        7. **AP3-Check** — Kein direkter DB-Zugriff aus falschem Modul, keine zirkulaeren Imports
        8. **AP4-Check** — Tests im selben PR, Coverage-Gate gruen
      - Detail-Fragen pro Check: [references/dimensions-detail.md §9.1–§9.8](references/dimensions-detail.md).
+   - [ ] §5b Infra-Layer (13-Layer-Tabelle, BOO-221) — **weiche Drift-Erkennung:** alle Zeilen mit Status `n.ok` oder leerer „Entscheidung" auflisten und zur Nacharbeit anstossen. **Kein Hard-Block** (Lazy-Fill erlaubt) — Ausnahme: explizites Compliance-Projekt. Pflichtfragen/Anti-Patterns je Layer im Katalog `cloud-system-engineer/references/infrastructure-dimensions.md`. Bei Layern mit §5-Querverweis (Security/Monitoring/Reliability) gegen die §5-Dimension gegenpruefen statt doppelt.
    - [ ] §6 Referenzen (Querverweise auf weitere Architektur-Dokumente)
    - [ ] §7+ Optionale Add-on-Sektionen (z.B. Failure Mode Analysis, Scalability Roadmap, Testing Architecture — falls projekt-spezifisch ergaenzt)
 2. Story/Aenderung verstehen

@@ -26,7 +26,7 @@
 11. [Tägliche Nutzung — ein typischer Workflow](#11-tägliche-nutzung--ein-typischer-workflow)
 11b. [Checkpoints & Rollback per /rewind](#11b-checkpoints--rollback-per-rewind-boo-208)
 12. [Häufige Fragen](#12-häufige-fragen) — inkl. Claude Agent SDK Migration
-13. [Anhänge — Wegweiser](#13-anhänge--wegweiser) — A bis AQ im Überblick (AL: Schalter A / Native-Pfade · AM: Automemory vs Learning-Loop · AN: Cloud-Engine /ultraplan · AO: Sprint Review vs /insights · AP: USP — 13 Komponenten ohne Anthropic-Pendant · AQ: Status Line — Worker-Equivalent live)
+13. [Anhänge — Wegweiser](#13-anhänge--wegweiser) — A bis AR im Überblick (AL: Schalter A / Native-Pfade · AM: Automemory vs Learning-Loop · AN: Cloud-Engine /ultraplan · AO: Sprint Review vs /insights · AP: USP — 13 Komponenten ohne Anthropic-Pendant · AQ: Status Line — Worker-Equivalent live · AR: Infra-Layer-Onboarding — die zweite Architektur-Achse)
 
 ---
 
@@ -5632,6 +5632,26 @@ Sonnet 4.7 | 142k/200k ctx | Worker-Equiv: 2.5h / 16h | Story BOO-205 | $4.20
 **Ausrollung.** `/bootstrap` legt bei `runtime_target: claude-code` `.claude/statusline.sh` an (SSoT-Template `bootstrap/templates/statusline.sh`) und verdrahtet `settings.json`. Bestandsprojekte: `intentron migrate` (`migrate_boo_205`, idempotent, Schalter-A-gated). `bootstrap/references/verify-setup.sh` §5c prueft Existenz + Ausfuehrbarkeit + Verdrahtung.
 
 **Anpassen & Grenzen.** Das Skript ist defensiv (jedes Feld optional, Exit immer 0) und bewusst klein — Felder umstellen heisst `.claude/statusline.sh` editieren; die Worker-Equiv-Anreicherung aus der Spec ist der einzige framework-spezifische Teil. Kein Render bei `runtime_target ≠ claude-code`. Der `$`-Wert ist eine client-seitige Schaetzung. Worker-Equiv erscheint nur, wenn die aktive Story eine Spec mit Doppelspalte (BOO-193) hat.
+
+---
+
+## Anhang AR: Infra-Layer-Onboarding — die zweite Architektur-Achse (BOO-221)
+
+> **Kurz:** Neben der **Qualitäts-Achse** (`ARCHITECTURE_DESIGN.md §5` — was das System können muss) gibt es eine zweite Achse: die **Infra-Achse** (`§5b Infra-Layer` — welche Infrastruktur-Entscheidung pro Layer getroffen ist). 13 Layer (Prototyp → Produkt), als **Single-Entry-Point-Tabelle** im Projekt.
+
+**Drei Ebenen.**
+1. **Katalog** (`cloud-system-engineer/references/infrastructure-dimensions.md`, BOO-220) — stack-neutrales Fragen-/Risiko-Raster: pro Layer Pflichtfragen, Failure-Modes, Anti-Patterns, Kategorien. **Einmal zentral**, framework-weit, keine Produktnamen.
+2. **Projekt-Tabelle** (`ARCHITECTURE_DESIGN.md §5b`) — 13 Zeilen `Layer | Entscheidung | Status (ok / n.ok / n/a bewusst) | Verweis`. Der Single Entry Point. Verweist auf den Katalog; Tiefe nur on-demand via Sub-MD (`DB_SCHEMA.md` / `IAM_POLICY.md` / `RECOVERY_PLAN.md`).
+3. **Konzern-Fork** — konzernweite Vorgaben leben in einer geforkten Framework-Instanz des Katalogs (einmal gepflegt, vererbt; nicht pro Kunde editiert). Details: Katalog-Sektion „Vererbungs-Mechanik".
+
+**Wann was.**
+- **Beim Bootstrap:** Die §5b-Tabelle wird mit allen 13 Zeilen auf `n.ok` angelegt. Reichen die Default-Standards → **Lazy-Fill**, einfach loscoden. Kein Zwang (Leichtgewicht-Designprinzip).
+- **Eigene/Konzern-Vorgaben:** `/infrastructure-onboarding` (BOO-223) führt propose-and-confirm pro Layer durch und füllt die Tabelle.
+- **Pro Feature (`/ideation`):** Berührt eine Story einen Layer, weicher Hinweis auf die betroffene `n.ok`-Zeile — kein Block.
+- **Wiederkehrend (`/architecture-review`):** Findet offene/abweichende Layer und stößt zur Nacharbeit an. **Hard-Gate nur im expliziten Compliance-Modus.**
+- **Bei `/implement`:** Gegencheck Spec ↔ betroffene Layer-Zeile (weich).
+
+**Zwei Achsen, keine Dopplung.** §5 (Qualität) bleibt unverändert die SSoT der Qualitäts-Achse. Layer, die primär eine Qualitäts-Eigenschaft realisieren (Security, Monitoring, Reliability), **verweisen** in der §5b-Zeile per Querverweis auf die passende §5-Dimension. Die Layer×Qualitäts-Matrix im Katalog macht das explizit.
 
 ---
 

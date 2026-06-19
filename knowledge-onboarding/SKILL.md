@@ -8,7 +8,7 @@ description: |
   Coverage-Check. Verwenden wenn Bestands-Doku/Vor-Material vorhanden ist (post-bootstrap).
   Ausloeser: "/knowledge-onboarding", "wir haben schon ein Wissenspaket", "verknuepfe
   das bestehende Repo mit unseren Artefakten".
-version: 1.1.0
+version: 1.2.0
 metadata:
   hermes:
     category: onboarding

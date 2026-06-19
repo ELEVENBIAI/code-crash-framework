@@ -5,7 +5,7 @@ description: |
   Architecture review for individual stories or the whole system. Checks the active
   architecture dimensions (8 standard + active add-ons) and identifies risks, tech debt and improvement potential.
   Use when the operator says "check architecture", "review", "does this fit architecturally" or "/architecture-review".
-version: 1.13.0
+version: 1.14.0
 language: en
 metadata:
   hermes:
@@ -72,6 +72,7 @@ Architecturally assess a single story or planned change.
        2. **Metrics-endpoint invariant** — `/metrics` in Prometheus format with 4 mandatory metrics per service, port convention 9090+N
        3. **Alert-rules invariant** — `observability/alerts/<service>.yml` with 3 mandatory alerts per service, routing active, `promtool check rules` green
      - Detail questions per invariant: see [references/dimensions-detail.en.md](references/dimensions-detail.en.md) §5.1 / §5.2 / §5.3.
+   - [ ] §5b Infra layers (13-layer table, BOO-221) — **soft drift detection:** list all rows with status `n.ok` or an empty "decision" and nudge for rework. **No hard block** (lazy-fill allowed) — exception: an explicit compliance project. Mandatory questions/anti-patterns per layer in the catalog `cloud-system-engineer/references/infrastructure-dimensions.en.md`. For layers with a §5 cross-reference (security/monitoring/reliability), check against the §5 dimension instead of duplicating.
    - [ ] §6 References (cross-refs to other architecture docs)
    - [ ] §7+ Optional add-on sections (e.g. failure mode analysis, scalability roadmap, testing architecture — if added project-specifically)
 2. Understand story/change

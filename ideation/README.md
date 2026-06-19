@@ -4,7 +4,7 @@
 
 > Workflow der aus einer rohen Idee ein produktionsreifes Linear-Issue macht — mit Research, Architecture Design Document (ADD), Dependency-Mapping, Sprint-Fit-Check, Intent-Check, Privacy-Pre-Flight und Token-Heuristik. Schluss mit "was haben wir eigentlich beschlossen?" drei Wochen spaeter.
 
-**Version:** 2.9.0 · **Befehl:** `/ideation`
+**Version:** 2.10.0 · **Befehl:** `/ideation`
 
 > 🔗 Sprint-Automation: **`/sprint-run`** faehrt einen ganzen Sprint und orchestriert die Kette `backlog → implement → sprint-review`. Siehe [`sprint-run/`](../sprint-run/README.md) · HANDBUCH Anhang AD.
 

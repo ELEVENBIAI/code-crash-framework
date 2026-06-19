@@ -6,7 +6,7 @@ description: |
   bis Ergebnis-Tabelle inkl. Post-Implement Validation. Verwenden wenn der Operator "los" sagt,
   eine Story umsetzen will, oder "/implement" ausfuehrt. Wird auch vom Automation Daemon genutzt
   (ohne Human-in-the-Loop).
-version: 2.16.0
+version: 2.17.0
 metadata:
   hermes:
     category: coding
@@ -212,7 +212,7 @@ Geh zurueck zu /ideation und ergaenze den fehlenden Bestandteil bevor du /implem
 
 - CLAUDE.md lesen (Systemkontext)
 - **`DEVELOPER_ONBOARDING.md` lesen** falls vorhanden — Handoff-Kontext fuer fremde Entwicklungsteams und Toolwechsel (Claude Code -> Codex/Cursor/GitHub Copilot/Google Antigravity/klassisches Dev-Team). Runtime-Hinweise, SSoTs, Startpunkt Umsetzung und Pflegepflicht in die Plan-Erstellung einbeziehen.
-- **`ARCHITECTURE_DESIGN.md` lesen** — Lead-Dokument: ADRs, Quality Attributes, Leitprinzipien. Pruefen ob die Story gegen bestehende ADRs oder Quality Attributes verstoesst (z.B. ADR-6: Zero External Dependencies, ADR-5: Kill-Switch First). Verweist auf alle weiteren Architektur-Dokumente.
+- **`ARCHITECTURE_DESIGN.md` lesen** — Lead-Dokument: ADRs, Quality Attributes, Leitprinzipien. Pruefen ob die Story gegen bestehende ADRs oder Quality Attributes verstoesst (z.B. ADR-6: Zero External Dependencies, ADR-5: Kill-Switch First). Verweist auf alle weiteren Architektur-Dokumente. **§5b Infra-Layer-Gegencheck (weich, BOO-221):** Beruehrt die Story einen der 13 Infra-Layer, dessen Tabellen-Zeile `n.ok`/leer ist, im Plan kurz vermerken (Entscheidung nachziehen oder bewusst `n/a`). Kein Block (Lazy-Fill erlaubt).
 - Betroffene Code-Dateien identifizieren (aus Issue-Description + eigene Analyse)
 - Verwandte abgeschlossene Issues pruefen (was wurde schon gebaut?)
 - Architektur-Dimensionen pruefen die fuer diese Story relevant sind:

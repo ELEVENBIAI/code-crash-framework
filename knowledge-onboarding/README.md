@@ -2,7 +2,7 @@
 
 > Framework-Bundle-Skill — routet Bestands-Doku eines Projekts deterministisch in die Governance-Artefakte. Anlassfall: BOO-137 (2026-06-03).
 
-**Version:** 1.1.0 · **Befehl:** `/knowledge-onboarding`
+**Version:** 1.2.0 · **Befehl:** `/knowledge-onboarding`
 
 > **Claude-Code-Modus:** `/knowledge-onboarding` schreibt Verweis-Bloecke und ein Manifest → beaufsichtigt **`acceptEdits`** (der Skill hat eigene Apply-/Diff-Gates pro Datei). Kein unbeaufsichtigter Betrieb. Details: HANDBUCH §6 „Claude-Code-Modus".
 

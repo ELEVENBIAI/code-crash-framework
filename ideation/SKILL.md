@@ -6,7 +6,7 @@ description: |
   den Learning-Loop (falls aktiv) und warnt bei Anti-Pattern-Match. Verwenden wenn der Nutzer
   eine neue Idee hat, ein Feature vorschlaegt, oder "ideation" / "neue Story" sagt.
   Ausloeser sind Anfragen wie "ich hab eine Idee", "neues Feature", "wir brauchen X", "/ideation".
-version: 2.9.0
+version: 2.10.0
 metadata:
   hermes:
     category: coding
@@ -260,6 +260,12 @@ ADD + Story-Template kombinieren. Der Draft besteht aus:
 > CMS-Content-Migration), setze einen Non-Code-Wert: `workflow | config | infrastructure | content`.
 > Dadurch verzweigt `/implement` Schritt 5.7 und macht die Soft-Gates 6c/6d/6e zu Hard Gates,
 > statt die Code-Gates leer durchlaufen zu lassen. Erklaerung: `implement/references/non-code-flow.md`.
+>
+> **Infra-Layer-Hinweis (weich, BOO-221):** Beruehrt die Story einen der 13 Infra-Layer (besonders bei
+> `Change-Type: infrastructure`), pruefe die **§5b Infra-Layer-Tabelle** im `ARCHITECTURE_DESIGN.md`: Ist die
+> betroffene Layer-Zeile noch `n.ok`/leer, weise im ADD darauf hin (Entscheidung nachziehen oder bewusst
+> `n/a` setzen). **Kein Block** — der „spaeter fuellen"-Pfad bleibt offen; `/architecture-review` findet offene
+> Zeilen ohnehin. Pflichtfragen je Layer: `cloud-system-engineer/references/infrastructure-dimensions.md`.
 
 **ADD als Anhang** (bei Features):
 - Das ADD wird als Kommentar an die Linear-Story angehaengt

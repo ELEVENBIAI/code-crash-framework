@@ -4,7 +4,7 @@
 
 > Ein **portabler Bootstrap-Skill** fuer Claude Code, Codex oder Cross-Tool-Setups, der ein vollstaendiges KI-gesteuertes Entwicklungs-Governance-Framework fuer jedes neue Projekt einrichtet — in 4 Interview-Bloecken (A-D) plus 7 Setup-Phasen, ohne externe Abhaengigkeiten.
 
-**Version:** 3.44.0 — generisch, interview-freundlich, mit portablem Learning-Loop (L1/L2/L3). Kein Projekt-Typ-Lock-in, keine trading-spezifischen Altlasten mehr.
+**Version:** 3.45.0 — generisch, interview-freundlich, mit portablem Learning-Loop (L1/L2/L3). Kein Projekt-Typ-Lock-in, keine trading-spezifischen Altlasten mehr.
 
 > 3.44.0 — Status-Line-Custom-Script mit Worker-Equivalent live (BOO-205)
 **Grundlage:** Claude Code Best Practice Checkliste v10 (OWLIST GmbH, 2026) — Context Engineering, Global Settings, Kontextschutz und Agent-Patterns sind als integraler Bestandteil in den Bootstrap-Prozess eingeflossen.

@@ -6,7 +6,7 @@ description: |
   learning loop (if active) and warns on anti-pattern matches. Use when the user has a new idea,
   suggests a feature, or says "ideation" / "new story".
   Triggers: "I have an idea", "new feature", "we need X", "/ideation".
-version: 2.9.0
+version: 2.10.0
 language: en
 metadata:
   hermes:
@@ -260,6 +260,12 @@ Combine the ADD + story template. The draft consists of:
 > migration), set a non-code value: `workflow | config | infrastructure | content`. This causes
 > `/implement` step 5.7 to branch and promote soft gates 6c/6d/6e to hard gates, instead of
 > letting the code gates pass empty. Reference: `implement/references/non-code-flow.md`.
+>
+> **Infra-layer hint (soft, BOO-221):** If the story touches one of the 13 infra layers (especially with
+> `Change-Type: infrastructure`), check the **§5b infra-layer table** in `ARCHITECTURE_DESIGN.md`: if the affected
+> layer row is still `n.ok`/empty, flag it in the ADD (catch up the decision or set it deliberately to `n/a`).
+> **No block** — the "fill in later" path stays open; `/architecture-review` finds open rows anyway. Mandatory
+> questions per layer: `cloud-system-engineer/references/infrastructure-dimensions.en.md`.
 
 **ADD as attachment** (for features):
 - The ADD gets attached as a comment on the Linear story

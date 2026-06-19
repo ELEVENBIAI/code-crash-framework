@@ -6,7 +6,7 @@ description: |
   to closing table including post-implement validation. Use when the operator says "go",
   wants to implement a story, or runs "/implement". Also used by the automation daemon
   (no human in the loop).
-version: 2.16.0
+version: 2.17.0
 language: en
 metadata:
   hermes:
@@ -166,7 +166,7 @@ drives Step 4b.
 
 - Read CLAUDE.md (system context)
 - **Read `DEVELOPER_ONBOARDING.md`** if present — handover context for unfamiliar development teams and tool switches (Claude Code -> Codex/Cursor/GitHub Copilot/Google Antigravity/classic development team). Include runtime notes, SSoTs, implementation starting point and maintenance obligation in the plan.
-- **Read `ARCHITECTURE_DESIGN.md`** — the lead document: ADRs, quality attributes, guiding principles. Check whether the story violates existing ADRs or quality attributes (e.g. ADR-6: zero external dependencies, ADR-5: kill-switch first). References all further architecture docs.
+- **Read `ARCHITECTURE_DESIGN.md`** — the lead document: ADRs, quality attributes, guiding principles. Check whether the story violates existing ADRs or quality attributes (e.g. ADR-6: zero external dependencies, ADR-5: kill-switch first). References all further architecture docs. **§5b infra-layer cross-check (soft, BOO-221):** if the story touches one of the 13 infra layers whose table row is `n.ok`/empty, note it briefly in the plan (catch up the decision or set it deliberately to `n/a`). No block (lazy-fill allowed).
 - Identify affected code files (from issue description + your own analysis)
 - Check related completed issues (what's already built?)
 - Check the architecture dimensions relevant for this story:

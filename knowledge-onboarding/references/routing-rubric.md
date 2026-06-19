@@ -90,6 +90,7 @@ journal/
 | 8 | `demo-storyboard-pitch` | `demo`, `choreographie`, `choreography`, `pitch`, `storyboard`, `script` | "Demo-Ablauf", "Storyboard", "Pitch-Folie", "Spielzug", "User Journey Demo" | `docs/project/demo/<name>.md` bzw. `/pitch`-Material | `referenzieren` |
 | 9 | `onboarding-handover` | `onboarding`, `handover`, `welcome`, `getting-started`, `quickstart` | "neuer Entwickler", "Uebergabe", "Einarbeitung", "Wo finde ich was" | `DEVELOPER_ONBOARDING.md` | `extrahieren` |
 | 10 | `prompt-library` | `prompts/` (Pfad), `*.prompt.md`, `prompts.md` | "Du bist ein …", "Aufgabe:", "Beispiel:", "Format:", LLM-Prompt-Strukturen (System/User/Assistant) | `docs/project/prompts/<name>.md` | `referenzieren` |
+| 11 | `infra-layer` | `infra`, `deployment`, `db-schema`, `schema`, `iam`, `rbac`, `runbook`, `sla`, `backup`, `recovery`, `terraform`, `k8s`, `ci-cd` | "RTO/RPO", "Replikation", "Rate Limit", "RLS", "Row-Level Security", "Shard", "Deployment-Strategie", "Failover", "Backup-Strategie", "SLA" | `ARCHITECTURE_DESIGN.md §5b` (Infra-Layer-Tabelle, BOO-221) + optional Sub-MD (`DB_SCHEMA.md` / `IAM_POLICY.md` / `RECOVERY_PLAN.md`); Katalog `cloud-system-engineer/references/infrastructure-dimensions.md` | `referenzieren` |
 
 ## Tier 3 — Mehrdeutigkeit-Regel
 

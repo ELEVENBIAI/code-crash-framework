@@ -4,7 +4,7 @@
 
 > Prueft jede Story — oder das gesamte System — gegen die aktiven Architektur-Dimensionen (8 Standard + aktive Add-ons). Findet Risiken, Tech Debt und Skalierungs-Probleme **bevor** sie im Produktivsystem landen.
 
-**Version:** 1.13.0 · **Befehl:** `/architecture-review`
+**Version:** 1.14.0 · **Befehl:** `/architecture-review`
 
 > **Claude-Code-Modus:** `/architecture-review` ist read-only Analyse → **`plan`** (Plan Mode); Befunde/Empfehlungen, kein Code. Details: HANDBUCH §6 „Claude-Code-Modus".
 

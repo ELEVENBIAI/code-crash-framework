@@ -26,7 +26,7 @@
 11. [Daily Usage — A Typical Workflow](#11-daily-usage--a-typical-workflow)
 11b. [Checkpoints & rollback via /rewind](#11b-checkpoints--rollback-via-rewind-boo-208)
 12. [FAQ](#12-faq) — incl. Claude Agent SDK migration
-13. [Appendices — signpost](#13-appendices--signpost) — A through AQ at a glance (AL: Switch A / native paths · AM: Automemory vs Learning-Loop · AN: Cloud-engine /ultraplan · AO: Sprint Review vs /insights · AP: USP — 13 components without an Anthropic equivalent · AQ: Status line — worker-equivalent live)
+13. [Appendices — signpost](#13-appendices--signpost) — A through AR at a glance (AL: Switch A / native paths · AM: Automemory vs Learning-Loop · AN: Cloud-engine /ultraplan · AO: Sprint Review vs /insights · AP: USP — 13 components without an Anthropic equivalent · AQ: Status line — worker-equivalent live · AR: Infra-layer onboarding — the second architecture axis)
 
 ---
 
@@ -5538,6 +5538,26 @@ Sonnet 4.7 | 142k/200k ctx | Worker-Equiv: 2.5h / 16h | Story BOO-205 | $4.20
 **Rollout.** `/bootstrap` creates `.claude/statusline.sh` (SSoT template `bootstrap/templates/statusline.sh`) and wires `settings.json` when `runtime_target: claude-code`. Existing projects: `intentron migrate` (`migrate_boo_205`, idempotent, switch-A-gated). `bootstrap/references/verify-setup.sh` §5c checks existence + executability + wiring.
 
 **Tailoring & limits.** The script is defensive (every field optional, always exits 0) and deliberately small — to reorder fields, edit `.claude/statusline.sh`; the worker-equivalent enrichment from the spec is the only framework-specific part. No render when `runtime_target ≠ claude-code`. The `$` value is a client-side estimate. Worker-equivalent only appears when the active story has a spec with the dual column (BOO-193).
+
+---
+
+## Appendix AR: Infra-layer onboarding — the second architecture axis (BOO-221)
+
+> **In brief:** Next to the **quality axis** (`ARCHITECTURE_DESIGN.md §5` — what the system must be able to do) there is a second axis: the **infra axis** (`§5b infra layers` — which infrastructure decision is made per layer). 13 layers (prototype → product), as a **single-entry-point table** in the project.
+
+**Three levels.**
+1. **Catalog** (`cloud-system-engineer/references/infrastructure-dimensions.en.md`, BOO-220) — a stack-neutral question/risk grid: per layer the mandatory questions, failure modes, anti-patterns, categories. **Once, centrally**, framework-wide, no product names.
+2. **Project table** (`ARCHITECTURE_DESIGN.md §5b`) — 13 rows `Layer | Decision | Status (ok / n.ok / n/a deliberate) | Reference`. The single entry point. References the catalog; depth only on-demand via sub-MD (`DB_SCHEMA.md` / `IAM_POLICY.md` / `RECOVERY_PLAN.md`).
+3. **Corporate fork** — corporate-wide rules live in a forked framework instance of the catalog (maintained once, inherited; not edited per customer). Details: catalog section "inheritance mechanics".
+
+**When what.**
+- **At bootstrap:** the §5b table is created with all 13 rows at `n.ok`. If the default standards are fine → **lazy-fill**, just start coding. No obligation (lightweight design principle).
+- **Own/corporate rules:** `/infrastructure-onboarding` (BOO-223) runs propose-and-confirm per layer and fills the table.
+- **Per feature (`/ideation`):** if a story touches a layer, a soft hint on the affected `n.ok` row — no block.
+- **Recurring (`/architecture-review`):** finds open/deviating layers and nudges for rework. **Hard gate only in an explicit compliance mode.**
+- **At `/implement`:** cross-check spec ↔ affected layer row (soft).
+
+**Two axes, no duplication.** §5 (quality) remains the SSoT of the quality axis unchanged. Layers that primarily realize a quality property (security, monitoring, reliability) **cross-reference** the matching §5 dimension in their §5b row. The layer × quality matrix in the catalog makes this explicit.
 
 ---
 

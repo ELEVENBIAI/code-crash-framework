@@ -132,6 +132,38 @@ Beantwortet "Warum haben wir X so gebaut?" für neue Entwickler und KI-Assistent
 
 ---
 
+## §5b Infra-Layer (13-Layer-Entscheidungsraster)
+
+> **Zweite Achse neben §5.** §5 ist die **Qualitäts-Achse** (was das System können muss), diese Tabelle ist die
+> **Infra-Achse** (welche Infrastruktur-Entscheidung pro Layer getroffen ist). **Single Entry Point** für den Infra-Stand
+> dieses Projekts — eine Zeile je Layer. Pflichtfragen, Failure-Modes und Anti-Patterns je Layer stehen im stack-neutralen
+> Katalog `cloud-system-engineer/references/infrastructure-dimensions.md` (die Spalte „Verweis" zeigt dorthin). Keine
+> Dopplung zu §5: wo ein Layer primär eine Qualitäts-Eigenschaft realisiert (Security, Monitoring, Performance), verweist
+> die Zeile per Querverweis auf die passende §5-Dimension statt sie erneut auszuformulieren.
+>
+> **Status:** `ok` (entschieden + umgesetzt) · `n.ok` (offen / nachzuarbeiten) · `n/a (bewusst)` (für dieses Projekt
+> bewusst irrelevant, mit Ein-Satz-Begründung). **Lazy-Fill erlaubt:** leere Zeilen sind ok, `/architecture-review` findet
+> sie und stößt zur Nacharbeit an. Tiefe **on-demand**: „Verweis" darf auf ein Projekt-Sub-MD zeigen (z.B. `DB_SCHEMA.md`,
+> `IAM_POLICY.md`, `RECOVERY_PLAN.md`) — nur wenn nötig, kein Vorbau.
+
+| # | Layer | Entscheidung (1 Satz) | Status | Verweis |
+|---|-------|-----------------------|--------|---------|
+| 1 | Frontend | [ausfüllen / n/a (bewusst)] | n.ok | [Katalog §1](cloud-system-engineer/references/infrastructure-dimensions.md) |
+| 2 | APIs & Backend | [ausfüllen] | n.ok | [Katalog §2](cloud-system-engineer/references/infrastructure-dimensions.md) |
+| 3 | Database & Storage | [ausfüllen] | n.ok | [Katalog §3](cloud-system-engineer/references/infrastructure-dimensions.md) |
+| 4 | Caching & CDN | [ausfüllen] | n.ok | [Katalog §4](cloud-system-engineer/references/infrastructure-dimensions.md) |
+| 5 | Hosting & Deployment | [ausfüllen] | n.ok | [Katalog §5](cloud-system-engineer/references/infrastructure-dimensions.md) |
+| 6 | Cloud & Compute | [ausfüllen] | n.ok | [Katalog §6](cloud-system-engineer/references/infrastructure-dimensions.md) |
+| 7 | CI/CD & Version Control | [ausfüllen] | n.ok | [Katalog §7](cloud-system-engineer/references/infrastructure-dimensions.md) |
+| 8 | Rate Limiting | [ausfüllen] | n.ok | [Katalog §8](cloud-system-engineer/references/infrastructure-dimensions.md) |
+| 9 | IAM / RBAC / Permissions | [ausfüllen] | n.ok | [Katalog §9](cloud-system-engineer/references/infrastructure-dimensions.md) · Q: §5 Security |
+| 10 | Security & RLS | [ausfüllen] | n.ok | [Katalog §10](cloud-system-engineer/references/infrastructure-dimensions.md) · Q: §5 Security |
+| 11 | Monitoring / Logs / Alerts | [ausfüllen] | n.ok | [Katalog §11](cloud-system-engineer/references/infrastructure-dimensions.md) · Q: §5 Observability |
+| 12 | Rollback & Recovery | [ausfüllen] | n.ok | [Katalog §12](cloud-system-engineer/references/infrastructure-dimensions.md) · Q: §5 Reliability |
+| 13 | Audit / Compliance & SLAs | [ausfüllen] | n.ok | [Katalog §13](cloud-system-engineer/references/infrastructure-dimensions.md) |
+
+---
+
 ## §6 Referenzen
 
 > Links zu allen verknüpften Architecture-Dokumenten — SSoT für Querverweise.

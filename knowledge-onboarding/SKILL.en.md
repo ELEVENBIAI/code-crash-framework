@@ -8,7 +8,7 @@ description: |
   over, coverage check. Use when existing documentation / preliminary material is
   available (post-bootstrap). Triggers: "/knowledge-onboarding", "we already have
   a knowledge package", "wire the existing repo into our artefacts".
-version: 1.1.0
+version: 1.2.0
 language: en
 metadata:
   hermes:

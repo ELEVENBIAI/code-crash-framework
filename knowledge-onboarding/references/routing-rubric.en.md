@@ -90,6 +90,7 @@ journal/
 | 8 | `demo-storyboard-pitch` | `demo`, `choreographie`, `choreography`, `pitch`, `storyboard`, `script` | "demo flow", "storyboard", "pitch slide", "user journey demo" | `docs/project/demo/<name>.md` or `/pitch` material | `reference` |
 | 9 | `onboarding-handover` | `onboarding`, `handover`, `welcome`, `getting-started`, `quickstart` | "new developer", "handover", "induction", "where to find what" | `DEVELOPER_ONBOARDING.md` | `extract` |
 | 10 | `prompt-library` | `prompts/` (path), `*.prompt.md`, `prompts.md` | "You are a …", "task:", "example:", "format:", LLM prompt structures (System/User/Assistant) | `docs/project/prompts/<name>.md` | `reference` |
+| 11 | `infra-layer` | `infra`, `deployment`, `db-schema`, `schema`, `iam`, `rbac`, `runbook`, `sla`, `backup`, `recovery`, `terraform`, `k8s`, `ci-cd` | "RTO/RPO", "replication", "rate limit", "RLS", "row-level security", "shard", "deployment strategy", "failover", "backup strategy", "SLA" | `ARCHITECTURE_DESIGN.md §5b` (infra-layer table, BOO-221) + optional sub-MD (`DB_SCHEMA.md` / `IAM_POLICY.md` / `RECOVERY_PLAN.md`); catalog `cloud-system-engineer/references/infrastructure-dimensions.en.md` | `reference` |
 
 ## Tier 3 — ambiguity rule
 

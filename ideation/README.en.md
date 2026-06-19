@@ -4,7 +4,7 @@
 
 > Workflow that turns a raw idea into a production-ready Linear issue — with research, architecture design document (ADD), dependency mapping, sprint-fit check, intent gate, privacy pre-flight, and token heuristic. No more "what did we actually agree on?" three weeks later.
 
-**Version:** 2.9.0 · **Command:** `/ideation`
+**Version:** 2.10.0 · **Command:** `/ideation`
 
 > 🔗 Sprint automation: **`/sprint-run`** runs a whole sprint and orchestrates the chain `backlog → implement → sprint-review`. See [`sprint-run/`](../sprint-run/README.en.md) · HANDBUCH Appendix AD.
 

@@ -2,7 +2,7 @@
 
 > Framework bundle skill — routes a project's existing documentation deterministically into the governance artefacts. Origin: BOO-137 (2026-06-03).
 
-**Version:** 1.1.0 · **Command:** `/knowledge-onboarding`
+**Version:** 1.2.0 · **Command:** `/knowledge-onboarding`
 
 > **Claude Code mode:** `/knowledge-onboarding` writes reference blocks and a manifest → supervised **`acceptEdits`** (the skill has its own per-file apply / diff gates). No unattended operation. Details: HANDBUCH §6 "Claude Code mode".
 
