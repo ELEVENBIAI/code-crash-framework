@@ -26,7 +26,7 @@ Die Spalte **Sprachen** zeigt, ob ein Dokument zweisprachig vorliegt (`DE+EN`) o
 | [Doku-Review 2026-06-03 (BOO-114–129)](./doc-review-2026-06-03-boo-114-129.md) | DE+EN-Review von Onboarding, Sketches und Handbuch auf Aktualität und Gaps. | Operator, Doku-Autor | DE |
 | [Framework-Update (Runbook)](./runbooks/framework-update.md) | Wie ein Bestandsprojekt auf den aktuellen Framework-Stand gehoben wird. | Operator | DE+EN |
 | [Glossar für Nicht-Entwickler](./glossar.md) | Klartext-Erklärungen zentraler Begriffe (Repo, Commit, …) für Nicht-Techniker. | Nicht-Entwickler, Stakeholder | DE+EN |
-| [HANDBUCH](../HANDBUCH.md) | Das vollständige Framework-Handbuch — erklärt das System zusammenhängend. | Operator, Entwickler | DE+EN |
+| [HANDBUCH](../HANDBUCH.md) | Das vollständige Framework-Handbuch — erklärt das System zusammenhängend (inkl. Hermes-Begründung Human-in-the-Lead, Anhang D). | Operator, Entwickler | DE+EN |
 | [Hostinger-VPS-Setup (Runbook)](./runbooks/hostinger-vps-setup.md) | Schrittweiser OS-Bootstrap und Härtung einer Hostinger-VPS. | Operator, DevOps | DE+EN |
 | [Integration-Discovery-Fragebogen](./onboarding/integration-discovery.md) | Erfasst den kundenindividuellen Teil für CI/CD in die Live-Umgebung des Kunden. | Kunde, Kunden-IT | DE+EN |
 | [KI-Architektur-Prinzipien](../references/ki-architektur-prinzipien.md) | Die vier KI-Architektur-Prinzipien als verbindliche Voraussetzung (Schrader Kap. 4). | Architekten, Operator | DE+EN |
@@ -36,7 +36,7 @@ Die Spalte **Sprachen** zeigt, ob ein Dokument zweisprachig vorliegt (`DE+EN`) o
 | [Multi-User-VPS (Runbook)](./runbooks/multi-user-vps.md) | Ein neues Teammitglied auf einer geteilten VPS onboarden. | Operator, DevOps | DE+EN |
 | [Pitch](./pitch/README.md) | Beschreibung der standalone 30-Minuten-Pitch-Präsentation im OWLIST-Layout. | Vertrieb, Operator | DE |
 | [Q&A](./qa.md) | Sammlung operativer Praxisfragen ergänzend zum Handbuch. | Operator, Entwickler | DE |
-| [README](../README.md) | Einstiegsseite des Frameworks mit Überblick und Navigation. | Alle | DE |
+| [README](../README.md) | Einstiegsseite des Frameworks mit Überblick, Navigation und der Positionierung (sequenzielle Pipeline, menschlich freigegebene Merges). | Alle | DE |
 | [Routinen vernetzen (Runbook)](./runbooks/routinen-vernetzen.md) | Drei Aufstellungs-Optionen für wiederkehrende Routinen mit kopierfertigen Prompt-Templates (Schalter C). | Operator | DE+EN |
 | [SECURITY](../SECURITY.md) | Security-Policy des Frameworks (Vulnerability-Reporting, Scope). | Alle, Security | DE |
 | [So dokumentiert dieses Framework](./how-we-document.md) | Erklärt das Doku-Modell: versionierter Markdown im Repo, per Hook erzwungen. | Operator, Doku-Autor | DE+EN |

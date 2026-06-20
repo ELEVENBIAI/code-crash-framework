@@ -26,7 +26,7 @@ The **Languages** column shows whether a document is bilingual (`DE+EN`) or Germ
 | [Doc review 2026-06-03 (BOO-114–129)](./doc-review-2026-06-03-boo-114-129.md) | DE+EN review of onboarding, sketches, and handbook for currency and gaps. | Operator, doc author | DE |
 | [Framework update (runbook)](./runbooks/framework-update.md) | How an existing project is lifted to the current framework state. | Operator | DE+EN |
 | [Glossary for non-developers](./glossar.md) | Plain-language explanations of core terms (repo, commit, …) for non-technical readers. | Non-developers, stakeholders | DE+EN |
-| [HANDBUCH (Handbook)](../HANDBUCH.md) | The complete framework handbook — explains the system as a coherent whole. | Operator, developers | DE+EN |
+| [HANDBUCH (Handbook)](../HANDBUCH.md) | The complete framework handbook — explains the system as a coherent whole (incl. the Hermes Human-in-the-Lead rationale, Appendix D). | Operator, developers | DE+EN |
 | [Hostinger VPS setup (runbook)](./runbooks/hostinger-vps-setup.md) | Step-by-step OS bootstrap and hardening of a Hostinger VPS. | Operator, DevOps | DE+EN |
 | [Integration-discovery questionnaire](./onboarding/integration-discovery.md) | Captures the customer-specific part for CI/CD into the customer's live environment. | Customer, customer IT | DE+EN |
 | [AI architecture principles](../references/ki-architektur-prinzipien.md) | The four AI architecture principles as a mandatory prerequisite (Schrader ch. 4). | Architects, operator | DE+EN |
@@ -36,7 +36,7 @@ The **Languages** column shows whether a document is bilingual (`DE+EN`) or Germ
 | [Multi-user VPS (runbook)](./runbooks/multi-user-vps.md) | Onboard a new team member on a shared VPS. | Operator, DevOps | DE+EN |
 | [Pitch](./pitch/README.md) | Description of the standalone 30-minute pitch presentation in OWLIST layout. | Sales, operator | DE |
 | [Q&A](./qa.md) | Collection of operational practice questions complementing the handbook. | Operator, developers | DE |
-| [README](../README.md) | Framework entry page with overview and navigation. | Everyone | DE |
+| [README](../README.md) | Framework entry page with overview, navigation, and the positioning (sequential pipeline, human-gated merges). | Everyone | DE |
 | [Connect routines (runbook)](./runbooks/routinen-vernetzen.md) | Three setup options for recurring routines with copy-ready prompt templates (switch C). | Operator | DE+EN |
 | [SECURITY](../SECURITY.md) | Security policy of the framework (vulnerability reporting, scope). | Everyone, security | DE |
 | [How this framework documents](./how-we-document.md) | Explains the doc model: versioned Markdown in the repo, enforced by hooks. | Operator, doc author | DE+EN |
