@@ -6,7 +6,7 @@ description: |
   to closing table including post-implement validation. Use when the operator says "go",
   wants to implement a story, or runs "/implement". Also used by the automation daemon
   (no human in the loop).
-version: 2.18.0
+version: 2.19.0
 language: en
 metadata:
   hermes:
@@ -157,8 +157,12 @@ It reads `ARCHITECTURE_DESIGN.md §References` + `INDEX.md` as the **single sour
 completeness, freshness and local-vs-remote drift. The finding feeds the run as a note —
 **warn-only at this stage** (no abort). The same SSoT list drives the post-implement doc check in
 Step 6e (no skill-own, hard-coded file list anymore). If the script is missing (project predating BOO-229):
-catch up with `intentron migrate --issue BOO-229`; the run continues. The compliance **hard gate**
-(drift blocks `/implement`) is an opt-in add-on and lands as BOO-229 B2.
+catch up with `intentron migrate --issue BOO-229`; the run continues. With `compliance_doc_gate: true`
+(`CONVENTIONS.md`, mirrored to `.claude/environment.json`) a checker **FAIL** becomes a hard block:
+`/implement` does not start until the drift is resolved; in the autopilot (`sprint-run` → `/goal`) the story
+**pauses** (see `sprint-run/references/gate-block-handling.md`) — the worker catches up safely resolvable
+drift itself, pausing only for a real decision (local ≠ remote). **WARN** stays a warning.
+Default `false`. Details: HANDBUCH Appendix AS.
 
 ### Step 1: Identify the issue
 

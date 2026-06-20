@@ -11,7 +11,7 @@
 > alle Issues *Done*, alle Quality-Gates gruen, Sprint-Journal geschrieben. **Reiner
 > Konfigurator + Wrapper:** `/sprint-run` ruft die bestehenden Skills nur auf und veraendert sie nicht.
 
-**Version:** 2.0.0 · **Befehl:** `/sprint-run`
+**Version:** 2.1.0 · **Befehl:** `/sprint-run`
 
 ![Sprint-Run — Ueberblick: Backlog -> Pre-Flight -> Vorbereitung -> /goal (native Subagents pro Story) -> 80%-Boundary -> /sprint-review](overview.png)
 

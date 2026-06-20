@@ -106,6 +106,14 @@ if [[ -f "scripts/doc-drift-check.sh" ]]; then
 else
   c_warn "scripts/doc-drift-check.sh fehlt — 'intentron migrate' (migrate_boo_229) nachziehen (Doku-Drift-Check, BOO-229)"
 fi
+# BOO-229 B2: Compliance-Doku-Gate — wenn aktiv, ist der Checker Pflicht (sonst kann der Hard-Gate nicht greifen)
+if [[ "$(env_val compliance_doc_gate)" == "true" ]]; then
+  if [[ -f "scripts/doc-drift-check.sh" ]]; then
+    c_pass "compliance_doc_gate=true + scripts/doc-drift-check.sh vorhanden — Compliance-Hard-Gate kann greifen (BOO-229)"
+  else
+    c_fail "compliance_doc_gate=true, aber scripts/doc-drift-check.sh fehlt — Compliance-Gate kann NICHT greifen ('intentron migrate --issue BOO-229')"
+  fi
+fi
 
 # --- 4b. Claude-Code-first: runtime_target + Native-Pfade (ADR-2 / BOO-199) -
 section "4b. Claude-Code-first (runtime_target + Native-Pfade, ADR-2)"

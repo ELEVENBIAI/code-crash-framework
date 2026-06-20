@@ -10,9 +10,19 @@ no longer to a skill-owned daemon loop.
 |---|---|---|---|
 | Sensitive-Paths | step 5.5 (BOO-18) | changed file matches `.claude/sensitive-paths.json` | `review-ok: <name> - <comment>` |
 | Personal-Data | step 5.5b (BOO-69) | `personal_data: true` + match in `.claude/personal-data-paths.json` | `privacy-ok: <name> - <comment>` (GDPR Art. 25) |
+| Doc-drift (compliance) | pre-flight (BOO-229) | `compliance_doc_gate: true` + checker FAIL (`scripts/doc-drift-check.sh`) | mostly worker self-heal; on `local≠remote`: `doc-drift-ok: <name> - <comment>` |
 
 Both can strike at the same time — then first `review-ok` (technical), then `privacy-ok`
 (legal). No confirmation replaces the other.
+
+## Special case: doc-drift gate (BOO-229)
+
+Unlike sensitive-paths/personal-data, doc drift is partly **safely self-resolvable**. Active only when `compliance_doc_gate: true`. Autopilot behavior:
+
+- **Safe (no stop needed):** a missing registration in §References/INDEX → the worker adds the file itself (mechanical, no real decision), logs it, and continues.
+- **Real decision (pauses):** `local ≠ remote` (a tracked doc lags behind `origin`) — the operator decides which version wins (`git pull` vs. keep local). Approval token `doc-drift-ok: <name> - <comment>`.
+
+In **standard mode** (`compliance_doc_gate: false`) nothing pauses — the drift is a WARN and the run continues.
 
 ## Protocol
 
@@ -36,7 +46,7 @@ Both can strike at the same time — then first `review-ok` (technical), then `p
 ## State machine
 
 ```text
-running ──(gate hit)──▶ paused ──(review-ok / privacy-ok)──▶ resumed ──▶ running
+running ──(gate hit)──▶ paused ──(review-ok / privacy-ok / doc-drift-ok)──▶ resumed ──▶ running
                           │
                           └──(operator rejects)──▶ aborted (story → Backlog)
 ```

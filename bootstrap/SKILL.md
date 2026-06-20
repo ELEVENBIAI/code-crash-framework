@@ -1,7 +1,7 @@
 ---
 name: bootstrap
 recommended_model: sonnet  # BOO-84 — tier mapping in bootstrap/references/model-tiers.json
-version: 3.47.0
+version: 3.48.0
 description: Setzt ein neues Projekt mit Governance-Framework auf — interaktiver Block-Interview-Flow in 4 Schritten, Doku-Architektur mit Hub-Auto-Verlinkung, optionaler Learning-Loop L1/L2/L3. Verwenden wenn der Operator ein neues Projekt aufsetzen will oder "/bootstrap" sagt.
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 metadata:
@@ -474,6 +474,34 @@ Dein interner Satz (Enter = Default uebernehmen): ____
 **Merken:** `FINANCIALS_GEO`, `FINANCIALS_CURRENCY`, `FINANCIALS_RATE`, `FINANCIALS_SOURCE`. Die Werte werden in Phase **4.4o (Financials-Setup)** in `docs/financials/worker-equivalent-baseline.md` Abschnitt 1 geschrieben.
 
 > **Issue-Referenz:** BOO-190. Konsumenten der Baseline: Worker-Equivalent-Report (`/sprint-review`, BOO-191) + Sprint-Forecast (`/backlog`, BOO-192), Datenquelle Doppelspalte (BOO-193). HANDBUCH-Hintergrund: Anhang AK (Financials & Worker-Equivalent), Doppelspalte: Anhang G.
+
+### A.10 Doku-Compliance-Gate (BOO-229, optional)
+
+Optionale, operator-aktivierte Ja/Nein-Frage — Add-on-Muster wie Privacy/EU-AI-Act. Bei `nein` (Default) passiert nichts; das Standard-Verhalten (Doku-Drift = WARN) bleibt.
+
+```
+Doku-Compliance-Gate aktivieren?
+
+Was das macht: Der gemeinsame Doku-Drift-Checker (scripts/doc-drift-check.sh, BOO-229)
+prueft vor /ideation, /architecture-review und /implement, ob die Doku-Landkarte
+(ARCHITECTURE_DESIGN.md §Referenzen + INDEX.md) noch mit der Realitaet uebereinstimmt.
+
+  Standard   (default) — ein Drift-Befund ist eine WARNUNG, der Skill laeuft weiter.
+  Compliance (an)      — ein FAIL (eine registrierte Datei fehlt) BLOCKIERT den Skill,
+                         bis der Drift aufgeloest ist. Im Autopilot pausiert die Story
+                         (Worker heilt Sicheres selbst, fragt nur bei lokal != remote).
+
+Empfohlen: nur fuer auditpflichtige Projekte (ISO 27001 / DORA / PCI / SOC 2),
+wo Doku-Konsistenz nachweispflichtig ist. Sonst Standard lassen.
+
+Jetzt aktivieren?
+  [ja]   compliance_doc_gate = true
+  [nein] (default) — compliance_doc_gate = false (Standard, warn-only)
+```
+
+**Merken:** `COMPLIANCE_DOC_GATE = true | false` (Default `false`). Der Wert fuellt den Platzhalter `{{COMPLIANCE_DOC_GATE}}` in `CONVENTIONS.md` (§3 Aktive Gates) und wird in `.claude/environment.json` unter `governance.compliance_doc_gate` gespiegelt. **Orthogonal** zum `governance_mode` — ein `lite`-Projekt darf es anschalten, ein `heavy`-Projekt darf es weglassen. SSoT ist `CONVENTIONS.md`; bei `--force`-Regen der environment.json den Wert (wie `governance.mode`) ggf. erneut setzen.
+
+> **Issue-Referenz:** BOO-229. Konsumenten: `/ideation`, `/architecture-review`, `/implement` (Pre-Flight-FAIL-Severity), Autopilot `sprint-run`→`/goal` (`sprint-run/references/gate-block-handling.md`, Token `doc-drift-ok`). HANDBUCH-Hintergrund: Anhang AS.
 
 Phase-1-Checkpoint: Kurze Bestaetigung der Antworten ausgeben.
 

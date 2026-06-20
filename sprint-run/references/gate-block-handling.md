@@ -10,9 +10,19 @@ Governance-Gates **niemals** automatisch ueberbruecken. Seit 2.0.0 (ADR-4) gehoe
 |---|---|---|---|
 | Sensitive-Paths | Schritt 5.5 (BOO-18) | geaenderte Datei matcht `.claude/sensitive-paths.json` | `review-ok: <name> - <kommentar>` |
 | Personal-Data | Schritt 5.5b (BOO-69) | `personal_data: true` + Match in `.claude/personal-data-paths.json` | `privacy-ok: <name> - <kommentar>` (DSGVO Art. 25) |
+| Doku-Drift (Compliance) | Pre-Flight (BOO-229) | `compliance_doc_gate: true` + Checker-FAIL (`scripts/doc-drift-check.sh`) | meist Worker-Selbstheilung; bei `lokal≠remote`: `doc-drift-ok: <name> - <kommentar>` |
 
 Beide koennen gleichzeitig zuschlagen — dann erst `review-ok` (technisch), dann `privacy-ok`
 (rechtlich). Keine Bestaetigung ersetzt die andere.
+
+## Sonderfall Doku-Drift-Gate (BOO-229)
+
+Anders als Sensitive-Paths/Personal-Data ist Doku-Drift teilweise **sicher selbst-aufloesbar**. Nur aktiv bei `compliance_doc_gate: true`. Verhalten im Autopilot:
+
+- **Sicher (kein Stopp noetig):** fehlende Registrierung in §Referenzen/INDEX → der Worker traegt die Datei selbst nach (mechanisch, keine Echt-Entscheidung), protokolliert es und faehrt fort.
+- **Echt-Entscheidung (pausiert):** `lokal ≠ remote` (eine getrackte Doku haengt hinter `origin`) — der Operator entscheidet, welche Version gilt (`git pull` vs. lokal behalten). Freigabe-Token `doc-drift-ok: <name> - <kommentar>`.
+
+Im **Standard-Modus** (`compliance_doc_gate: false`) pausiert nichts — der Drift ist WARN, der Lauf laeuft durch.
 
 ## Protokoll
 
@@ -36,7 +46,7 @@ Beide koennen gleichzeitig zuschlagen — dann erst `review-ok` (technisch), dan
 ## Zustandsmaschine
 
 ```text
-laufend ──(Gate-Treffer)──▶ pausiert ──(review-ok / privacy-ok)──▶ resumed ──▶ laufend
+laufend ──(Gate-Treffer)──▶ pausiert ──(review-ok / privacy-ok / doc-drift-ok)──▶ resumed ──▶ laufend
                               │
                               └──(Operator lehnt ab)──▶ abgebrochen (Story → Backlog)
 ```

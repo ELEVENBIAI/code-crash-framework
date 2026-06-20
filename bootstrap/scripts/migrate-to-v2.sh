@@ -3324,7 +3324,9 @@ migrate_boo_229() {
     fi
 
     log_info "BOO-229: Operator-Schritt: 'bash scripts/doc-drift-check.sh' ausfuehren — PASS/WARN/FAIL-Report (§Referenzen/INDEX als SSoT)."
-    log_info "BOO-229: /implement, /ideation, /architecture-review rufen das Skript im Pre-Flight (warn-only in dieser Stufe; Compliance-Hard-Gate = BOO-229 B2)."
+    log_info "BOO-229: /implement, /ideation, /architecture-review rufen das Skript im Pre-Flight (Standard: warn-only)."
+    log_info "BOO-229 (B2): Compliance-Doku-Gate optional — 'compliance_doc_gate' in CONVENTIONS.md §3 + .claude/environment.json 'governance.compliance_doc_gate' (Default false). true = FAIL blockiert die drei Skills. SSoT = CONVENTIONS.md."
+    log_manual "BOO-229 (B2): Fuer auditpflichtige Projekte 'compliance_doc_gate' in CONVENTIONS.md (Platzhalter {{COMPLIANCE_DOC_GATE}} -> true) + environment.json 'governance.compliance_doc_gate=true' setzen. Sonst nichts zu tun (Default false = bisheriges Verhalten)."
     log_info "BOO-229 done."
 }
 

@@ -5,7 +5,7 @@ description: |
   Architektur-Review fuer einzelne Stories oder das Gesamtsystem. Prueft die aktiven
   Architektur-Dimensionen (8 Standard + aktive Add-ons) und identifiziert Risiken, Tech Debt und Verbesserungspotential.
   Verwenden wenn der Operator "Architektur pruefen", "Review", "passt das architektonisch" oder "/architecture-review" sagt.
-version: 1.15.0
+version: 1.16.0
 metadata:
   hermes:
     category: governance
@@ -32,7 +32,7 @@ Vor dem Review den gemeinsamen Drift-Checker aufrufen (falls vorhanden):
 ```bash
 bash scripts/doc-drift-check.sh
 ```
-Er liest `ARCHITECTURE_DESIGN.md §Referenzen` + `INDEX.md` als **Single Source of Truth** und meldet Vollstaendigkeits-, Frische- und lokal-vs-remote-Drift. **Kernpunkt gegen „Drift zwischen den Skills":** die Artefakt-Liste, die dieses Review auf Aktualitaet prueft (§6 Referenzen, Schritt-Checkliste Punkt §6), ist **dieselbe SSoT**, die der Checker liest — kein skill-eigener, separat gepflegter Katalog. **Warn-only in dieser Stufe** — der Befund fliesst als Empfehlung ins Review-Ergebnis, kein Abbruch. Fehlt das Skript (Projekt vor BOO-229): `intentron migrate --issue BOO-229` nachziehen; das Review laeuft weiter. Das Compliance-**Hard-Gate** (Drift blockiert) ist ein Opt-in-Add-on und folgt als BOO-229 B2.
+Er liest `ARCHITECTURE_DESIGN.md §Referenzen` + `INDEX.md` als **Single Source of Truth** und meldet Vollstaendigkeits-, Frische- und lokal-vs-remote-Drift. **Kernpunkt gegen „Drift zwischen den Skills":** die Artefakt-Liste, die dieses Review auf Aktualitaet prueft (§6 Referenzen, Schritt-Checkliste Punkt §6), ist **dieselbe SSoT**, die der Checker liest — kein skill-eigener, separat gepflegter Katalog. **Warn-only in dieser Stufe** — der Befund fliesst als Empfehlung ins Review-Ergebnis, kein Abbruch. Fehlt das Skript (Projekt vor BOO-229): `intentron migrate --issue BOO-229` nachziehen; das Review laeuft weiter. Bei `compliance_doc_gate: true` (`CONVENTIONS.md`, gespiegelt in `.claude/environment.json`) wird ein **FAIL** des Checkers zum Hard-Block: `/architecture-review` startet nicht, bis der Drift aufgeloest ist; **WARN** bleibt eine Warnung. Default `false`. Details: HANDBUCH Anhang AS.
 
 ## Schritt 0b: Ultraplan-Trigger (BOO-207, Schalter B)
 
@@ -89,7 +89,7 @@ Eine einzelne Story oder geplante Aenderung architektonisch bewerten.
        7. **AP3-Check** — Kein direkter DB-Zugriff aus falschem Modul, keine zirkulaeren Imports
        8. **AP4-Check** — Tests im selben PR, Coverage-Gate gruen
      - Detail-Fragen pro Check: [references/dimensions-detail.md §9.1–§9.8](references/dimensions-detail.md).
-   - [ ] §5b Infra-Layer (13-Layer-Tabelle, BOO-221) — **weiche Drift-Erkennung:** alle Zeilen mit Status `n.ok` oder leerer „Entscheidung" auflisten und zur Nacharbeit anstossen. **Kein Hard-Block** (Lazy-Fill erlaubt) — Ausnahme: explizites Compliance-Projekt. Pflichtfragen/Anti-Patterns je Layer im Katalog `cloud-system-engineer/references/infrastructure-dimensions.md`. Bei Layern mit §5-Querverweis (Security/Monitoring/Reliability) gegen die §5-Dimension gegenpruefen statt doppelt.
+   - [ ] §5b Infra-Layer (13-Layer-Tabelle, BOO-221) — **weiche Drift-Erkennung:** alle Zeilen mit Status `n.ok` oder leerer „Entscheidung" auflisten und zur Nacharbeit anstossen. **Kein Hard-Block** (Lazy-Fill erlaubt) — Ausnahme: `compliance_doc_gate: true` (Compliance-Add-on, BOO-229). Pflichtfragen/Anti-Patterns je Layer im Katalog `cloud-system-engineer/references/infrastructure-dimensions.md`. Bei Layern mit §5-Querverweis (Security/Monitoring/Reliability) gegen die §5-Dimension gegenpruefen statt doppelt.
    - [ ] §6 Referenzen (Querverweise auf weitere Architektur-Dokumente)
    - [ ] §7+ Optionale Add-on-Sektionen (z.B. Failure Mode Analysis, Scalability Roadmap, Testing Architecture — falls projekt-spezifisch ergaenzt)
 2. Story/Aenderung verstehen

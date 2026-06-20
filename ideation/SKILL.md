@@ -6,7 +6,7 @@ description: |
   den Learning-Loop (falls aktiv) und warnt bei Anti-Pattern-Match. Verwenden wenn der Nutzer
   eine neue Idee hat, ein Feature vorschlaegt, oder "ideation" / "neue Story" sagt.
   Ausloeser sind Anfragen wie "ich hab eine Idee", "neues Feature", "wir brauchen X", "/ideation".
-version: 2.11.0
+version: 2.12.0
 metadata:
   hermes:
     category: coding
@@ -52,7 +52,7 @@ Neue Ideen systematisch recherchieren, gegen Architektur + Backlog + Learnings a
 3. Bei `nein`: Skill stoppt mit Hinweis "Operator-Entscheidung: erst /architecture-review bzw. Doku-Drift aufloesen". Kein Issue wird angelegt.
 4. Bei `ja`: weiter zu Schritt 0.5/0.6/1. Die Entscheidung wird in der Story unter `Current State` dokumentiert (`Doku-Drift bewusst akzeptiert — Operator-Override`).
 
-**Warum weich, kein Hard-Block?** Ein Hard-Gate wuerde `/ideation` bei jedem laenger nicht angefassten Projekt blockieren. Realistisch ist die Doku haeufig „alt genug zum Warnen, aber noch valide" — der Operator entscheidet pro Story. Threshold ist konfigurierbar: ein schnell evolvierendes System setzt 14 Tage, ein stabiles System 90 Tage. Das **Compliance-Hard-Gate** (Drift blockiert den Skill) ist ein Opt-in-Add-on und folgt als BOO-229 B2.
+**Warum weich, kein Hard-Block?** Ein Hard-Gate wuerde `/ideation` bei jedem laenger nicht angefassten Projekt blockieren. Realistisch ist die Doku haeufig „alt genug zum Warnen, aber noch valide" — der Operator entscheidet pro Story. Threshold ist konfigurierbar: ein schnell evolvierendes System setzt 14 Tage, ein stabiles System 90 Tage. Das **Compliance-Doku-Gate** (`compliance_doc_gate: true` in `CONVENTIONS.md`, gespiegelt in `.claude/environment.json` unter `governance.compliance_doc_gate`) macht daraus einen Hard-Block: ein **FAIL** des Checkers (eine in §Referenzen/INDEX registrierte Datei fehlt) stoppt `/ideation` — kein Issue, kein „trotzdem fortfahren" —, bis der Drift aufgeloest ist; **WARN** bleibt auch dann eine Warnung. Default `false`. Details: HANDBUCH Anhang AS.
 
 ### Schritt 0.5: Learnings-Kontext (wenn Learning-Loop aktiv)
 

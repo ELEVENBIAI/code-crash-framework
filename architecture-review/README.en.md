@@ -4,7 +4,7 @@
 
 > Review any story — or the entire system — against the active architecture dimensions (8 standard + active add-ons). Catches risks, tech debt, and scaling issues **before** they land in production.
 
-**Version:** 1.15.0 · **Command:** `/architecture-review`
+**Version:** 1.16.0 · **Command:** `/architecture-review`
 
 > **Claude Code mode:** `/architecture-review` is read-only analysis → **`plan`** (plan mode); findings / recommendations, no code. Details: HANDBUCH §6 "Claude Code mode".
 

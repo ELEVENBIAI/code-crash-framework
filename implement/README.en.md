@@ -4,7 +4,7 @@
 
 > Turns a Linear issue into shipped code through a non-skippable 8-step protocol: identify → dependencies → context → governance validation → spec-gate → plan → implement → post-validation. No step optional, no shortcuts. Also usable by the automation daemon without human in the loop.
 
-**Version:** 2.18.0 · **Command:** `/implement`
+**Version:** 2.19.0 · **Command:** `/implement`
 
 > **Native subagents (BOO-204, switch B):** with `prefer_native_subagents: true`, `/implement` generates real `.claude/agents/<story>-<agent>.md` from the spec's `## Subagents` section — each subagent with its own 200k window, own tools/permissions, optionally its own model (steps 0d + 4b). Without the flag/section: the previous text-block pattern in the same window.
 

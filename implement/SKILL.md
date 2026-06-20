@@ -6,7 +6,7 @@ description: |
   bis Ergebnis-Tabelle inkl. Post-Implement Validation. Verwenden wenn der Operator "los" sagt,
   eine Story umsetzen will, oder "/implement" ausfuehrt. Wird auch vom Automation Daemon genutzt
   (ohne Human-in-the-Loop).
-version: 2.18.0
+version: 2.19.0
 metadata:
   hermes:
     category: coding
@@ -174,8 +174,12 @@ Er liest `ARCHITECTURE_DESIGN.md §Referenzen` + `INDEX.md` als **Single Source 
 Vollstaendigkeits-, Frische- und lokal-vs-remote-Drift. Der Befund fliesst als Hinweis in den Lauf —
 **warn-only in dieser Stufe** (kein Abbruch). Dieselbe SSoT-Liste steuert den Post-Implement-Doku-Check
 in Schritt 6e (keine skill-eigene, hartkodierte Datei-Liste mehr). Fehlt das Skript (Projekt vor BOO-229):
-`intentron migrate --issue BOO-229` nachziehen; der Lauf geht weiter. Das Compliance-**Hard-Gate**
-(Drift blockiert `/implement`) ist ein Opt-in-Add-on und folgt als BOO-229 B2.
+`intentron migrate --issue BOO-229` nachziehen; der Lauf geht weiter. Bei `compliance_doc_gate: true`
+(`CONVENTIONS.md`, gespiegelt in `.claude/environment.json`) wird ein **FAIL** des Checkers zum Hard-Block:
+`/implement` startet nicht, bis der Drift aufgeloest ist; im Autopilot (`sprint-run` → `/goal`) **pausiert**
+die Story (siehe `sprint-run/references/gate-block-handling.md`) — der Worker traegt sicher Aufloesbares
+selbst nach, pausiert nur bei Echt-Entscheidung (lokal ≠ remote). **WARN** bleibt eine Warnung.
+Default `false`. Details: HANDBUCH Anhang AS.
 
 ### Schritt 1: Issue identifizieren
 

@@ -10,7 +10,7 @@ description: |
   and does not change the orchestrated skills — it configures the sprint and calls `/goal`.
   Use when the operator says "run the sprint", "drive the sprint", "automation-cycle"
   or "/sprint-run".
-version: 2.0.0
+version: 2.1.0
 metadata:
   hermes:
     category: governance

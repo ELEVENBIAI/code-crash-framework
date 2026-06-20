@@ -327,6 +327,15 @@ Governance modes must never delete or omit the baseline artifacts that make a pr
 
 `none` is not a governance mode. It belongs to execution isolation and means no special parallel-agent isolation.
 
+### Compliance doc gate (opt-in add-on, BOO-229)
+
+Orthogonal to `governance_mode`, a project may opt into a **documentation compliance gate** by declaring `compliance_doc_gate: true` in its project-local `CONVENTIONS.md` (mirrored to `.claude/environment.json` under `governance.compliance_doc_gate`). It is an add-on flag like the privacy / EU-AI-Act add-ons — independent of the lite/standard/heavy strictness axis (a `lite` project may turn it on; a `heavy` project may leave it off).
+
+It controls the **severity** of the shared doc-drift checker `scripts/doc-drift-check.sh` (BOO-229), which `/ideation`, `/architecture-review` and `/implement` run in their pre-flight:
+
+- `false` (default) — a doc-drift finding is a **WARN**; the skill continues. This is the standard, lightweight behavior.
+- `true` (compliance) — a checker **FAIL** (a file registered in `ARCHITECTURE_DESIGN.md §References` / `INDEX.md` is missing) **blocks**: the skill does not start until the drift is consciously resolved. For audit-bound contexts (ISO 27001 / DORA / PCI / SOC 2), where human accountability over the doc map is the feature, not the friction. **WARN** stays a warning even in compliance mode. In the autopilot (`sprint-run` → `/goal`), a FAIL pauses the story (see `sprint-run/references/gate-block-handling.md`); the worker resolves safe drift itself (register the missing file in §References/INDEX) and pauses only for a real decision (local ≠ remote). Optionally enforced as a project CI gate (required status check). Details: HANDBUCH Appendix AS.
+
 ### Runtime and adapter contract
 
 Every project declares `runtime_target` in `CONVENTIONS.md`:
@@ -801,6 +810,15 @@ Governance-Modi duerfen nie die Baseline-Artefakte loeschen oder auslassen, die 
 | Parallelitaet | Worktrees | Write-Scopes fuer Subagents | Worktrees fuer agentische Spuren |
 
 `none` ist kein Governance-Modus. Es gehoert zur Execution-Isolation und bedeutet: keine besondere Isolation fuer parallele Agentenarbeit.
+
+### Compliance-Doku-Gate (Opt-in-Add-on, BOO-229)
+
+Orthogonal zu `governance_mode` kann ein Projekt ein **Doku-Compliance-Gate** aktivieren, indem es `compliance_doc_gate: true` in seiner projektlokalen `CONVENTIONS.md` deklariert (gespiegelt in `.claude/environment.json` unter `governance.compliance_doc_gate`). Es ist ein Add-on-Flag wie die Privacy-/EU-AI-Act-Add-ons — unabhaengig von der lite/standard/heavy-Strenge-Achse (ein `lite`-Projekt darf es anschalten; ein `heavy`-Projekt darf es weglassen).
+
+Es steuert die **Schaerfe** des gemeinsamen Doku-Drift-Checkers `scripts/doc-drift-check.sh` (BOO-229), den `/ideation`, `/architecture-review` und `/implement` im Pre-Flight ausfuehren:
+
+- `false` (Default) — ein Doku-Drift-Befund ist eine **WARN**; der Skill laeuft weiter. Das ist das leichtgewichtige Standard-Verhalten.
+- `true` (Compliance) — ein Checker-**FAIL** (eine in `ARCHITECTURE_DESIGN.md §Referenzen` / `INDEX.md` registrierte Datei fehlt) **blockiert**: der Skill startet nicht, bis der Drift bewusst aufgeloest ist. Fuer auditpflichtige Kontexte (ISO 27001 / DORA / PCI / SOC 2), wo die menschliche Rechenschaft ueber die Doku-Landkarte das Feature ist, nicht die Reibung. **WARN** bleibt auch im Compliance-Modus eine Warnung. Im Autopilot (`sprint-run` → `/goal`) **pausiert** ein FAIL die Story (siehe `sprint-run/references/gate-block-handling.md`); der Worker loest Sicheres selbst (fehlende Datei in §Referenzen/INDEX nachtragen) und pausiert nur bei Echt-Entscheidung (lokal ≠ remote). Optional als Projekt-CI-Gate erzwingbar (Required Status Check). Details: HANDBUCH Anhang AS.
 
 ### Runtime- und Adapter-Vertrag
 

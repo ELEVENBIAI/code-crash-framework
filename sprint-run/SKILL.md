@@ -10,7 +10,7 @@ description: |
   `/sprint-run` schreibt keinen Produktcode und veraendert die orchestrierten Skills nicht —
   es konfiguriert den Sprint und ruft `/goal` auf. Verwenden wenn der Operator "Sprint laufen
   lassen", "fahr den Sprint", "automation-cycle" oder "/sprint-run" sagt.
-version: 2.0.0
+version: 2.1.0
 metadata:
   hermes:
     category: governance

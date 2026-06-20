@@ -5555,7 +5555,7 @@ Sonnet 4.7 | 142k/200k ctx | Worker-Equiv: 2.5h / 16h | Story BOO-205 | $4.20
 - **At bootstrap:** the §5b table is created with all 13 rows at `n.ok`. If the default standards are fine → **lazy-fill**, just start coding. No obligation (lightweight design principle).
 - **Own/corporate rules:** `/infrastructure-onboarding` (BOO-223) runs propose-and-confirm per layer and fills the table.
 - **Per feature (`/ideation`):** if a story touches a layer, a soft hint on the affected `n.ok` row — no block.
-- **Recurring (`/architecture-review`):** finds open/deviating layers and nudges for rework. **Hard gate only in an explicit compliance mode.**
+- **Recurring (`/architecture-review`):** finds open/deviating layers and nudges for rework. **Hard gate only when `compliance_doc_gate` is on** (compliance add-on, BOO-229 — see Appendix AS).
 - **At `/implement`:** cross-check spec ↔ affected layer row (soft).
 
 **Two axes, no duplication.** §5 (quality) remains the SSoT of the quality axis unchanged. Layers that primarily realize a quality property (security, monitoring, reliability) **cross-reference** the matching §5 dimension in their §5b row. The layer × quality matrix in the catalog makes this explicit.
@@ -5573,9 +5573,11 @@ Sonnet 4.7 | 142k/200k ctx | Worker-Equiv: 2.5h / 16h | Story BOO-205 | $4.20
 
 **Two severity levels.**
 - **Standard (default):** finding = **WARN**, the skill continues. Standard projects stay untouched (lightweight design principle).
-- **Compliance (opt-in add-on `compliance_doc_gate`):** finding = **FAIL blocks** — the skill does not start until the drift is consciously resolved. For audit-bound contexts (ISO 27001 / DORA / PCI / SOC 2). Orthogonal to `governance_mode = lite|standard|heavy`, like the privacy / EU-AI-Act add-ons. **Status:** the flag, the bootstrap question and the autopilot-pause behavior land in **BOO-229 B2** — B1 delivers the script, the SSoT derivation and the **warn-only** wiring of the three skills.
+- **Compliance (opt-in add-on `compliance_doc_gate`):** finding = **FAIL blocks** — the skill does not start until the drift is consciously resolved. For audit-bound contexts (ISO 27001 / DORA / PCI / SOC 2). Orthogonal to `governance_mode = lite|standard|heavy`, like the privacy / EU-AI-Act add-ons. **Shipped (B2, BOO-229):** The flag lives in `CONVENTIONS.md` (mirrored to `.claude/environment.json` under `governance.compliance_doc_gate`, default `false`); the bootstrap add-on question explains standard vs. compliance; `/ideation`, `/architecture-review` and `/implement` read the flag and block on FAIL (otherwise warn-only); the autopilot-pause behavior is in `sprint-run/references/gate-block-handling.md` (worker self-heals safe drift, pauses only on local≠remote, token `doc-drift-ok`); optionally enforced as a project CI gate (required status check). **B1** delivered the script, the SSoT derivation and the warn-only wiring of the three skills.
 
 **Boundary.** `scripts/doc-drift-check.sh` checks the **customer project**. The repo-internal `.github/scripts/docs_drift_check.py` still checks the **framework repo** itself (SKILL.md↔README versions) — a different thing, not bootstrapped. Scaffold: bootstrap phase 7.3b + `migrate_boo_229` for existing projects; `verify-setup.sh` §4 checks its presence.
+
+**Optional CI gate (audit-bound projects).** For the audit case the checker can additionally be wired as a **required status check**: a GitHub Actions step `bash scripts/doc-drift-check.sh --strict` (rc≠0 on WARN/FAIL) blocks the merge into `main` until the doc map is consistent. Complementary to the skill pre-flight (local run) — the CI gate is the red line in the PR.
 
 ---
 

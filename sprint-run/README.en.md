@@ -11,7 +11,7 @@
 > journal written. **Pure configurator + wrapper:** `/sprint-run` only calls the existing skills
 > and does not change them.
 
-**Version:** 2.0.0 · **Command:** `/sprint-run`
+**Version:** 2.1.0 · **Command:** `/sprint-run`
 
 ![Sprint-Run — overview: Backlog -> Pre-Flight -> Preparation -> /goal (native subagents per story) -> 80% boundary -> /sprint-review](overview.en.png)
 

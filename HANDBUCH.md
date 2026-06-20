@@ -5649,7 +5649,7 @@ Sonnet 4.7 | 142k/200k ctx | Worker-Equiv: 2.5h / 16h | Story BOO-205 | $4.20
 - **Beim Bootstrap:** Die §5b-Tabelle wird mit allen 13 Zeilen auf `n.ok` angelegt. Reichen die Default-Standards → **Lazy-Fill**, einfach loscoden. Kein Zwang (Leichtgewicht-Designprinzip).
 - **Eigene/Konzern-Vorgaben:** `/infrastructure-onboarding` (BOO-223) führt propose-and-confirm pro Layer durch und füllt die Tabelle.
 - **Pro Feature (`/ideation`):** Berührt eine Story einen Layer, weicher Hinweis auf die betroffene `n.ok`-Zeile — kein Block.
-- **Wiederkehrend (`/architecture-review`):** Findet offene/abweichende Layer und stößt zur Nacharbeit an. **Hard-Gate nur im expliziten Compliance-Modus.**
+- **Wiederkehrend (`/architecture-review`):** Findet offene/abweichende Layer und stößt zur Nacharbeit an. **Hard-Gate nur bei aktivem `compliance_doc_gate`** (Compliance-Add-on, BOO-229 — siehe Anhang AS).
 - **Bei `/implement`:** Gegencheck Spec ↔ betroffene Layer-Zeile (weich).
 
 **Zwei Achsen, keine Dopplung.** §5 (Qualität) bleibt unverändert die SSoT der Qualitäts-Achse. Layer, die primär eine Qualitäts-Eigenschaft realisieren (Security, Monitoring, Reliability), **verweisen** in der §5b-Zeile per Querverweis auf die passende §5-Dimension. Die Layer×Qualitäts-Matrix im Katalog macht das explizit.
@@ -5667,9 +5667,11 @@ Sonnet 4.7 | 142k/200k ctx | Worker-Equiv: 2.5h / 16h | Story BOO-205 | $4.20
 
 **Zwei Schärfegrade.**
 - **Standard (Default):** Befund = **WARN**, der Skill läuft weiter. Standard-Projekte bleiben unberührt (Leichtgewicht-Designprinzip).
-- **Compliance (Opt-in-Add-on `compliance_doc_gate`):** Befund = **FAIL blockiert** — der Skill startet nicht, bis der Drift bewusst aufgelöst ist. Für auditpflichtige Kontexte (ISO 27001 / DORA / PCI / SOC 2). Orthogonal zu `governance_mode = lite|standard|heavy`, wie die Privacy-/EU-AI-Act-Add-ons. **Status:** Flag, Bootstrap-Frage und Autopilot-Pause-Verhalten kommen in **BOO-229 B2** — B1 liefert das Skript, die SSoT-Ableitung und die **warn-only**-Verdrahtung der drei Skills.
+- **Compliance (Opt-in-Add-on `compliance_doc_gate`):** Befund = **FAIL blockiert** — der Skill startet nicht, bis der Drift bewusst aufgelöst ist. Für auditpflichtige Kontexte (ISO 27001 / DORA / PCI / SOC 2). Orthogonal zu `governance_mode = lite|standard|heavy`, wie die Privacy-/EU-AI-Act-Add-ons. **Umgesetzt (B2, BOO-229):** Das Flag lebt in `CONVENTIONS.md` (gespiegelt in `.claude/environment.json` unter `governance.compliance_doc_gate`, Default `false`); die Bootstrap-Add-on-Frage erklärt Standard vs. Compliance; `/ideation`, `/architecture-review` und `/implement` lesen das Flag und blockieren bei FAIL (sonst warn-only); das Autopilot-Pause-Verhalten steht in `sprint-run/references/gate-block-handling.md` (Worker heilt Sicheres selbst, pausiert nur bei lokal≠remote, Token `doc-drift-ok`); optional als Projekt-CI-Gate (Required Status Check) erzwingbar. **B1** lieferte das Skript, die SSoT-Ableitung und die warn-only-Verdrahtung der drei Skills.
 
 **Abgrenzung.** `scripts/doc-drift-check.sh` prüft das **Kundenprojekt**. Das repo-interne `.github/scripts/docs_drift_check.py` prüft weiterhin das **Framework-Repo** selbst (SKILL.md↔README-Versionen) — ein anderes Ding, nicht gebootstrappt. Scaffold: Bootstrap Phase 7.3b + `migrate_boo_229` für Bestands-Projekte; `verify-setup.sh` §4 prüft die Präsenz.
+
+**Optionales CI-Gate (auditpflichtige Projekte).** Für den Audit-Ernstfall lässt sich der Checker zusätzlich als **Required Status Check** verdrahten: ein GitHub-Actions-Schritt `bash scripts/doc-drift-check.sh --strict` (rc≠0 bei WARN/FAIL) blockiert den Merge nach `main`, bis die Doku-Landkarte stimmt. Komplementär zum Skill-Pre-Flight (lokaler Lauf) — das CI-Gate ist die rote Linie im PR.
 
 ---
 

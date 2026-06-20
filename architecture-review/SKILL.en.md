@@ -5,7 +5,7 @@ description: |
   Architecture review for individual stories or the whole system. Checks the active
   architecture dimensions (8 standard + active add-ons) and identifies risks, tech debt and improvement potential.
   Use when the operator says "check architecture", "review", "does this fit architecturally" or "/architecture-review".
-version: 1.15.0
+version: 1.16.0
 language: en
 metadata:
   hermes:
@@ -33,7 +33,7 @@ Before the review, call the shared drift checker (if present):
 ```bash
 bash scripts/doc-drift-check.sh
 ```
-It reads `ARCHITECTURE_DESIGN.md §References` + `INDEX.md` as the **single source of truth** and reports completeness, freshness and local-vs-remote drift. **Core point against "drift between the skills":** the artifact list this review checks for currency (§6 References, checklist item §6) is the **same SSoT** the checker reads — not a skill-own, separately maintained catalog. **Warn-only at this stage** — the finding feeds the review result as a recommendation, no abort. If the script is missing (project predating BOO-229): catch up with `intentron migrate --issue BOO-229`; the review continues. The compliance **hard gate** (drift blocks) is an opt-in add-on and lands as BOO-229 B2.
+It reads `ARCHITECTURE_DESIGN.md §References` + `INDEX.md` as the **single source of truth** and reports completeness, freshness and local-vs-remote drift. **Core point against "drift between the skills":** the artifact list this review checks for currency (§6 References, checklist item §6) is the **same SSoT** the checker reads — not a skill-own, separately maintained catalog. **Warn-only at this stage** — the finding feeds the review result as a recommendation, no abort. If the script is missing (project predating BOO-229): catch up with `intentron migrate --issue BOO-229`; the review continues. With `compliance_doc_gate: true` (`CONVENTIONS.md`, mirrored to `.claude/environment.json`) a checker **FAIL** becomes a hard block: `/architecture-review` does not start until the drift is resolved; **WARN** stays a warning. Default `false`. Details: HANDBUCH Appendix AS.
 
 ## Step 0b: Ultraplan trigger (BOO-207, switch B)
 
@@ -80,7 +80,7 @@ Architecturally assess a single story or planned change.
        2. **Metrics-endpoint invariant** — `/metrics` in Prometheus format with 4 mandatory metrics per service, port convention 9090+N
        3. **Alert-rules invariant** — `observability/alerts/<service>.yml` with 3 mandatory alerts per service, routing active, `promtool check rules` green
      - Detail questions per invariant: see [references/dimensions-detail.en.md](references/dimensions-detail.en.md) §5.1 / §5.2 / §5.3.
-   - [ ] §5b Infra layers (13-layer table, BOO-221) — **soft drift detection:** list all rows with status `n.ok` or an empty "decision" and nudge for rework. **No hard block** (lazy-fill allowed) — exception: an explicit compliance project. Mandatory questions/anti-patterns per layer in the catalog `cloud-system-engineer/references/infrastructure-dimensions.en.md`. For layers with a §5 cross-reference (security/monitoring/reliability), check against the §5 dimension instead of duplicating.
+   - [ ] §5b Infra layers (13-layer table, BOO-221) — **soft drift detection:** list all rows with status `n.ok` or an empty "decision" and nudge for rework. **No hard block** (lazy-fill allowed) — exception: `compliance_doc_gate: true` (compliance add-on, BOO-229). Mandatory questions/anti-patterns per layer in the catalog `cloud-system-engineer/references/infrastructure-dimensions.en.md`. For layers with a §5 cross-reference (security/monitoring/reliability), check against the §5 dimension instead of duplicating.
    - [ ] §6 References (cross-refs to other architecture docs)
    - [ ] §7+ Optional add-on sections (e.g. failure mode analysis, scalability roadmap, testing architecture — if added project-specifically)
 2. Understand story/change

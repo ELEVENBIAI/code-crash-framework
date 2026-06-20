@@ -1,7 +1,7 @@
 ---
 name: bootstrap
 recommended_model: sonnet  # BOO-84 — tier mapping in bootstrap/references/model-tiers.json
-version: 3.47.0
+version: 3.48.0
 language: en
 description: Sets up a new project with a governance framework — interactive 4-block interview flow, docs architecture with automatic hub linking, optional learning loop L1/L2/L3. Use when the operator wants to set up a new project or says "/bootstrap".
 tools: [Read, Write, Edit, Bash, Glob, Grep]
@@ -434,6 +434,34 @@ Your internal rate (Enter = take default): ____
 **Remember:** `FINANCIALS_GEO`, `FINANCIALS_CURRENCY`, `FINANCIALS_RATE`, `FINANCIALS_SOURCE`. The values are written in Phase **4.4o (Financials Setup)** into `docs/financials/worker-equivalent-baseline.md` section 1.
 
 > **Issue reference:** BOO-190. Consumers of the baseline: worker-equivalent report (`/sprint-review`, BOO-191) + sprint forecast (`/backlog`, BOO-192), data source dual column (BOO-193). HANDBUCH background: Appendix AK (Financials & Worker-Equivalent), dual column: Appendix G.
+
+### A.10 Compliance doc gate (BOO-229, optional)
+
+Optional, operator-activated yes/no question — add-on pattern like privacy / EU-AI-Act. On `no` (default) nothing happens; the standard behavior (doc drift = WARN) stays.
+
+```
+Enable the compliance doc gate?
+
+What it does: the shared doc-drift checker (scripts/doc-drift-check.sh, BOO-229) checks,
+before /ideation, /architecture-review and /implement, whether the doc map
+(ARCHITECTURE_DESIGN.md §References + INDEX.md) still matches reality.
+
+  Standard   (default) — a drift finding is a WARNING, the skill continues.
+  Compliance (on)      — a FAIL (a registered file is missing) BLOCKS the skill
+                         until the drift is resolved. In the autopilot the story
+                         pauses (worker self-heals safe drift, asks only on local != remote).
+
+Recommended: only for audit-bound projects (ISO 27001 / DORA / PCI / SOC 2),
+where doc consistency is an evidence obligation. Otherwise leave it on standard.
+
+Enable now?
+  [yes]  compliance_doc_gate = true
+  [no]   (default) — compliance_doc_gate = false (standard, warn-only)
+```
+
+**Remember:** `COMPLIANCE_DOC_GATE = true | false` (default `false`). The value fills the `{{COMPLIANCE_DOC_GATE}}` placeholder in `CONVENTIONS.md` (§3 Active gates) and is mirrored to `.claude/environment.json` under `governance.compliance_doc_gate`. **Orthogonal** to `governance_mode` — a `lite` project may turn it on, a `heavy` project may leave it off. SSoT is `CONVENTIONS.md`; on a `--force` regen of environment.json, re-set the value (like `governance.mode`) if customized.
+
+> **Issue reference:** BOO-229. Consumers: `/ideation`, `/architecture-review`, `/implement` (pre-flight FAIL severity), autopilot `sprint-run`→`/goal` (`sprint-run/references/gate-block-handling.md`, token `doc-drift-ok`). HANDBUCH background: Appendix AS.
 
 Phase 1 checkpoint: print a short confirmation of the answers.
 

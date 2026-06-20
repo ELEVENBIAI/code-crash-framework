@@ -6,7 +6,7 @@ description: |
   learning loop (if active) and warns on anti-pattern matches. Use when the user has a new idea,
   suggests a feature, or says "ideation" / "new story".
   Triggers: "I have an idea", "new feature", "we need X", "/ideation".
-version: 2.11.0
+version: 2.12.0
 language: en
 metadata:
   hermes:
@@ -53,7 +53,7 @@ Systematically research new ideas, cross-check against architecture + backlog + 
 3. On `no`: the skill stops with the note "Operator decision: run /architecture-review or resolve the doc drift first". No issue is created.
 4. On `yes`: continue to step 0.5/0.6/1. The decision is recorded in the story under `Current State` (`Doc drift deliberately accepted — operator override`).
 
-**Why soft, not hard-block?** A hard gate would block `/ideation` on every project that hasn't been touched in a while. In practice the doc is often "old enough to warn about, but still valid" — the operator decides per story. The threshold is configurable: a fast-evolving system sets 14 days, a stable system 90 days. The **compliance hard gate** (drift blocks the skill) is an opt-in add-on and lands as BOO-229 B2.
+**Why soft, not hard-block?** A hard gate would block `/ideation` on every project that hasn't been touched in a while. In practice the doc is often "old enough to warn about, but still valid" — the operator decides per story. The threshold is configurable: a fast-evolving system sets 14 days, a stable system 90 days. The **compliance doc gate** (`compliance_doc_gate: true` in `CONVENTIONS.md`, mirrored to `.claude/environment.json` under `governance.compliance_doc_gate`) turns this into a hard block: a checker **FAIL** (a file registered in §References/INDEX is missing) stops `/ideation` — no issue, no "continue anyway" — until the drift is resolved; **WARN** stays a warning even then. Default `false`. Details: HANDBUCH Appendix AS.
 
 ### Step 0.5: Learnings context (if learning loop active)
 

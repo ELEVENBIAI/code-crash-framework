@@ -225,6 +225,8 @@ Constraints:
 
 `none` is not a governance mode; it is an execution-isolation value.
 
+**Compliance doc gate (opt-in add-on):** `{{COMPLIANCE_DOC_GATE}}` (default `false`) — orthogonal to the governance mode. When `true`, the shared doc-drift checker (`scripts/doc-drift-check.sh`, BOO-229) turns a **FAIL** into a hard block in `/ideation`, `/architecture-review`, `/implement`; when `false` it stays a warning. Master spec: `intentron/CONVENTIONS.md` §Compliance doc gate.
+
 ## 2. Execution isolation
 
 **Active isolation:** `{{EXECUTION_ISOLATION}}`
@@ -2248,7 +2250,8 @@ traegt im `quelle`-Feld seinen Beleg.
     "mode": "standard",
     "execution_isolation": "write-scope",
     "worktree_required_for": ["agentic"],
-    "write_scope_required_for": ["sub-agents"]
+    "write_scope_required_for": ["sub-agents"],
+    "compliance_doc_gate": false
   },
   "thresholds": {
     "architecture_doc_freshness_days": 30,
@@ -2277,6 +2280,7 @@ traegt im `quelle`-Feld seinen Beleg.
 | `paths.*` | string | Default paths relative to the project root. Skills read via these keys instead of hardcoded strings. |
 | `governance.mode` | string | `lite` / `standard` / `heavy` — from `CONVENTIONS.md`; controls which gates are mandatory. |
 | `governance.execution_isolation` | string | `none` / `write-scope` / `git-worktree` — from `CONVENTIONS.md`; controls whether parallel agents need worktrees or disjoint write scopes. |
+| `governance.compliance_doc_gate` | bool | Default `false`. Opt-in add-on (BOO-229), mirrored from `CONVENTIONS.md`. `true` → the shared doc-drift checker (`scripts/doc-drift-check.sh`) blocks `/ideation`/`/architecture-review`/`/implement` on FAIL (a registered file is missing) instead of only warning. Orthogonal to `governance.mode`. |
 | `thresholds.architecture_doc_freshness_days` | int | Default `30`. Maximum age (in days) of `ARCHITECTURE_DESIGN.md` before `/ideation` step 0a shows a soft pre-flight reminder. Fast-evolving systems: 14. Stable systems: 90. |
 | `thresholds.token_warn_threshold` | int | Default `70`. Percentage of the context window above which `/implement` step 0b shows a soft hint ("one small story may still fit"). |
 | `thresholds.token_hard_threshold` | int | Default `80`. Percentage above which `/implement` step 0b recommends sprint close (the sprint-box limit per HANDBUCH Appendix G). The operator may proceed with a conscious decision — the override is recorded in `meta.json.pre_flight_warning`. |
@@ -2453,7 +2457,8 @@ cat > "$OUT" <<EOF
     "mode": "standard",
     "execution_isolation": "write-scope",
     "worktree_required_for": ["agentic"],
-    "write_scope_required_for": ["sub-agents"]
+    "write_scope_required_for": ["sub-agents"],
+    "compliance_doc_gate": false
   },
   "thresholds": {
     "architecture_doc_freshness_days": 30,

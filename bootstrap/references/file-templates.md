@@ -259,6 +259,8 @@ Regeln:
 
 ## 3. Aktive Gates
 
+**Doku-Compliance-Gate:** `{{COMPLIANCE_DOC_GATE}}` (Default `false`) — bei `true` macht der gemeinsame Doku-Drift-Checker (`scripts/doc-drift-check.sh`, BOO-229) einen **FAIL** zum Hard-Block in `/ideation`, `/architecture-review`, `/implement`; bei `false` bleibt er eine Warnung. Orthogonal zum Governance-Modus (Opt-in-Add-on wie Privacy/EU-AI-Act). Master-Spez: `intentron/CONVENTIONS.md` §Compliance-Doku-Gate.
+
 | Gate | Status | Quelle |
 |---|---|---|
 | Spec-Gate | aktiv | `hooks/spec-gate.sh` |
@@ -271,6 +273,7 @@ Regeln:
 | Anti-Platzhalter-Check | nach Modus | `.claude/hooks/anti-placeholder-check.py` |
 | Performance-Gate | nach Modus | `.github/workflows/perf.yml` |
 | Sensitive-Paths-Review | nach Modus | `.claude/sensitive-paths.json` |
+| Doku-Drift (Compliance) | `{{COMPLIANCE_DOC_GATE}}` — WARN, bei `true` FAIL-Block | `scripts/doc-drift-check.sh` (BOO-229) |
 
 ## 4. Pipeline-Abgrenzung
 
@@ -2510,7 +2513,8 @@ traegt im `quelle`-Feld seinen Beleg.
     "mode": "standard",
     "execution_isolation": "write-scope",
     "worktree_required_for": ["agentic"],
-    "write_scope_required_for": ["sub-agents"]
+    "write_scope_required_for": ["sub-agents"],
+    "compliance_doc_gate": false
   },
   "thresholds": {
     "architecture_doc_freshness_days": 30,
@@ -2541,6 +2545,7 @@ traegt im `quelle`-Feld seinen Beleg.
 | `governance.execution_isolation` | string | `none` / `write-scope` / `git-worktree` — aus `CONVENTIONS.md`; steuert ob parallele Agenten Worktrees oder disjunkte Write-Scopes brauchen. |
 | `governance.worktree_required_for` | array | Execution-Modes, fuer die Git-Worktrees Pflicht sind. Default: `["agentic"]`. |
 | `governance.write_scope_required_for` | array | Execution-Modes, fuer die mindestens disjunkte Write-Scopes Pflicht sind. Default: `["sub-agents"]`. |
+| `governance.compliance_doc_gate` | bool | Default `false`. Opt-in-Add-on (BOO-229), aus `CONVENTIONS.md` gespiegelt. `true` → der gemeinsame Doku-Drift-Checker (`scripts/doc-drift-check.sh`) blockiert `/ideation`/`/architecture-review`/`/implement` bei FAIL (registrierte Datei fehlt), statt nur zu warnen. Orthogonal zu `governance.mode`. |
 | `thresholds.architecture_doc_freshness_days` | int | Default `30`. Maximales Alter (in Tagen) der `ARCHITECTURE_DESIGN.md`, bevor `/ideation` Schritt 0a einen weichen Pre-Flight-Reminder zeigt. Schnell evolvierende Systeme: 14. Stabile Systeme: 90. |
 | `thresholds.token_warn_threshold` | int | Default `70`. Prozentwert des Context-Windows, ab dem `/implement` Schritt 0b einen weichen Hinweis zeigt ("noch eine kleine Story passt rein"). |
 | `thresholds.token_hard_threshold` | int | Default `80`. Prozentwert ab dem `/implement` Schritt 0b Sprint-Ende empfiehlt (Sprint-Box-Grenze laut HANDBUCH Anhang G). Operator kann mit bewusster Entscheidung weiter — Vermerk landet in `meta.json.pre_flight_warning`. |
@@ -2722,7 +2727,8 @@ cat > "$OUT" <<EOF
     "mode": "standard",
     "execution_isolation": "write-scope",
     "worktree_required_for": ["agentic"],
-    "write_scope_required_for": ["sub-agents"]
+    "write_scope_required_for": ["sub-agents"],
+    "compliance_doc_gate": false
   },
   "thresholds": {
     "architecture_doc_freshness_days": 30,
