@@ -66,5 +66,6 @@ HANDBUCH **Anhang J** (Codex-Onboarding, mit diesem Scanner als optionalem Beisp
 
 ## Visualisierung
 
-> [!note] Sketch ausstehend (BOO-241)
-> Ein Excalidraw-Sketch der Mechanik (Auslöser → Codex-Sandbox → `memory.md` → Findings) folgt über den Render-Loop und wird hier eingebettet. Offene Akzeptanz, siehe `specs/BOO-241.md`.
+![Daily-Bug-Scanner — Mechanik: Auslöser (Cron) → Codex-Sandbox → memory.md-Dedup → Findings → Mensch entscheidet](../daily-bug-scanner.png)
+
+*Quelle: [`daily-bug-scanner.excalidraw`](../daily-bug-scanner.excalidraw). Eine getriggerte Routine — Codex schlägt vor, der Mensch entscheidet (kein Auto-Fix / Auto-Merge).*

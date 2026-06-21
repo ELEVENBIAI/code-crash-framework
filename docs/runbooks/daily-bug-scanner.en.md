@@ -66,5 +66,6 @@ HANDBUCH **Appendix J** (Codex onboarding, with this scanner as the optional exa
 
 ## Visualization
 
-> [!note] Sketch pending (BOO-241)
-> An Excalidraw sketch of the mechanics (trigger → Codex sandbox → `memory.md` → findings) will follow via the render loop and be embedded here. Open acceptance criterion, see `specs/BOO-241.md`.
+![Daily bug scanner — mechanics: trigger (cron) → Codex sandbox → memory.md dedup → findings → human decides](../daily-bug-scanner.en.png)
+
+*Source: [`daily-bug-scanner.en.excalidraw`](../daily-bug-scanner.en.excalidraw). A triggered routine — Codex proposes, the human decides (no auto-fix / auto-merge).*
