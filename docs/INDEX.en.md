@@ -11,6 +11,7 @@ The **Languages** column shows whether a document is bilingual (`DE+EN`) or Germ
 | Document | Description | Audience | Languages |
 | --- | --- | --- | --- |
 | [ADR: Branching standard](./domain/adrs/branching-standard.md) | Architecture decision for trunk-based development with a protected `main` branch. | Developers, architects | DE+EN |
+| [ADR: Company-context layer (dev VPS)](./domain/adrs/company-context-layer.en.md) | Spike decision (proposed): lean company context (purpose/goals/values) as a referenced layer of the global CLAUDE.md instead of a parallel SecondBrain. | Operator, developers | DE+EN |
 | [ADR: Cross-session drift](./domain/adrs/cross-session-drift.md) | Documents and accepts the BOO-number and wave-letter offset caused by parallel sessions. | Developers, operator | DE+EN |
 | [ADR: Design-story handling](./domain/adrs/design-story-handling.md) | Architecture decision to implement design stories against a reference instead of `change_type:design`. | Developers, architects | DE+EN |
 | [Anti-pattern catalog](../references/anti-pattern-katalog.md) | Catalog of typical sprint- and program-level anti-patterns (Schrader ch. 7) as a review reference. | Operator, lead | DE+EN |
@@ -22,8 +23,10 @@ The **Languages** column shows whether a document is bilingual (`DE+EN`) or Germ
 | [Code quality & tech debt (runbook)](./runbooks/cto-code-quality.md) | How a CTO secures code quality with the quality-gate chain. | CTO | DE+EN |
 | [Compliance mechanics](./compliance/compliance-mechanik.md) | End-to-end mechanics of gates and catalogs across the entire lifecycle. | Operator, compliance | DE+EN |
 | [Conventions](../CONVENTIONS.md) | Binding conventions for work, code, and documentation in the framework. | Developers, operator | DE |
+| [Daily bug scanner (runbook)](./runbooks/daily-bug-scanner.en.md) | How the Codex reviewer job works and is built: trigger/cron, prompt contract, sandbox, memory.md dedup, findings, setup, limits. | Operator, developers | DE+EN |
 | [DPO view (runbook)](./runbooks/dpo-privacy.md) | Where data protection is hard-wired in the framework — planning, code, audit. | DPO | DE+EN |
 | [Doc review 2026-06-03 (BOO-114–129)](./doc-review-2026-06-03-boo-114-129.md) | DE+EN review of onboarding, sketches, and handbook for currency and gaps. | Operator, doc author | DE |
+| [Developer quick-start (cheat sheet)](./quickstart-entwickler.en.md) | Quick guide "when do I use what?" — `/implement` vs `/sprint-run` vs `--auto`, gates, switches. ≤5 pages. | Developers | DE+EN |
 | [Framework update (runbook)](./runbooks/framework-update.md) | How an existing project is lifted to the current framework state. | Operator | DE+EN |
 | [Glossary for non-developers](./glossar.md) | Plain-language explanations of core terms (repo, commit, …) for non-technical readers. | Non-developers, stakeholders | DE+EN |
 | [HANDBUCH (Handbook)](../HANDBUCH.md) | The complete framework handbook — explains the system as a coherent whole (incl. the Hermes Human-in-the-Lead rationale, Appendix D). | Operator, developers | DE+EN |
@@ -31,6 +34,7 @@ The **Languages** column shows whether a document is bilingual (`DE+EN`) or Germ
 | [Integration-discovery questionnaire](./onboarding/integration-discovery.md) | Captures the customer-specific part for CI/CD into the customer's live environment. | Customer, customer IT | DE+EN |
 | [AI architecture principles](../references/ki-architektur-prinzipien.md) | The four AI architecture principles as a mandatory prerequisite (Schrader ch. 4). | Architects, operator | DE+EN |
 | [Collision protection: three layers](./kollisionsschutz-drei-ebenen.md) | Separates the three layers of parallelism and their respective protection mechanisms. | Developers, operator | DE+EN |
+| [Customer demo (runbook)](./runbooks/customer-demo.en.md) | Script to show the framework live to a customer in 1–2 h — flow with timing, role use-cases, live gate block, reset. | Sales, operator | DE+EN |
 | [LICENSE](../LICENSE.md) | License text (PolyForm Perimeter License 1.0.0) of the framework. | Everyone | DE |
 | [Logging & monitoring (runbook)](./runbooks/logging-monitoring.md) | Set up logging/monitoring after bootstrap: fill `observability.md` — onboarding questions + examples. | Operator, DevOps | DE+EN |
 | [Multi-user VPS (runbook)](./runbooks/multi-user-vps.md) | Onboard a new team member on a shared VPS. | Operator, DevOps | DE+EN |

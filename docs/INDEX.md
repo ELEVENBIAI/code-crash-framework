@@ -13,6 +13,7 @@ Die Spalte **Sprachen** zeigt, ob ein Dokument zweisprachig vorliegt (`DE+EN`) o
 | [ADR: Branching-Standard](./domain/adrs/branching-standard.md) | Architektur-Entscheidung für Trunk-Based Development mit geschützter `main`-Branch. | Entwickler, Architekten | DE+EN |
 | [ADR: Cross-Session-Drift](./domain/adrs/cross-session-drift.md) | Dokumentiert und akzeptiert den BOO-Nummern- und Wave-Buchstaben-Versatz aus parallelen Sessions. | Entwickler, Operator | DE+EN |
 | [ADR: Design-Story-Handling](./domain/adrs/design-story-handling.md) | Architektur-Entscheidung, Design-Stories gegen eine Referenz zu implementieren statt über `change_type:design`. | Entwickler, Architekten | DE+EN |
+| [ADR: Firmenkontext-Layer (Dev-VPS)](./domain/adrs/company-context-layer.md) | Spike-Entscheidung (Vorschlag): leaner Firmenkontext (Zweck/Ziele/Werte) als referenzierte Ebene der globalen CLAUDE.md statt parallelem SecondBrain. | Operator, Entwickler | DE+EN |
 | [Anti-Pattern-Katalog](../references/anti-pattern-katalog.md) | Katalog typischer Anti-Patterns auf Sprint- und Programm-Ebene (Schrader Kap. 7) als Prüfreferenz. | Operator, Lead | DE+EN |
 | [Artefakt- & Freigabe-Landkarte](./onboarding/artefakt-landkarte.md) | Überblick, welche Artefakte das Framework liefert und welche Rollen sie abnehmen. | Kunde, Operator | DE+EN |
 | [Audit-Perspektive (Runbook)](./runbooks/audit-perspective.md) | Wie ein Auditor die Regel-Einhaltung anhand reproduzierbarer Belege verifiziert. | Auditor, CISO/CIO/CTO | DE+EN |
@@ -22,8 +23,10 @@ Die Spalte **Sprachen** zeigt, ob ein Dokument zweisprachig vorliegt (`DE+EN`) o
 | [Codequalität & Tech-Debt (Runbook)](./runbooks/cto-code-quality.md) | Wie ein CTO mit der Quality-Gate-Kette die Codequalität sichert. | CTO | DE+EN |
 | [Compliance-Mechanik](./compliance/compliance-mechanik.md) | End-to-End-Mechanik aus Gates und Katalogen über den gesamten Lebenszyklus. | Operator, Compliance | DE+EN |
 | [Conventions](../CONVENTIONS.md) | Verbindliche Konventionen für Arbeit, Code und Doku im Framework. | Entwickler, Operator | DE |
+| [Daily-Bug-Scanner (Runbook)](./runbooks/daily-bug-scanner.md) | Wie der Codex-Reviewer-Job funktioniert und gebaut ist: Auslöser/Cron, Prompt-Vertrag, Sandbox, memory.md-Dedup, Findings, Setup, Grenzen. | Operator, Entwickler | DE+EN |
 | [DPO-Sicht (Runbook)](./runbooks/dpo-privacy.md) | Wo Datenschutz im Framework fest verdrahtet ist — Planung, Code, Audit. | DPO | DE+EN |
 | [Doku-Review 2026-06-03 (BOO-114–129)](./doc-review-2026-06-03-boo-114-129.md) | DE+EN-Review von Onboarding, Sketches und Handbuch auf Aktualität und Gaps. | Operator, Doku-Autor | DE |
+| [Entwickler-Schnelleinstieg (Cheat-Sheet)](./quickstart-entwickler.md) | Kurzanleitung „Wann nehme ich was?" — `/implement` vs `/sprint-run` vs `--auto`, Gates, Schalter. ≤5 Seiten. | Entwickler | DE+EN |
 | [Framework-Update (Runbook)](./runbooks/framework-update.md) | Wie ein Bestandsprojekt auf den aktuellen Framework-Stand gehoben wird. | Operator | DE+EN |
 | [Glossar für Nicht-Entwickler](./glossar.md) | Klartext-Erklärungen zentraler Begriffe (Repo, Commit, …) für Nicht-Techniker. | Nicht-Entwickler, Stakeholder | DE+EN |
 | [HANDBUCH](../HANDBUCH.md) | Das vollständige Framework-Handbuch — erklärt das System zusammenhängend (inkl. Hermes-Begründung Human-in-the-Lead, Anhang D). | Operator, Entwickler | DE+EN |
@@ -31,6 +34,7 @@ Die Spalte **Sprachen** zeigt, ob ein Dokument zweisprachig vorliegt (`DE+EN`) o
 | [Integration-Discovery-Fragebogen](./onboarding/integration-discovery.md) | Erfasst den kundenindividuellen Teil für CI/CD in die Live-Umgebung des Kunden. | Kunde, Kunden-IT | DE+EN |
 | [KI-Architektur-Prinzipien](../references/ki-architektur-prinzipien.md) | Die vier KI-Architektur-Prinzipien als verbindliche Voraussetzung (Schrader Kap. 4). | Architekten, Operator | DE+EN |
 | [Kollisionsschutz: drei Ebenen](./kollisionsschutz-drei-ebenen.md) | Trennt die drei Ebenen der Parallelität und ihre jeweiligen Schutzmechanismen. | Entwickler, Operator | DE+EN |
+| [Kunden-Demo (Runbook)](./runbooks/customer-demo.md) | Drehbuch, um das Framework beim Kunden live in 1–2 h vorzuführen — Ablauf mit Timing, Rollen-Use-Cases, Gate-Block live, Reset. | Vertrieb, Operator | DE+EN |
 | [LICENSE](../LICENSE.md) | Lizenztext (PolyForm Perimeter License 1.0.0) des Frameworks. | Alle | DE |
 | [Logging & Monitoring (Runbook)](./runbooks/logging-monitoring.md) | Logging/Monitoring nach dem Bootstrap einrichten: `observability.md` füllen — Onboarding-Fragen + Beispiele. | Operator, DevOps | DE+EN |
 | [Multi-User-VPS (Runbook)](./runbooks/multi-user-vps.md) | Ein neues Teammitglied auf einer geteilten VPS onboarden. | Operator, DevOps | DE+EN |

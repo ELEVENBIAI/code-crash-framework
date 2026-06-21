@@ -463,6 +463,8 @@ Dein Projekt ist bereit. Starte mit: /ideation
 
 ## 6. Die Skills — wann nutze ich was?
 
+> 🧑‍💻 **Schnell-Nachschlagewerk:** Die kompakte „Wann nehme ich was?"-Übersicht (≤5 Seiten, DE+EN) steht im [Entwickler-Schnelleinstieg](docs/quickstart-entwickler.md) — dieser Abschnitt ist die ausführliche Fassung.
+
 ### Übersicht: Das Skill-System
 
 Skills sind **wiederholbare Workflows** die Claude durch komplexe Aufgaben führen.
@@ -2976,6 +2978,8 @@ Codex hat keine direkte Linear-/Obsidian-Anbindung. Der Kontext kommt aus Dateie
 `bash scripts/verify-setup.sh` (Anhang T) laeuft tool-unabhaengig (reines Bash) und prueft `environment.json`, Toolchain, **Git-Hooks (pro Repo — auch unter Codex neu setzen)**, Kern-Artefakte. Fuer den Rollout-Proof: das **5-Schritte-E2E-Probelauf-Protokoll** aus Anhang T analog durchspielen, mit `codex run-task` statt `/implement`.
 
 ### Optional — recurring Background-Task (Daily Bug-Scanner)
+
+> 📄 **Ausführliches Runbook:** Mechanik (Auslöser → Codex-Sandbox → `memory.md` → Findings), `.toml`-Felder, Setup, Datenschutz-Tier und Grenzen stehen im [Daily-Bug-Scanner-Runbook](docs/runbooks/daily-bug-scanner.md) (DE+EN). Produktisierung als Opt-in-Layer: BOO-239.
 
 Wer wiederkehrende Hintergrund-Aufgaben an Codex abgeben will (async Off-Load, spart Claude-Token), nutzt `.codex/automations/<name>.toml` (Cron + `memory.md`):
 

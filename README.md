@@ -33,7 +33,7 @@ INTENTRON reads differently depending on your role. Each runbook below is a 10-m
 | 🔐 **Data protection officer (DPO)** | [`dpo-privacy.md`](docs/runbooks/dpo-privacy.md) — privacy, auditable |
 | 🔎 **Auditor (security / code quality)** | [`audit-perspective.md`](docs/runbooks/audit-perspective.md) — question → proof → place |
 
-> 🚀 **The 60-second pitch:** [`docs/pitch/elevator-pitch.en.md`](docs/pitch/elevator-pitch.en.md) · 🗂 **All documents at a glance:** [`docs/INDEX.en.md`](docs/INDEX.en.md) · full role table [below](#role-specific-runbooks--read-the-framework-through-your-lens).
+> 🚀 **The 60-second pitch:** [`docs/pitch/elevator-pitch.en.md`](docs/pitch/elevator-pitch.en.md) · 🗂 **All documents at a glance:** [`docs/INDEX.en.md`](docs/INDEX.en.md) · 🧑‍💻 **Developer quick-start:** [`docs/quickstart-entwickler.en.md`](docs/quickstart-entwickler.en.md) · full role table [below](#role-specific-runbooks--read-the-framework-through-your-lens).
 
 ---
 
@@ -335,6 +335,7 @@ Token and cost consumption is **measured**, not assumed. After every story (`/im
 | New project, empty folder | → [/bootstrap](bootstrap/) — start here |
 | Existing project, needs structure | → [HANDBUCH.md §4](HANDBUCH.md) — step-by-step retrofit |
 | Just one specific skill | → Clone the skill folder and install it |
+| New to the commands — which one when? | → [`docs/quickstart-entwickler.en.md`](docs/quickstart-entwickler.en.md) — developer quick-start cheat sheet |
 | Want to understand everything first | → [HANDBUCH.md](HANDBUCH.md) — full reference |
 | Rolling out at a customer | → [docs/onboarding/](docs/onboarding/) — the three checklists (start here) |
 | Concrete operational question | → [docs/qa.md](docs/qa.md) — living Q&A |
@@ -440,7 +441,7 @@ INTENTRON liest sich je nach Rolle anders. Jedes Runbook unten ist eine 10-Minut
 | 🔐 **Datenschutzbeauftragte:r (DPO)** | [`dpo-privacy.md`](docs/runbooks/dpo-privacy.md) — Datenschutz, auditierbar |
 | 🔎 **Auditor (Security / Code-Quality)** | [`audit-perspective.md`](docs/runbooks/audit-perspective.md) — Frage → Beleg → Ort |
 
-> 🚀 **In 60 Sekunden erklärt:** [`docs/pitch/elevator-pitch.md`](docs/pitch/elevator-pitch.md) · 🗂 **Alle Dokumente im Überblick:** [`docs/INDEX.md`](docs/INDEX.md) · ausführliche Rollen-Tabelle [weiter unten](#rollenspezifische-runbooks--das-framework-durch-ihre-brille).
+> 🚀 **In 60 Sekunden erklärt:** [`docs/pitch/elevator-pitch.md`](docs/pitch/elevator-pitch.md) · 🗂 **Alle Dokumente im Überblick:** [`docs/INDEX.md`](docs/INDEX.md) · 🧑‍💻 **Entwickler-Schnelleinstieg:** [`docs/quickstart-entwickler.md`](docs/quickstart-entwickler.md) · ausführliche Rollen-Tabelle [weiter unten](#rollenspezifische-runbooks--das-framework-durch-ihre-brille).
 
 ---
 
@@ -742,6 +743,7 @@ Token- und Kosten-Verbrauch wird **gemessen**, nicht angenommen. Nach jeder Stor
 | Neues Projekt, leerer Ordner | → [/bootstrap](bootstrap/) |
 | Bestehendes Projekt, Chaos | → [HANDBUCH.md §4](HANDBUCH.md) |
 | Nur einzelne Skills | → Gewünschten Skill-Ordner klonen und installieren |
+| Welcher Befehl wann? | → [`docs/quickstart-entwickler.md`](docs/quickstart-entwickler.md) — Entwickler-Cheat-Sheet „Wann nehme ich was?" |
 | Alles verstehen bevor ich anfange | → [HANDBUCH.md](HANDBUCH.md) |
 | Beim Kunden ausrollen | → [docs/onboarding/](docs/onboarding/) — die drei Checklisten (hier starten) |
 | Konkrete Praxisfrage | → [docs/qa.md](docs/qa.md) — lebendes Q&A |
