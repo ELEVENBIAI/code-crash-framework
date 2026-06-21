@@ -320,6 +320,8 @@ No spec, no commit. That's the difference between a prompt and a governance fram
 
 > **Operating at scale:** running on a VPS, a team, or in a regulated industry? HANDBUCH appendices **P** (deployment scenarios), **R** (multi-operator coordination, 5–20+ operators), **S** (where do skills/tools/hooks belong) and **Q** (EU-sovereignty stack) cover the setup decisions; appendix **O** documents privacy-by-design.
 
+> **Running it on a VPS unattended?** Start it in [tmux](docs/runbooks/sprint-unattended-tmux.en.md) (survives an SSH drop), schedule it [headless via cron/systemd](docs/runbooks/headless-vps.en.md), or steer a running session [from your phone](docs/runbooks/vps-vom-handy.en.md) — the VPS operating runbooks are wired together in HANDBUCH [Appendix Y](HANDBUCH.en.md) (the operations hub).
+
 ### Quality-gate wiring — a configured gate is not yet a wired gate
 
 A quality gate can be *configured* and still be **blind**: a custom Semgrep rule directory that is never handed to the CLI via `--config` simply never runs. To prove a gate actually bites, bootstrap ships a **wiring canary** — a fixture file with a deliberate violation that produces a finding *only* when the gate is truly wired. For Semgrep this is `.semgrep/test-fixtures/wiring-canary.py` (tripwire literal `QGAUDIT-CANARY-TRIPWIRE`), matched by the custom rule `qgaudit-wiring-canary`; the fixture is excluded from the repo-wide scan via `.semgrepignore` and is read only by a targeted audit scan. A hit proves the wiring lives; silence proves the gate is blind. The pattern is transferable to other gates (slopsquatting, coverage, Layer-0). The **`quality-gate-audit`** skill (BOO-183) automates this check — a hard hook in `/sprint-run` step 1. Plain-language definitions of *slopsquatting*, *wiring canary* and the audit statuses *wired / nominal / blind* are in the [plain-language glossary](docs/glossar.en.md); the technical short form is in [HANDBUCH Appendix C](HANDBUCH.en.md), the full skill walkthrough in **Appendix AF**.
@@ -741,6 +743,8 @@ Governance-Gates laufen automatisch bei `git commit` / `git push` (und `git pull
 Kein Spec, kein Commit. Das ist der Unterschied zwischen einem Prompt und einem Governance-Framework.
 
 > **Im Team / auf VPS / reguliert?** HANDBUCH-Anhaenge **P** (Deployment-Szenarien), **R** (Multi-Operator-Koordination, 5–20+ Operatoren), **S** (wo gehoeren Skills/Tools/Hooks hin) und **Q** (EU-Souveraenitaets-Stack) decken die Setup-Entscheidungen ab; Anhang **O** dokumentiert Privacy-by-Design.
+
+> **Unbeaufsichtigt auf der VPS?** Starte in [tmux](docs/runbooks/sprint-unattended-tmux.md) (übersteht SSH-Abbruch), zeitgesteuert [headless per cron/systemd](docs/runbooks/headless-vps.md) oder steuere eine laufende Session [vom Handy](docs/runbooks/vps-vom-handy.md) — die VPS-Betriebs-Runbooks sind in HANDBUCH [Anhang Y](HANDBUCH.md) (der Betriebs-Hub) verdrahtet.
 
 ### Quality-Gate-Wiring — ein konfiguriertes Gate ist noch kein verdrahtetes Gate
 

@@ -89,6 +89,12 @@ schreibe KEINE Secrets.
 - Du selbst mit **zwei Sessions** auf einem Klon? → **Ebene 2**, nutze `git worktree` ([Kollisionsschutz-Modell](../kollisionsschutz-drei-ebenen.md)).
 - Eine Story mit **mehreren KI-Agenten** parallel? → **Ebene 3**, `EXECUTION_ISOLATION` (greift automatisch im `implement`-Skill).
 
-## Verweise
+## Siehe auch
 
-[Kollisionsschutz-Modell (drei Ebenen)](../kollisionsschutz-drei-ebenen.md) · HANDBUCH **Anhang P §3** (Multi-User-VPS-Setup) · **Anhang U** (Pro-Projekt-Minimal-Checkliste) · **Anhang Y** (VPS-Team-Lebenszyklus) · `docs/how-we-document.md`.
+**Mentales Modell:** Cheat-Sheet = Befehle · tmux = Basis · Headless + Remote = Betriebs-Varianten · Team/Multi-User = Skalierung · **Anhang Y = Hub.**
+
+- **Befehle:** [`quickstart-entwickler.md`](../quickstart-entwickler.md) — Cheat-Sheet „Wann nehme ich was?"
+- **Basis:** [`sprint-unattended-tmux.md`](sprint-unattended-tmux.md) — tmux: Prozess überlebt SSH-Abbruch
+- **Betriebs-Varianten:** [`headless-vps.md`](headless-vps.md) — cron/systemd · [`vps-vom-handy.md`](vps-vom-handy.md) — vom Handy (Remote Control)
+- **Skalierung:** [`vps-team-setup.md`](vps-team-setup.md) · multi-user-vps (dieses Runbook) · [`hostinger-vps-setup.md`](hostinger-vps-setup.md)
+- **Hub:** HANDBUCH [Anhang Y — VPS/Cloud-Team-Runbook](../../HANDBUCH.md#anhang-y-vpscloud-team-runbook-boo-94) · Konzept: [Kollisionsschutz-Modell](../kollisionsschutz-drei-ebenen.md) · Anhang **P §3** / **U** · `docs/how-we-document.md`

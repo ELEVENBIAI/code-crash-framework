@@ -90,3 +90,5 @@ Full table: [README §The Skills](../README.md#the-skills).
 ## Going deeper
 
 [HANDBUCH §6 "The Skills — when do I use what?"](../HANDBUCH.en.md) · [plain-language glossary](./glossar.en.md) · [Our position (sequential, human-gated)](../README.md#our-position-sequential-pipeline-human-gated-merges) · [README §Quickstart](../README.md) (installation).
+
+**VPS operations** (commands here, operating there): [`sprint-unattended-tmux.en.md`](./runbooks/sprint-unattended-tmux.en.md) (tmux = base) · [`headless-vps.en.md`](./runbooks/headless-vps.en.md) (cron/systemd) · [`vps-vom-handy.en.md`](./runbooks/vps-vom-handy.en.md) (Remote Control) · hub: HANDBUCH [Appendix Y](../HANDBUCH.en.md#appendix-y-vpscloud-team-runbook-boo-94).

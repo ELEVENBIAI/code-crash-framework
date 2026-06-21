@@ -31,6 +31,7 @@ The **Languages** column shows whether a document is bilingual (`DE+EN`) or Germ
 | [Framework update (runbook)](./runbooks/framework-update.md) | How an existing project is lifted to the current framework state. | Operator | DE+EN |
 | [Glossary for non-developers](./glossar.md) | Plain-language explanations of core terms (repo, commit, …) for non-technical readers. | Non-developers, stakeholders | DE+EN |
 | [HANDBUCH (Handbook)](../HANDBUCH.md) | The complete framework handbook — explains the system as a coherent whole (incl. the Hermes Human-in-the-Lead rationale, Appendix D). | Operator, developers | DE+EN |
+| [Headless VPS (runbook)](./runbooks/headless-vps.en.md) | Start the sprint unattended via `claude -p "/sprint-run --auto"` as a cron or systemd job — budget cap, sandbox, deny rules, non-root. | Operator, DevOps | DE+EN |
 | [Hostinger VPS setup (runbook)](./runbooks/hostinger-vps-setup.md) | Step-by-step OS bootstrap and hardening of a Hostinger VPS. | Operator, DevOps | DE+EN |
 | [Integration-discovery questionnaire](./onboarding/integration-discovery.md) | Captures the customer-specific part for CI/CD into the customer's live environment. | Customer, customer IT | DE+EN |
 | [AI architecture principles](../references/ki-architektur-prinzipien.md) | The four AI architecture principles as a mandatory prerequisite (Schrader ch. 4). | Architects, operator | DE+EN |
@@ -52,6 +53,7 @@ The **Languages** column shows whether a document is bilingual (`DE+EN`) or Germ
 | [Integrate a stack linter (runbook)](./runbooks/stack-linter-integrieren.md) | Integrate a non-covered stack/linter (e.g. PHP/TYPO3, Go) step by step — the 5 places + verification. | Operator, DevOps | DE+EN |
 | [Unit tests (runbook)](./runbooks/unit-tests.md) | Unit-test flow in detail: 6a-quart test gate, diff coverage, JUnit XML, anti-placeholder check. | Operator | DE+EN |
 | [Vercel CI/CD setup (runbook)](./runbooks/vercel-cicd-setup.md) | Vercel CI/CD integration via GitHub Actions, deploy after green checks. | Operator, DevOps | DE |
+| [VPS from your phone (runbook)](./runbooks/vps-vom-handy.en.md) | Observe/steer a running Claude Code session on the VPS from your phone — Remote Control + tmux, human-gated on irreversible actions. | Operator, developers | DE+EN |
 | [VPS team setup (runbook)](./runbooks/vps-team-setup.md) | Set up INTENTRON on a developer VPS for teams. | Operator, DevOps | DE |
 
 ## Skill documentation

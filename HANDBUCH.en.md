@@ -4772,6 +4772,20 @@ Practical rule: on the VPS you do not expect inline feedback in the editor — y
 | Operator users + SSH hardening (scenario 3) | Doc SSoT choice, `specs/`, `journal/`, backlog adapter |
 | (optional) Container profile for version lockstep | `bash scripts/verify-setup.sh` → 0 FAIL |
 
+### Y.9 Operating runbooks at a glance (hub)
+
+Appendix Y is the **hub** for VPS operations. The individual step-by-step runbooks (each links back here) — mental model: **cheat sheet = commands · tmux = base · headless + remote = operating variants · team/multi-user = scaling · Appendix Y = hub.**
+
+| Runbook | Role | What for | Languages |
+|---|---|---|---|
+| [`quickstart-entwickler.en.md`](docs/quickstart-entwickler.en.md) | Commands | cheat sheet "when do I use what?" | DE+EN |
+| [`sprint-unattended-tmux.en.md`](docs/runbooks/sprint-unattended-tmux.en.md) | Base | sprint survives an SSH drop via tmux | DE+EN |
+| [`headless-vps.en.md`](docs/runbooks/headless-vps.en.md) | Operating variant | start it scheduled via cron/systemd | DE+EN |
+| [`vps-vom-handy.en.md`](docs/runbooks/vps-vom-handy.en.md) | Operating variant | observe/steer from your phone (Remote Control) | DE+EN |
+| [`multi-user-vps.en.md`](docs/runbooks/multi-user-vps.en.md) | Scaling | onboard a new team member | DE+EN |
+| [`hostinger-vps-setup.en.md`](docs/runbooks/hostinger-vps-setup.en.md) | Base/scaling | OS bootstrap + hardening of the VPS | DE+EN |
+| [`vps-team-setup.md`](docs/runbooks/vps-team-setup.md) | Pointer | redirect → this Appendix Y | DE |
+
 ### Related appendices & sources
 
 - **HANDBUCH §8d (coding environments):** the Mac/VPS/CI distinction this lifecycle sits on.

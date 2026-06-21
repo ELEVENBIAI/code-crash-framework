@@ -441,6 +441,18 @@ ssh <HOSTNAME>
 
 ---
 
+## See also
+
+**Mental model:** cheat sheet = commands · tmux = base · headless + remote = operating variants · team/multi-user = scaling · **Appendix Y = hub.**
+
+- **Commands:** [`quickstart-entwickler.en.md`](../quickstart-entwickler.en.md) — cheat sheet "when do I use what?"
+- **Base:** [`sprint-unattended-tmux.en.md`](sprint-unattended-tmux.en.md) — tmux: the process survives an SSH drop
+- **Operating variants:** [`headless-vps.en.md`](headless-vps.en.md) — cron/systemd · [`vps-vom-handy.en.md`](vps-vom-handy.en.md) — from your phone (Remote Control)
+- **Scaling:** [`vps-team-setup.md`](vps-team-setup.md) · [`multi-user-vps.en.md`](multi-user-vps.en.md) · hostinger-vps-setup (this runbook)
+- **Hub:** HANDBUCH [Appendix Y — VPS/cloud team runbook](../../HANDBUCH.en.md#appendix-y-vpscloud-team-runbook-boo-94)
+
+---
+
 *Sources: live setup run on a Hostinger VPS (Ubuntu 24.04 LTS) · Claude Code installation docs
 (code.claude.com/docs/en/setup) · complements the framework-centric fragments in HANDBUCH
 Appendix Y with the missing OS bootstrap and hardening part.*

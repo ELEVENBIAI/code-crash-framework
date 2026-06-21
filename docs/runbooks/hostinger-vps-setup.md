@@ -444,6 +444,18 @@ ssh <HOSTNAME>
 
 ---
 
+## Siehe auch
+
+**Mentales Modell:** Cheat-Sheet = Befehle · tmux = Basis · Headless + Remote = Betriebs-Varianten · Team/Multi-User = Skalierung · **Anhang Y = Hub.**
+
+- **Befehle:** [`quickstart-entwickler.md`](../quickstart-entwickler.md) — Cheat-Sheet „Wann nehme ich was?"
+- **Basis:** [`sprint-unattended-tmux.md`](sprint-unattended-tmux.md) — tmux: Prozess überlebt SSH-Abbruch
+- **Betriebs-Varianten:** [`headless-vps.md`](headless-vps.md) — cron/systemd · [`vps-vom-handy.md`](vps-vom-handy.md) — vom Handy (Remote Control)
+- **Skalierung:** [`vps-team-setup.md`](vps-team-setup.md) · [`multi-user-vps.md`](multi-user-vps.md) · hostinger-vps-setup (dieses Runbook)
+- **Hub:** HANDBUCH [Anhang Y — VPS/Cloud-Team-Runbook](../../HANDBUCH.md#anhang-y-vpscloud-team-runbook-boo-94)
+
+---
+
 *Quellen: gelebter Setup-Durchlauf auf Hostinger-VPS (Ubuntu 24.04 LTS) · Claude Code
 Installations-Doku (code.claude.com/docs/en/setup) · ergänzt die framework-zentrierten
 Bruchstücke aus HANDBUCH Anhang Y um den fehlenden OS-Bootstrap- und Härtungs-Teil.*

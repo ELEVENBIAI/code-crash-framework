@@ -80,7 +80,12 @@ Das wäre Sache eines echten Daemons (`cron`/`systemd`). Den setzt das Framework
 
 ---
 
-## Verwandt
+## Siehe auch
 
-- [`sprint-run/README.md`](../../sprint-run/README.md) — der Sprint-Orchestrator selbst
-- [`hostinger-vps-setup.md`](hostinger-vps-setup.md) · [`multi-user-vps.md`](multi-user-vps.md) — VPS-Grundlagen
+**Mentales Modell:** Cheat-Sheet = Befehle · tmux = Basis · Headless + Remote = Betriebs-Varianten · Team/Multi-User = Skalierung · **Anhang Y = Hub.**
+
+- **Befehle:** [`quickstart-entwickler.md`](../quickstart-entwickler.md) — Cheat-Sheet „Wann nehme ich was?"
+- **Basis:** sprint-unattended-tmux (dieses Runbook) · [`sprint-run/README.md`](../../sprint-run/README.md) — der Orchestrator selbst
+- **Betriebs-Varianten:** [`headless-vps.md`](headless-vps.md) — cron/systemd · [`vps-vom-handy.md`](vps-vom-handy.md) — vom Handy (Remote Control)
+- **Skalierung:** [`vps-team-setup.md`](vps-team-setup.md) · [`multi-user-vps.md`](multi-user-vps.md) · [`hostinger-vps-setup.md`](hostinger-vps-setup.md)
+- **Hub:** HANDBUCH [Anhang Y — VPS/Cloud-Team-Runbook](../../HANDBUCH.md#anhang-y-vpscloud-team-runbook-boo-94)

@@ -80,7 +80,12 @@ That would be the job of a real daemon (`cron`/`systemd`). The framework **delib
 
 ---
 
-## Related
+## See also
 
-- [`sprint-run/README.en.md`](../../sprint-run/README.en.md) — the sprint orchestrator itself
-- [`hostinger-vps-setup.en.md`](hostinger-vps-setup.en.md) · [`multi-user-vps.en.md`](multi-user-vps.en.md) — VPS basics
+**Mental model:** cheat sheet = commands · tmux = base · headless + remote = operating variants · team/multi-user = scaling · **Appendix Y = hub.**
+
+- **Commands:** [`quickstart-entwickler.en.md`](../quickstart-entwickler.en.md) — cheat sheet "when do I use what?"
+- **Base:** sprint-unattended-tmux (this runbook) · [`sprint-run/README.en.md`](../../sprint-run/README.en.md) — the orchestrator itself
+- **Operating variants:** [`headless-vps.en.md`](headless-vps.en.md) — cron/systemd · [`vps-vom-handy.en.md`](vps-vom-handy.en.md) — from your phone (Remote Control)
+- **Scaling:** [`vps-team-setup.md`](vps-team-setup.md) · [`multi-user-vps.en.md`](multi-user-vps.en.md) · [`hostinger-vps-setup.en.md`](hostinger-vps-setup.en.md)
+- **Hub:** HANDBUCH [Appendix Y — VPS/cloud team runbook](../../HANDBUCH.en.md#appendix-y-vpscloud-team-runbook-boo-94)

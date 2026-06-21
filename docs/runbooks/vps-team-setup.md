@@ -12,3 +12,15 @@
 > Projekt 2..N & Brownfield-Onboarding · Team (CODEOWNERS/Branch-Protection) · Entscheidungen
 > (Docker vs. Direkt-Install, Git-lokal vs. GitHub, Souveränität) · Vier-Layer auf headless VPS ·
 > Schnellreferenz einmal-pro-VPS vs. pro-Projekt.
+
+---
+
+## Siehe auch
+
+**Mentales Modell:** Cheat-Sheet = Befehle · tmux = Basis · Headless + Remote = Betriebs-Varianten · Team/Multi-User = Skalierung · **Anhang Y = Hub.**
+
+- **Befehle:** [`quickstart-entwickler.md`](../quickstart-entwickler.md) — Cheat-Sheet „Wann nehme ich was?"
+- **Basis:** [`sprint-unattended-tmux.md`](sprint-unattended-tmux.md) — tmux: Prozess überlebt SSH-Abbruch
+- **Betriebs-Varianten:** [`headless-vps.md`](headless-vps.md) — cron/systemd · [`vps-vom-handy.md`](vps-vom-handy.md) — vom Handy (Remote Control)
+- **Skalierung:** vps-team-setup (dieses Runbook → kanonisch in Anhang Y) · [`multi-user-vps.md`](multi-user-vps.md) · [`hostinger-vps-setup.md`](hostinger-vps-setup.md)
+- **Hub:** HANDBUCH [Anhang Y — VPS/Cloud-Team-Runbook](../../HANDBUCH.md#anhang-y-vpscloud-team-runbook-boo-94)

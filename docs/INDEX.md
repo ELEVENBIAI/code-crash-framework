@@ -31,6 +31,7 @@ Die Spalte **Sprachen** zeigt, ob ein Dokument zweisprachig vorliegt (`DE+EN`) o
 | [Framework-Update (Runbook)](./runbooks/framework-update.md) | Wie ein Bestandsprojekt auf den aktuellen Framework-Stand gehoben wird. | Operator | DE+EN |
 | [Glossar für Nicht-Entwickler](./glossar.md) | Klartext-Erklärungen zentraler Begriffe (Repo, Commit, …) für Nicht-Techniker. | Nicht-Entwickler, Stakeholder | DE+EN |
 | [HANDBUCH](../HANDBUCH.md) | Das vollständige Framework-Handbuch — erklärt das System zusammenhängend (inkl. Hermes-Begründung Human-in-the-Lead, Anhang D). | Operator, Entwickler | DE+EN |
+| [Headless-VPS (Runbook)](./runbooks/headless-vps.md) | Den Sprint unbeaufsichtigt per `claude -p "/sprint-run --auto"` als cron- oder systemd-Job starten — Budget-Schranke, Sandbox, Deny-Regeln, non-root. | Operator, DevOps | DE+EN |
 | [Hostinger-VPS-Setup (Runbook)](./runbooks/hostinger-vps-setup.md) | Schrittweiser OS-Bootstrap und Härtung einer Hostinger-VPS. | Operator, DevOps | DE+EN |
 | [Integration-Discovery-Fragebogen](./onboarding/integration-discovery.md) | Erfasst den kundenindividuellen Teil für CI/CD in die Live-Umgebung des Kunden. | Kunde, Kunden-IT | DE+EN |
 | [KI-Architektur-Prinzipien](../references/ki-architektur-prinzipien.md) | Die vier KI-Architektur-Prinzipien als verbindliche Voraussetzung (Schrader Kap. 4). | Architekten, Operator | DE+EN |
@@ -53,6 +54,7 @@ Die Spalte **Sprachen** zeigt, ob ein Dokument zweisprachig vorliegt (`DE+EN`) o
 | [Unit-Tests (Runbook)](./runbooks/unit-tests.md) | Unit-Test-Ablauf im Detail: Test-Gate 6a-quart, Diff-Coverage, JUnit-XML, Anti-Platzhalter-Check. | Operator | DE+EN |
 | [Vercel-CI/CD-Setup (Runbook)](./runbooks/vercel-cicd-setup.md) | Vercel-CI/CD-Integration via GitHub Actions, Deploy nach grünen Checks. | Operator, DevOps | DE |
 | [VPS-Team-Setup (Runbook)](./runbooks/vps-team-setup.md) | INTENTRON auf einer Developer-VPS für Teams einrichten. | Operator, DevOps | DE |
+| [VPS-vom-Handy (Runbook)](./runbooks/vps-vom-handy.md) | Eine laufende Claude-Code-Session auf der VPS vom Handy beobachten/steuern — Remote Control + tmux, menschlich-gated bei irreversiblen Aktionen. | Operator, Entwickler | DE+EN |
 
 ## Skill-Dokumentation
 

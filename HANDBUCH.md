@@ -4879,7 +4879,21 @@ Auf einer SSH-VPS fällt **nur Layer 1 (IDE-Inline-Hints) weg** — alle anderen
 
 > **Bekannte Lücken / zu entscheiden:** Kein zentrales Install-Script (die Sequenz in Y.2 ist aus dem Container-Dockerfile abgeleitet); `generate-environment-json.sh` wird vom `/bootstrap`-Skill zur Laufzeit erzeugt (kein statisches Template); `gh`/`git`/`jq`/bash-Version stehen nicht in der §3-Pflichtliste (dieser Anhang führt sie als Prereq); VPS-Sizing nur als Daumenwert (8 GB/4 vCPU für 5 Operatoren), nach Last skalieren; `core.hooksPath` ist eine Operator-Empfehlung, kein Bootstrap-Schritt.
 
-Quelle: BOO-94 (Promotion des standalone Runbooks `docs/runbooks/vps-team-setup.md`). Bündelt §8d + Anhänge P/Q/R/S/T/U/V. Bei Framework-Updates diesen Anhang gegen die Anhänge abgleichen.
+### Y.9 Betriebs-Runbooks im Überblick (Hub)
+
+Anhang Y ist der **Hub** für den VPS-Betrieb. Die einzelnen Schritt-für-Schritt-Runbooks (jedes verlinkt zurück hierher) — mentales Modell: **Cheat-Sheet = Befehle · tmux = Basis · Headless + Remote = Betriebs-Varianten · Team/Multi-User = Skalierung · Anhang Y = Hub.**
+
+| Runbook | Rolle | Wofür | Sprachen |
+|---|---|---|---|
+| [`quickstart-entwickler.md`](docs/quickstart-entwickler.md) | Befehle | Cheat-Sheet „Wann nehme ich was?" | DE+EN |
+| [`sprint-unattended-tmux.md`](docs/runbooks/sprint-unattended-tmux.md) | Basis | Sprint überlebt SSH-Abbruch via tmux | DE+EN |
+| [`headless-vps.md`](docs/runbooks/headless-vps.md) | Betriebs-Variante | zeitgesteuert per cron/systemd starten | DE+EN |
+| [`vps-vom-handy.md`](docs/runbooks/vps-vom-handy.md) | Betriebs-Variante | vom Handy beobachten/steuern (Remote Control) | DE+EN |
+| [`multi-user-vps.md`](docs/runbooks/multi-user-vps.md) | Skalierung | neues Teammitglied onboarden | DE+EN |
+| [`hostinger-vps-setup.md`](docs/runbooks/hostinger-vps-setup.md) | Basis/Skalierung | OS-Bootstrap + Härtung der VPS | DE+EN |
+| [`vps-team-setup.md`](docs/runbooks/vps-team-setup.md) | Pointer | Verweis → dieser Anhang Y | DE |
+
+Quelle: BOO-94 (Promotion des standalone Runbooks `docs/runbooks/vps-team-setup.md`). Bündelt §8d + Anhänge P/Q/R/S/T/U/V. Bei Framework-Updates diesen Anhang gegen die Anhänge abgleichen. Hub-Liste Y.9: BOO-245 (Sprint 9).
 
 ## Anhang Z: Kunden-Onboarding — die drei Checklisten + Artefakt-Landkarte (BOO-108)
 
