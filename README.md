@@ -15,7 +15,7 @@
 
 INTENTRON turns the method described in Matthias Schrader's book "Code Crash" into a working operating system for AI-assisted development.
 
-**The name — INTENT + -TRON:** *Intent* is Schrader's core idea — we extend spec-driven development by the layer *above* the spec: every story is aligned to an **intent** (the *why*), not just a specification (the *what*). The *-tron* suffix names a **machine** (cyclotron, magnetron). Together, INTENTRON is **the engine that turns intent into production** — enforced and traceable.
+**The name — INTENT + -TRON:** the engine that turns *intent* into production — enforced and traceable. Where the name, the book and the method come from is one short read: [Where INTENTRON comes from](#origin).
 
 **What INTENTRON is not.** INTENTRON is not itself an autonomous, agentic AI. It is primarily a human-steered, **sequential** engineering pipeline with quality gates and review points — not a fully autonomous developer agent. The AI tools (Claude, Codex, Cursor) are *adapters* onto this contract: they may drive the framework, but they stay inside its declared specs, gates, reports and review points. The governance itself does not run off on its own.
 
@@ -185,13 +185,25 @@ One-shot prompt — paste into Claude Code opened in the old repo:
 
 ---
 
-## Why the method comes from "Code Crash" (and how to read this)
+<a name="origin"></a>
 
-The thinking behind INTENTRON comes from **Matthias Schrader's book "Code Crash"**. Schrader's thesis, in one line: AI now writes the code, so the scarce resource is no longer typing speed — it is **intent, governance and the ability to still understand a system months later**. INTENTRON is our attempt to turn that thesis into a working *operating system* for AI-assisted development: skills, gates and artifacts that keep the "why" alive while the AI handles the "how".
+## Where INTENTRON comes from — the book "Code Crash" by Matthias Schrader
+
+This is the one place that tells the whole story: what "Code Crash" is, how INTENTRON follows from it, and where the name comes from.
+
+**What "Code Crash" is.** *Code Crash* is a book by **Matthias Schrader**. Its thesis, in one line: AI now writes the code, so the scarce resource is no longer typing speed — it is **intent, governance and the ability to still understand a system months later**.
+
+**How INTENTRON follows from it.** INTENTRON turns that thesis into a working *operating system* for AI-assisted development: skills, gates and artifacts that keep the "why" alive while the AI handles the "how". The book is the *idea*; INTENTRON is the *enforced, traceable implementation*.
+
+**Where the name comes from — INTENT + -TRON.** *Intent* is Schrader's core concept: we extend spec-driven development by the layer *above* the spec — every story is aligned to an **intent** (the *why*), not just a specification (the *what*). The *-tron* suffix names a **machine** (cyclotron, magnetron). Together, INTENTRON is **the engine that turns intent into production**.
+
+**How to read this:**
 
 - **You do not need to have read the book.** The framework and HANDBUCH are written to stand on their own — every concept is explained where it is used.
 - **But we recommend it** for the deeper context. The HANDBUCH references Schrader throughout (anti-patterns, production-readiness, the 4P pipeline), and **Appendix M ("Schrader Decoder")** maps the book's chapters onto the concrete framework pieces.
 - If you only read one thing first: this README, then [HANDBUCH.en.md](HANDBUCH.en.md) §1–§8.
+
+> INTENTRON is an independent product of OWLIST GmbH; it has no business relationship with Matthias Schrader or the book's publisher, and the methodology is based on the principles described in the book. Full notice: [NOTICE](NOTICE) and the footer below.
 
 ## Not a one-size-fits-all framework
 
@@ -337,6 +349,7 @@ Token and cost consumption is **measured**, not assumed. After every story (`/im
 | Just one specific skill | → Clone the skill folder and install it |
 | New to the commands — which one when? | → [`docs/quickstart-entwickler.en.md`](docs/quickstart-entwickler.en.md) — developer quick-start cheat sheet |
 | Want to understand everything first | → [HANDBUCH.md](HANDBUCH.md) — full reference |
+| Curious about the name / where the method comes from | → [Where INTENTRON comes from](#origin) — book, method & name in one place |
 | Rolling out at a customer | → [docs/onboarding/](docs/onboarding/) — the three checklists (start here) |
 | Showing the framework to a customer | → [`docs/runbooks/demo-vorbereitung.en.md`](docs/runbooks/demo-vorbereitung.en.md) (prepare) + [`customer-demo.en.md`](docs/runbooks/customer-demo.en.md) (run it) |
 | Concrete operational question | → [docs/qa.md](docs/qa.md) — living Q&A |
@@ -424,7 +437,7 @@ This project is **source-available** under the [PolyForm Perimeter License 1.0.0
 
 INTENTRON setzt die im Buch »Code Crash« von Matthias Schrader beschriebene Methode in ein funktionierendes Betriebssystem für KI-gestützte Entwicklung um.
 
-**Der Name — INTENT + -TRON:** *Intent* ist Schraders Kernbegriff — wir erweitern Spec-Driven Development um die Ebene *über* der Spec: Jede Story ist auf einen **Intent** ausgerichtet (das *Warum*), nicht nur auf eine Spezifikation (das *Was*). Die Endung *-tron* benennt eine **Maschine** (Zyklotron, Magnetron). Zusammen ist INTENTRON **die Engine, die Intent in Produktion überführt** — erzwungen und nachvollziehbar.
+**Der Name — INTENT + -TRON:** die Engine, die *Intent* in Produktion überführt — erzwungen und nachvollziehbar. Woher der Name, das Buch und die Methode kommen, ist ein kurzer Abschnitt: [Woher INTENTRON kommt](#herkunft).
 
 **Was INTENTRON nicht ist.** INTENTRON ist selbst **keine** autonome, agentische KI. Es ist zuerst eine menschlich gesteuerte, **sequenzielle** Engineering-Pipeline mit Quality-Gates und Review-Punkten — kein vollautonomer Developer-Agent. Die KI-Tools (Claude, Codex, Cursor) sind *Adapter* auf diesen Vertrag: Sie können das Framework agentisch nutzen, bleiben aber innerhalb seiner Specs, Gates, Reports und Review-Punkte. Die Governance selbst läuft nicht selbstständig los.
 
@@ -594,13 +607,25 @@ Einmal-Prompt — in Claude Code einfügen, geöffnet im alten Repo:
 
 ---
 
-## Warum die Methode aus »Code Crash« kommt (und wie man das hier liest)
+<a name="herkunft"></a>
 
-Der Denkanstoss hinter INTENTRON kommt aus **Matthias Schraders Buch »Code Crash«**. Schraders These in einem Satz: Die KI schreibt jetzt den Code — die knappe Ressource ist nicht mehr Tippgeschwindigkeit, sondern **Intent, Governance und die Faehigkeit, ein System auch in Monaten noch zu verstehen**. INTENTRON ist unser Versuch, diese These in ein funktionierendes *Betriebssystem* fuer KI-gestuetzte Entwicklung zu giessen: Skills, Gates und Artefakte, die das "Warum" am Leben halten, waehrend die KI das "Wie" uebernimmt.
+## Woher INTENTRON kommt — das Buch »Code Crash« von Matthias Schrader
 
-- **Du musst das Buch nicht gelesen haben.** Framework und HANDBUCH stehen fuer sich — jedes Konzept wird dort erklaert, wo es genutzt wird.
-- **Wir empfehlen es aber** fuer den tieferen Kontext. Das HANDBUCH nimmt durchgehend Bezug auf Schrader (Anti-Patterns, Production-Readiness, 4P-Pipeline), und **Anhang M ("Schrader-Decoder")** mappt die Buch-Kapitel auf die konkreten Framework-Bausteine.
+Das ist die eine Stelle, die die ganze Geschichte erzählt: was »Code Crash« ist, wie INTENTRON daraus folgt und woher der Name kommt.
+
+**Was »Code Crash« ist.** »Code Crash« ist ein Buch von **Matthias Schrader**. Seine These in einem Satz: Die KI schreibt jetzt den Code — die knappe Ressource ist nicht mehr Tippgeschwindigkeit, sondern **Intent, Governance und die Fähigkeit, ein System auch in Monaten noch zu verstehen**.
+
+**Wie INTENTRON daraus folgt.** INTENTRON giesst diese These in ein funktionierendes *Betriebssystem* für KI-gestützte Entwicklung: Skills, Gates und Artefakte, die das »Warum« am Leben halten, während die KI das »Wie« übernimmt. Das Buch ist die *Idee*; INTENTRON die *erzwungene, nachvollziehbare Umsetzung*.
+
+**Woher der Name kommt — INTENT + -TRON.** *Intent* ist Schraders Kernbegriff: Wir erweitern Spec-Driven Development um die Ebene *über* der Spec — jede Story ist auf einen **Intent** ausgerichtet (das *Warum*), nicht nur auf eine Spezifikation (das *Was*). Die Endung *-tron* benennt eine **Maschine** (Zyklotron, Magnetron). Zusammen ist INTENTRON **die Engine, die Intent in Produktion überführt**.
+
+**Wie man das hier liest:**
+
+- **Du musst das Buch nicht gelesen haben.** Framework und HANDBUCH stehen für sich — jedes Konzept wird dort erklärt, wo es genutzt wird.
+- **Wir empfehlen es aber** für den tieferen Kontext. Das HANDBUCH nimmt durchgehend Bezug auf Schrader (Anti-Patterns, Production-Readiness, 4P-Pipeline), und **Anhang M (»Schrader-Decoder«)** mappt die Buch-Kapitel auf die konkreten Framework-Bausteine.
 - Wenn du zuerst nur eines liest: diese README, dann [HANDBUCH.md](HANDBUCH.md) §1–§8.
+
+> INTENTRON ist ein eigenständiges Produkt der OWLIST GmbH; es steht in keiner geschäftlichen Verbindung zu Matthias Schrader oder dem Verlag des Buchs, und die Methodik ist angelehnt an die im Buch beschriebenen Prinzipien. Vollständiger Hinweis: [NOTICE](NOTICE) und die Fusszeile unten.
 
 ## Kein One-Size-Fits-All-Framework
 
@@ -746,6 +771,7 @@ Token- und Kosten-Verbrauch wird **gemessen**, nicht angenommen. Nach jeder Stor
 | Nur einzelne Skills | → Gewünschten Skill-Ordner klonen und installieren |
 | Welcher Befehl wann? | → [`docs/quickstart-entwickler.md`](docs/quickstart-entwickler.md) — Entwickler-Cheat-Sheet „Wann nehme ich was?" |
 | Alles verstehen bevor ich anfange | → [HANDBUCH.md](HANDBUCH.md) |
+| Woher kommt der Name / die Methode? | → [Woher INTENTRON kommt](#herkunft) — Buch, Methode & Name an einer Stelle |
 | Beim Kunden ausrollen | → [docs/onboarding/](docs/onboarding/) — die drei Checklisten (hier starten) |
 | Framework beim Kunden vorführen | → [`docs/runbooks/demo-vorbereitung.md`](docs/runbooks/demo-vorbereitung.md) (vorbereiten) + [`customer-demo.md`](docs/runbooks/customer-demo.md) (Ablauf) |
 | Konkrete Praxisfrage | → [docs/qa.md](docs/qa.md) — lebendes Q&A |
