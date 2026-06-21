@@ -338,6 +338,7 @@ Token and cost consumption is **measured**, not assumed. After every story (`/im
 | New to the commands — which one when? | → [`docs/quickstart-entwickler.en.md`](docs/quickstart-entwickler.en.md) — developer quick-start cheat sheet |
 | Want to understand everything first | → [HANDBUCH.md](HANDBUCH.md) — full reference |
 | Rolling out at a customer | → [docs/onboarding/](docs/onboarding/) — the three checklists (start here) |
+| Showing the framework to a customer | → [`docs/runbooks/demo-vorbereitung.en.md`](docs/runbooks/demo-vorbereitung.en.md) (prepare) + [`customer-demo.en.md`](docs/runbooks/customer-demo.en.md) (run it) |
 | Concrete operational question | → [docs/qa.md](docs/qa.md) — living Q&A |
 
 ---
@@ -746,6 +747,7 @@ Token- und Kosten-Verbrauch wird **gemessen**, nicht angenommen. Nach jeder Stor
 | Welcher Befehl wann? | → [`docs/quickstart-entwickler.md`](docs/quickstart-entwickler.md) — Entwickler-Cheat-Sheet „Wann nehme ich was?" |
 | Alles verstehen bevor ich anfange | → [HANDBUCH.md](HANDBUCH.md) |
 | Beim Kunden ausrollen | → [docs/onboarding/](docs/onboarding/) — die drei Checklisten (hier starten) |
+| Framework beim Kunden vorführen | → [`docs/runbooks/demo-vorbereitung.md`](docs/runbooks/demo-vorbereitung.md) (vorbereiten) + [`customer-demo.md`](docs/runbooks/customer-demo.md) (Ablauf) |
 | Konkrete Praxisfrage | → [docs/qa.md](docs/qa.md) — lebendes Q&A |
 
 ---

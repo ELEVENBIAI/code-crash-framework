@@ -24,6 +24,7 @@ Die Spalte **Sprachen** zeigt, ob ein Dokument zweisprachig vorliegt (`DE+EN`) o
 | [Compliance-Mechanik](./compliance/compliance-mechanik.md) | End-to-End-Mechanik aus Gates und Katalogen über den gesamten Lebenszyklus. | Operator, Compliance | DE+EN |
 | [Conventions](../CONVENTIONS.md) | Verbindliche Konventionen für Arbeit, Code und Doku im Framework. | Entwickler, Operator | DE |
 | [Daily-Bug-Scanner (Runbook)](./runbooks/daily-bug-scanner.md) | Wie der Codex-Reviewer-Job funktioniert und gebaut ist: Auslöser/Cron, Prompt-Vertrag, Sandbox, memory.md-Dedup, Findings, Setup, Grenzen. | Operator, Entwickler | DE+EN |
+| [Demo-Vorbereitung (Runbook)](./runbooks/demo-vorbereitung.md) | Vorbereitungs-Drehbuch: VPS → /bootstrap → Beispiel-Story + kopierfertiger Prompt → Feature-Walkthrough → Reset, damit man mit fertiger Demo beim Kunden ankommt. | Vertrieb, Operator | DE+EN |
 | [DPO-Sicht (Runbook)](./runbooks/dpo-privacy.md) | Wo Datenschutz im Framework fest verdrahtet ist — Planung, Code, Audit. | DPO | DE+EN |
 | [Doku-Review 2026-06-03 (BOO-114–129)](./doc-review-2026-06-03-boo-114-129.md) | DE+EN-Review von Onboarding, Sketches und Handbuch auf Aktualität und Gaps. | Operator, Doku-Autor | DE |
 | [Entwickler-Schnelleinstieg (Cheat-Sheet)](./quickstart-entwickler.md) | Kurzanleitung „Wann nehme ich was?" — `/implement` vs `/sprint-run` vs `--auto`, Gates, Schalter. ≤5 Seiten. | Entwickler | DE+EN |

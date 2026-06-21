@@ -24,6 +24,7 @@ The **Languages** column shows whether a document is bilingual (`DE+EN`) or Germ
 | [Compliance mechanics](./compliance/compliance-mechanik.md) | End-to-end mechanics of gates and catalogs across the entire lifecycle. | Operator, compliance | DE+EN |
 | [Conventions](../CONVENTIONS.md) | Binding conventions for work, code, and documentation in the framework. | Developers, operator | DE |
 | [Daily bug scanner (runbook)](./runbooks/daily-bug-scanner.en.md) | How the Codex reviewer job works and is built: trigger/cron, prompt contract, sandbox, memory.md dedup, findings, setup, limits. | Operator, developers | DE+EN |
+| [Demo preparation (runbook)](./runbooks/demo-vorbereitung.en.md) | Prep script: VPS → /bootstrap → example story + ready prompt → feature walkthrough → reset, so you arrive at the customer with a finished demo. | Sales, operator | DE+EN |
 | [DPO view (runbook)](./runbooks/dpo-privacy.md) | Where data protection is hard-wired in the framework — planning, code, audit. | DPO | DE+EN |
 | [Doc review 2026-06-03 (BOO-114–129)](./doc-review-2026-06-03-boo-114-129.md) | DE+EN review of onboarding, sketches, and handbook for currency and gaps. | Operator, doc author | DE |
 | [Developer quick-start (cheat sheet)](./quickstart-entwickler.en.md) | Quick guide "when do I use what?" — `/implement` vs `/sprint-run` vs `--auto`, gates, switches. ≤5 pages. | Developers | DE+EN |

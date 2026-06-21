@@ -4,8 +4,8 @@
 
 > A script to show the framework **live in 1–2 h** — "this is how we build". What to show in which order, what to say, and which role use-cases. Source: BOO-238.
 
-> [!warning] Demo project repo = follow-up work
-> A ready, clonable **demo repo** (pre-bootstrapped, with issues + CI) is separate follow-up work (see `specs/BOO-238.md`, open acceptance criterion). For now, use a small, freshly bootstrapped project.
+> [!tip] Prepare beforehand
+> How to set up the demo environment in advance (VPS → `/bootstrap` → example story + ready prompt → reset) is in the [demo preparation runbook](./demo-vorbereitung.en.md). This script here is the flow *during* the demo.
 
 ## 0. Preparation (before the meeting)
 

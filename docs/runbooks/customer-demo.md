@@ -4,8 +4,8 @@
 
 > Drehbuch, um das Framework **live in 1–2 h** zu zeigen — „so wird entwickelt". Was zeige ich in welcher Reihenfolge, was sage ich dazu, und welche Rollen-Use-Cases. Quelle: BOO-238.
 
-> [!warning] Demo-Projekt-Repo = Folge-Arbeit
-> Ein fertiges, klonbares **Demo-Repo** (vorgebootstrappt, mit Issues + CI) ist eigene Folge-Arbeit (siehe `specs/BOO-238.md`, offene Akzeptanz). Für jetzt nutzt du ein kleines, frisch gebootstrapptes Projekt.
+> [!tip] Vorher vorbereiten
+> Wie du die Demo-Umgebung vorab aufsetzt (VPS → `/bootstrap` → Beispiel-Story + kopierfertiger Prompt → Reset), steht im [Demo-Vorbereitungs-Runbook](./demo-vorbereitung.md). Dieses Drehbuch hier ist der Ablauf *während* der Demo.
 
 ## 0. Vorbereitung (vor dem Termin)
 
