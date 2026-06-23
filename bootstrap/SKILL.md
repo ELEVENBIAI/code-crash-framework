@@ -1,7 +1,7 @@
 ---
 name: bootstrap
 recommended_model: sonnet  # BOO-84 — tier mapping in bootstrap/references/model-tiers.json
-version: 3.48.0
+version: 3.49.0
 description: Setzt ein neues Projekt mit Governance-Framework auf — interaktiver Block-Interview-Flow in 4 Schritten, Doku-Architektur mit Hub-Auto-Verlinkung, optionaler Learning-Loop L1/L2/L3. Verwenden wenn der Operator ein neues Projekt aufsetzen will oder "/bootstrap" sagt.
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 metadata:
@@ -1864,6 +1864,19 @@ Bootstrap fertig. Weiter mit:
 > **Setup-Self-Check jederzeit (BOO-128):** `verify-setup.sh` ist read-only und unabhaengig vom `/implement`-Probelauf — der Operator prueft sein Setup jederzeit selbst. Fertiger Prompt: „führ `verify-setup.sh` aus und erklär mir die WARN/FAIL-Punkte". Hintergrund + Sketch: HANDBUCH Anhang T „Post-Install-Verifikation".
 
 > **GitHub-Connect proaktiv pruefen, wenn GitHub im Scope (BOO-123):** vor dem Loslegen `gh auth status` (CLI/API) **und** `git remote -v` (push-Pfad: HTTPS-via-`gh` oder SSH) checken — Branch-Protection braucht beide Auth-Ebenen (`gh auth` ≠ `git auth`). Runbook: HANDBUCH Anhang Y „GitHub-Connect pro VPS".
+
+### 7.7 Optionale Add-ons / Naechste Schritte (BOO-248)
+
+Das Framework ist nach dem Bootstrap **baseline-funktionsfaehig**. Die folgenden Add-ons sind **opt-in** — sie werden **bewusst nicht** im Interview abgefragt (kein Bloat, Leichtgewicht-Designprinzip), sondern hier als Pointer gelistet und bei Bedarf **im Nachgang** ueber ihr Runbook eingerichtet.
+
+| Add-on | Was es bringt | Einrichtung / Runbook |
+|--------|---------------|------------------------|
+| Unabhaengiger Code-Reviewer (Codex) | Zweiter Review-Pass von einem *anderen* Anbieter (kein Interessenkonflikt) — faengt Design/Handwerk/Edge-Cases, die die deterministischen Gates nicht fangen. Opt-in, kein Gate. | `docs/runbooks/codex-reviewer.md` (mit BOO-239) |
+| Daily-Bug-Scanner | Getriggerte Routine, die das Repo regelmaessig auf Bugs/Regressions absucht und Findings als Report liefert (kein Auto-Fix). | `docs/runbooks/daily-bug-scanner.md` |
+| Headless-VPS | Sprints unbeaufsichtigt auf einem Server laufen lassen (`claude -p` als cron/systemd-Job). | `docs/runbooks/headless-vps.md` |
+| Developer-VPS vom Handy | Den Dev-VPS via Remote Control + tmux vom Mobilgeraet steuern. | `docs/runbooks/vps-vom-handy.md` |
+
+**Regel:** Diese Liste ist **erweiterbar**. Jedes neue Opt-in-Feature traegt sich hier mit einem Einzeiler + Runbook-Pointer ein, statt eine Bootstrap-Frage hinzuzufuegen — so bleibt das Interview konstant schlank. Hintergrund + Erweiterungs-Regel: HANDBUCH Anhang AT. Siehe auch das Routinen-Setup: `docs/runbooks/routinen-vernetzen.md` (Schalter C, ADR-2).
 
 ---
 

@@ -47,8 +47,11 @@ Ein bestehendes Release nachtraeglich aktualisieren: `gh release edit v0.2.0 --n
 
 ---
 
-## Alle Releases — Index (85 Waves, neueste zuerst)
+## Alle Releases — Index (88 Waves, neueste zuerst)
 
+- **CH** — [Wave CH — Post-Install: Optionale Add-ons / Next-Steps-Sektion (BOO-248)](wave-ch-postinstall-addons.md) · [EN](wave-ch-postinstall-addons.en.md)
+- **CG** — [Wave CG — Positions-Block + Hermes-Begruendung + README-Auffrischung (BOO-227, BOO-236)](wave-cg-position-readme-refresh.md) · [EN](wave-cg-position-readme-refresh.en.md)
+- **CF** — [Wave CF — research als vendored Bundle-Skill: Self-Contained-Fix (BOO-219)](wave-cf-research-vendored-bundle-skill.md) · [EN](wave-cf-research-vendored-bundle-skill.en.md)
 - **CE** — [Wave CE — Worker-Equivalent: zweite Steuerungs-Dimension neben Token-Verbrauch (BOO-190/191/192/193)](wave-ce-worker-equivalent.md) · [EN](wave-ce-worker-equivalent.en.md)
 - **CD** — [Wave CD — Semgrep Custom-Rule-Wiring + Verifikations-Canary (BOO-185/188)](wave-cd-semgrep-custom-rule-wiring.md) · [EN](wave-cd-semgrep-custom-rule-wiring.en.md)
 - **CC** — [Wave CC — Linter-Verdrahtung end-to-end: zentrales Bild + Sketch (BOO-182)](wave-cc-linter-verdrahtung-e2e.md) · [EN](wave-cc-linter-verdrahtung-e2e.en.md)

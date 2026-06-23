@@ -5609,6 +5609,20 @@ Sonnet 4.7 | 142k/200k ctx | Worker-Equiv: 2.5h / 16h | Story BOO-205 | $4.20
 
 **Optional CI gate (audit-bound projects).** For the audit case the checker can additionally be wired as a **required status check**: a GitHub Actions step `bash scripts/doc-drift-check.sh --strict` (rc≠0 on WARN/FAIL) blocks the merge into `main` until the doc map is consistent. Complementary to the skill pre-flight (local run) — the CI gate is the red line in the PR.
 
+## Appendix AT: Post-install — optional add-ons / next steps (BOO-248)
+
+> **In brief:** Opt-in features (independent Codex reviewer, daily bug scanner, headless VPS, developer VPS from your phone ...) are **not** asked as bootstrap interview questions — that would bloat the onboarding. Instead the bootstrap lists them at the end as **"Optional add-ons / next steps"** (§7.7) with a one-liner + runbook pointer each; setup happens afterwards.
+
+**The problem.** Making every optional feature an interview question would be bloat. Most projects never need most add-ons, and a long interview lowers adoption (lightweight design principle). Yet the operator must *know* the add-ons exist — otherwise they stay invisible and are never used.
+
+**The solution — surfacing, not setup.** The interview asks only for the mandatory setup (stack, governance mode, execution isolation). Optional operations/governance add-ons move into a **post-install view**: bootstrap §7.7 "Optional add-ons / next steps" plus the same-named section in `DEVELOPER_ONBOARDING.md`. Each entry is a one-liner (what it gives you) + a pointer to its runbook. Setup happens **afterwards when needed**, not in the interview. The pattern matches the routines surfacing (switch C, `docs/runbooks/routinen-vernetzen.en.md`) and the post-install self-check (Appendix T).
+
+**Initial list.** Independent code reviewer (Codex, BOO-239) · daily bug scanner (BOO-241) · headless VPS (BOO-226) · developer VPS from your phone (BOO-240). The list retroactively also covers the Sprint 9 features (headless/remote) that shipped without this shared section.
+
+**Extension rule.** Every new opt-in feature adds itself to §7.7 + developer onboarding (one-liner + runbook pointer) instead of adding a bootstrap question. That keeps the interview constantly lean; the feature list grows only in the post-install view. Existing projects: `migrate_boo_248` appends the section additively to an existing `DEVELOPER_ONBOARDING.md` (idempotent, non-destructive).
+
+**Boundary.** Mandatory setup stays in the interview. Only *optional* add-ons move to the post-install list. No new interview step, no gate, no activation logic — pure surfacing.
+
 ---
 
 *This handbook is part of the INTENTRON.*

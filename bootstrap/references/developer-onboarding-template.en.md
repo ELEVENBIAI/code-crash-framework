@@ -90,6 +90,17 @@ Tool-switch context:
 - Cursor/GitHub Copilot/Google Antigravity: load this document plus the SSoTs as project context; do not assume chat history.
 - Classic development team: backlog, spec, architecture and security are enough to start; add missing implicit assumptions here.
 
+## Optional Add-ons / Next Steps
+
+Optional, **opt-in** operations/governance add-ons are **not** set up after the bootstrap and **deliberately not** asked in the interview (lightweight design principle). Activate them afterwards via the respective framework runbook when needed (background + extension rule: HANDBUCH Appendix AT):
+
+- **Independent code reviewer (Codex)** — a second review pass from a different vendor (no conflict of interest, no gate). Runbook `codex-reviewer`.
+- **Daily bug scanner** — triggered repo scan for bugs/regressions (report-only). Runbook `daily-bug-scanner`.
+- **Headless VPS** — run sprints unattended (`claude -p` as cron/systemd). Runbook `headless-vps`.
+- **Developer VPS from your phone** — remote control via Remote Control + tmux. Runbook `vps-vom-handy`.
+
+This list is extensible: new opt-in features are added here (and in the bootstrap post-install section §7.7) instead of as an interview question.
+
 ## Maintenance Obligation
 
 Update this document when any of the following changes:

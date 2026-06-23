@@ -5703,6 +5703,20 @@ Sonnet 4.7 | 142k/200k ctx | Worker-Equiv: 2.5h / 16h | Story BOO-205 | $4.20
 
 **Optionales CI-Gate (auditpflichtige Projekte).** Für den Audit-Ernstfall lässt sich der Checker zusätzlich als **Required Status Check** verdrahten: ein GitHub-Actions-Schritt `bash scripts/doc-drift-check.sh --strict` (rc≠0 bei WARN/FAIL) blockiert den Merge nach `main`, bis die Doku-Landkarte stimmt. Komplementär zum Skill-Pre-Flight (lokaler Lauf) — das CI-Gate ist die rote Linie im PR.
 
+## Anhang AT: Post-Install — Optionale Add-ons / Naechste Schritte (BOO-248)
+
+> **Kurz:** Opt-in-Features (unabhaengiger Codex-Reviewer, Daily-Bug-Scanner, Headless-VPS, Developer-VPS vom Handy ...) werden **nicht** als Bootstrap-Interview-Fragen abgefragt — das blaehte das Onboarding auf. Stattdessen listet der Bootstrap sie am Ende als **„Optionale Add-ons / Naechste Schritte"** (§7.7) mit je einem Einzeiler + Runbook-Pointer; eingerichtet wird im Nachgang.
+
+**Das Problem.** Jedes optionale Feature als Interview-Frage waere Bloat. Die meisten Projekte brauchen die meisten Add-ons nie, und ein langes Interview senkt die Adoption (Leichtgewicht-Designprinzip). Trotzdem muss der Operator *wissen*, dass es die Add-ons gibt — sonst bleiben sie unsichtbar und werden nie genutzt.
+
+**Die Loesung — Surfacing statt Setup.** Der Bootstrap fragt im Interview nur das Pflicht-Setup ab (Stack, Governance-Modus, Execution-Isolation). Optionale Betriebs-/Governance-Add-ons wandern in eine **Post-Install-Sicht**: bootstrap §7.7 „Optionale Add-ons / Naechste Schritte" plus die gleichnamige Sektion im `DEVELOPER_ONBOARDING.md`. Jeder Eintrag ist ein Einzeiler (Was es bringt) + ein Pointer auf das jeweilige Runbook. Setup passiert **bei Bedarf im Nachgang**, nicht im Interview. Das Muster deckt sich mit dem Routinen-Surfacing (Schalter C, `docs/runbooks/routinen-vernetzen.md`) und dem Post-Install-Self-Check (Anhang T).
+
+**Erst-Liste.** Unabhaengiger Code-Reviewer (Codex, BOO-239) · Daily-Bug-Scanner (BOO-241) · Headless-VPS (BOO-226) · Developer-VPS vom Handy (BOO-240). Die Liste deckt rueckwirkend auch die Sprint-9-Features (Headless/Remote) ab, die ohne diese gemeinsame Sektion ausgeliefert wurden.
+
+**Erweiterungs-Regel.** Jedes neue Opt-in-Feature traegt sich in §7.7 + Developer-Onboarding ein (Einzeiler + Runbook-Pointer), statt eine Bootstrap-Frage hinzuzufuegen. So bleibt das Interview konstant schlank; die Feature-Liste waechst nur in der Post-Install-Sicht. Bestandsprojekte: `migrate_boo_248` haengt die Sektion additiv an ein vorhandenes `DEVELOPER_ONBOARDING.md` an (idempotent, nicht-destruktiv).
+
+**Abgrenzung.** Pflicht-Setup bleibt im Interview. Nur *optionale* Add-ons wandern in die Post-Install-Liste. Kein neuer Interview-Schritt, kein Gate, keine Aktivierungs-Logik — reines Surfacing.
+
 ---
 
 *Dieses Handbuch ist Teil des INTENTRONs.*

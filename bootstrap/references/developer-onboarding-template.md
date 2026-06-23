@@ -90,6 +90,17 @@ Toolwechsel-Kontext:
 - Cursor/GitHub Copilot/Google Antigravity: Dieses Dokument plus SSoTs als Projektkontext laden; keine Chat-Historie voraussetzen.
 - Klassisches Dev-Team: Backlog, Spec, Architektur und Security reichen als Einstieg; fehlende implizite Annahmen hier nachtragen.
 
+## Optionale Add-ons / Naechste Schritte
+
+Optionale, **opt-in** Betriebs-/Governance-Add-ons sind nach dem Setup **nicht** eingerichtet und **bewusst nicht** im Interview abgefragt (Leichtgewicht-Designprinzip). Bei Bedarf im Nachgang ueber das jeweilige Framework-Runbook aktivieren (Hintergrund + Erweiterungs-Regel: HANDBUCH Anhang AT):
+
+- **Unabhaengiger Code-Reviewer (Codex)** — zweiter Review-Pass von einem anderen Anbieter (kein Interessenkonflikt, kein Gate). Runbook `codex-reviewer`.
+- **Daily-Bug-Scanner** — getriggerte Repo-Suche nach Bugs/Regressions (Report-only). Runbook `daily-bug-scanner`.
+- **Headless-VPS** — Sprints unbeaufsichtigt (`claude -p` als cron/systemd). Runbook `headless-vps`.
+- **Developer-VPS vom Handy** — Fernsteuerung via Remote Control + tmux. Runbook `vps-vom-handy`.
+
+Die Liste ist erweiterbar: neue Opt-in-Features kommen hier (und in der Bootstrap-Post-Install-Sektion §7.7) dazu, statt als Interview-Frage.
+
 ## Pflegepflicht
 
 Dieses Dokument wird aktualisiert, wenn sich eines der folgenden Dinge aendert:

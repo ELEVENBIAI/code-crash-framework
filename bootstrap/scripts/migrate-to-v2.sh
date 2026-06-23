@@ -2943,6 +2943,9 @@ migrate_all() {
     # Sprint 7+ — Doku-Drift-Checker (BOO-229): doc-drift-check.sh ins Projekt
     migrate_boo_229
 
+    # Sprint 10 — Post-Install Optionale-Add-ons-Surfacing (BOO-248): Add-ons-Sektion in DEVELOPER_ONBOARDING.md
+    migrate_boo_248
+
     log_info "DE: Migration abgeschlossen. Status pro Projekt in migration-status.md eintragen."
     log_info "EN: Migration finished. Record per-project status in migration-status.md."
 }
@@ -4766,6 +4769,45 @@ native_paths:
 NATIVE_PATHS_EOF
         log_info "Native-Pfade-Block an CLAUDE.md angehaengt (byte-identisch zum Template)"
     fi
+}
+
+migrate_boo_248() {
+    # BOO-248 — Post-Install "Optionale Add-ons / Next-Steps"-Sektion (Surfacing)
+    # https://linear.app/owlist/issue/BOO-248
+    #
+    # Reine Doku/Surfacing: bootstrap §7.7 + Developer-Onboarding-Template listen die opt-in
+    # Add-ons (Codex-Reviewer, Daily-Bug-Scanner, Headless-VPS, VPS-vom-Handy) als erweiterbare
+    # Pointer-Liste statt als Interview-Frage (kein Bloat). Bestandsprojekt: die
+    # "Optionale Add-ons"-Sektion additiv an DEVELOPER_ONBOARDING.md anhaengen, falls der Marker
+    # fehlt. Nicht-destruktiv, idempotent. KEIN neuer Interview-Schritt.
+    log_info "BOO-248: Post-Install Optionale-Add-ons-Sektion in DEVELOPER_ONBOARDING.md sichern"
+    local onb="DEVELOPER_ONBOARDING.md"
+    if [[ ! -f "$onb" ]]; then
+        log_skip "DEVELOPER_ONBOARDING.md fehlt — wird beim Bootstrap aus dem Template (inkl. Optionale Add-ons) erzeugt"
+        return 0
+    fi
+    if grep -q "Optionale Add-ons / Naechste Schritte" "$onb" 2>/dev/null; then
+        log_skip "Optionale-Add-ons-Sektion bereits in DEVELOPER_ONBOARDING.md"
+        return 0
+    fi
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log_dry "append Optionale-Add-ons-Sektion an $onb"
+        return 0
+    fi
+    cat >> "$onb" <<'ADDONS_EOF'
+
+## Optionale Add-ons / Naechste Schritte
+
+Optionale, opt-in Betriebs-/Governance-Add-ons sind nicht eingerichtet und bewusst nicht im Interview abgefragt (Leichtgewicht-Designprinzip). Bei Bedarf im Nachgang ueber das jeweilige Framework-Runbook aktivieren (Hintergrund: HANDBUCH Anhang AT):
+
+- Unabhaengiger Code-Reviewer (Codex) — Runbook `codex-reviewer`.
+- Daily-Bug-Scanner — Runbook `daily-bug-scanner`.
+- Headless-VPS — Runbook `headless-vps`.
+- Developer-VPS vom Handy — Runbook `vps-vom-handy`.
+
+Die Liste ist erweiterbar: neue Opt-in-Features kommen hier dazu, statt als Interview-Frage.
+ADDONS_EOF
+    log_info "Optionale-Add-ons-Sektion an $onb angehaengt"
 }
 
 migrate_boo_190() {
