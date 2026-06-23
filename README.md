@@ -9,7 +9,7 @@
 
 > **License:** Source-available (PolyForm Perimeter 1.0.0) — usable and adaptable for your own projects, **no reselling**. ([details](#license))
 
-> A **battle-tested, tool-neutral governance framework** for AI-assisted development — reference implementation in Claude Code, runs equally with Codex, Cursor and other AI tools. An interview-driven orchestrator plus a coherent set of sub-skills set up a complete AI-driven development governance framework for any new project, covering the full delivery cycle.
+> A **proven governance framework** — the guardrails that enforce quality, security and traceability — for AI-assisted development. Built for Claude Code, it runs equally with Codex, Cursor and other AI tools. A guided setup interview plus a coherent set of skills configure it for any new project and carry it the whole way, from first idea to finished release.
 
 **Core idea:** AI writes your code. Governance makes sure you still understand why in six months.
 
@@ -442,7 +442,7 @@ This project is **source-available** under the [PolyForm Perimeter License 1.0.0
 
 > **Lizenz:** Source-available (PolyForm Perimeter 1.0.0) — nutzbar und anpassbar für eigene Projekte, **kein Weiterverkauf**. ([Details](#lizenz))
 
-> Ein **battle-tested, tool-neutrales Governance-Framework** für KI-gestützte Entwicklung — Referenz-Implementierung in Claude Code, läuft genauso mit Codex, Cursor und anderen KI-Tools. Ein interview-geführter Orchestrator plus kohärente Sub-Skills setzen ein vollständiges KI-getriebenes Governance-Framework für jedes neue Projekt auf und decken den kompletten Delivery-Zyklus ab.
+> Ein **praxiserprobtes Governance-Framework** — die Leitplanken, die Qualität, Sicherheit und Nachvollziehbarkeit erzwingen — für KI-gestützte Entwicklung. Gebaut für Claude Code, läuft es genauso mit Codex, Cursor und anderen KI-Tools. Ein geführtes Setup-Interview plus aufeinander abgestimmte Skills richten es für jedes neue Projekt ein und begleiten den ganzen Weg von der ersten Idee bis zum fertigen Release.
 
 **Kernidee:** KI schreibt deinen Code. Governance stellt sicher, dass du in 6 Monaten noch weißt warum.
 
