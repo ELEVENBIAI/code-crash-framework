@@ -1,7 +1,7 @@
 ---
 name: bootstrap
 recommended_model: sonnet  # BOO-84 — tier mapping in bootstrap/references/model-tiers.json
-version: 3.49.0
+version: 3.50.0
 description: Setzt ein neues Projekt mit Governance-Framework auf — interaktiver Block-Interview-Flow in 4 Schritten, Doku-Architektur mit Hub-Auto-Verlinkung, optionaler Learning-Loop L1/L2/L3. Verwenden wenn der Operator ein neues Projekt aufsetzen will oder "/bootstrap" sagt.
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 metadata:
@@ -1871,7 +1871,7 @@ Das Framework ist nach dem Bootstrap **baseline-funktionsfaehig**. Die folgenden
 
 | Add-on | Was es bringt | Einrichtung / Runbook |
 |--------|---------------|------------------------|
-| Unabhaengiger Code-Reviewer (Codex) | Zweiter Review-Pass von einem *anderen* Anbieter (kein Interessenkonflikt) — faengt Design/Handwerk/Edge-Cases, die die deterministischen Gates nicht fangen. Opt-in, kein Gate. | `docs/runbooks/codex-reviewer.md` (mit BOO-239) |
+| Unabhaengiger Code-Reviewer (Codex) | Zweiter Review-Pass von einem *anderen* Anbieter (kein Interessenkonflikt) — faengt Design/Handwerk/Edge-Cases, die die deterministischen Gates nicht fangen. Opt-in, kein Gate. | `docs/runbooks/codex-reviewer.md` |
 | Daily-Bug-Scanner | Getriggerte Routine, die das Repo regelmaessig auf Bugs/Regressions absucht und Findings als Report liefert (kein Auto-Fix). | `docs/runbooks/daily-bug-scanner.md` |
 | Headless-VPS | Sprints unbeaufsichtigt auf einem Server laufen lassen (`claude -p` als cron/systemd-Job). | `docs/runbooks/headless-vps.md` |
 | Developer-VPS vom Handy | Den Dev-VPS via Remote Control + tmux vom Mobilgeraet steuern. | `docs/runbooks/vps-vom-handy.md` |

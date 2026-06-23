@@ -21,6 +21,7 @@ Die Spalte **Sprachen** zeigt, ob ein Dokument zweisprachig vorliegt (`DE+EN`) o
 | [Business Case (Runbook)](./runbooks/ceo-business-case.md) | Warum ein Entscheider in INTENTRON investiert — der wirtschaftliche Nutzen. | CEO, Entscheider | DE+EN |
 | [CISO-Sicht (Runbook)](./runbooks/ciso-security.md) | Was INTENTRON für die Cyber-Security bedeutet, von Threat Model bis Gate. | CISO | DE+EN |
 | [Codequalität & Tech-Debt (Runbook)](./runbooks/cto-code-quality.md) | Wie ein CTO mit der Quality-Gate-Kette die Codequalität sichert. | CTO | DE+EN |
+| [Codex-Reviewer (Runbook)](./runbooks/codex-reviewer.md) | Unabhängiger Code-Reviewer (Codex, anderer Anbieter als der Autor): zwei Tiers (GitHub-nativ / Azure-EU souverän), Report-only, Findings-Flow, CoI-Control, Abgrenzung. Opt-in, kein Gate. | Operator, Entwickler | DE+EN |
 | [Compliance-Mechanik](./compliance/compliance-mechanik.md) | End-to-End-Mechanik aus Gates und Katalogen über den gesamten Lebenszyklus. | Operator, Compliance | DE+EN |
 | [Conventions](../CONVENTIONS.md) | Verbindliche Konventionen für Arbeit, Code und Doku im Framework. | Entwickler, Operator | DE |
 | [Daily-Bug-Scanner (Runbook)](./runbooks/daily-bug-scanner.md) | Wie der Codex-Reviewer-Job funktioniert und gebaut ist: Auslöser/Cron, Prompt-Vertrag, Sandbox, memory.md-Dedup, Findings, Setup, Grenzen. | Operator, Entwickler | DE+EN |

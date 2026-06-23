@@ -4,8 +4,9 @@
 
 > Ein **portabler Bootstrap-Skill** fuer Claude Code, Codex oder Cross-Tool-Setups, der ein vollstaendiges KI-gesteuertes Entwicklungs-Governance-Framework fuer jedes neue Projekt einrichtet — in 4 Interview-Bloecken (A-D) plus 7 Setup-Phasen, ohne externe Abhaengigkeiten.
 
-**Version:** 3.49.0 — generisch, interview-freundlich, mit portablem Learning-Loop (L1/L2/L3). Kein Projekt-Typ-Lock-in, keine trading-spezifischen Altlasten mehr.
+**Version:** 3.50.0 — generisch, interview-freundlich, mit portablem Learning-Loop (L1/L2/L3). Kein Projekt-Typ-Lock-in, keine trading-spezifischen Altlasten mehr.
 
+> 3.50.0 — AGENTS.md-Review-Guidelines-Block (BOO-239): Codex-Reviewer-Vertrag (Senior-Dev-Perspektive, Report-only, Findings-Flow) als AGENTS.md-Template + `migrate_boo_239`; §7.7-Codex-Pointer auf das Runbook `codex-reviewer.md` scharf geschaltet.
 > 3.49.0 — Optionale Add-ons / Next-Steps-Sektion im Post-Install (BOO-248): opt-in Add-ons (Codex-Reviewer, Daily-Bug-Scanner, Headless-VPS, VPS-vom-Handy) als erweiterbare Pointer-Liste statt Interview-Frage — kein Bloat. §7.7 + Developer-Onboarding + HANDBUCH Anhang AT.
 > 3.48.0 — Compliance-Doku-Gate `compliance_doc_gate` (Opt-in-Add-on, BOO-229 B2): FAIL-Block statt WARN; Bootstrap-Frage A.10, CONVENTIONS + environment.json, Autopilot-Pause
 > 3.47.0 — Doku-Drift-Checker `doc-drift-check.sh` scaffoldet + per Migration nachziehbar (BOO-229 B1)

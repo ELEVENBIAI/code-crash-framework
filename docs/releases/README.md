@@ -47,8 +47,9 @@ Ein bestehendes Release nachtraeglich aktualisieren: `gh release edit v0.2.0 --n
 
 ---
 
-## Alle Releases — Index (88 Waves, neueste zuerst)
+## Alle Releases — Index (89 Waves, neueste zuerst)
 
+- **CI** — [Wave CI — Codex-Reviewer: unabhängiger Code-Review als Opt-in-Layer (BOO-239)](wave-ci-codex-reviewer.md) · [EN](wave-ci-codex-reviewer.en.md)
 - **CH** — [Wave CH — Post-Install: Optionale Add-ons / Next-Steps-Sektion (BOO-248)](wave-ch-postinstall-addons.md) · [EN](wave-ch-postinstall-addons.en.md)
 - **CG** — [Wave CG — Positions-Block + Hermes-Begruendung + README-Auffrischung (BOO-227, BOO-236)](wave-cg-position-readme-refresh.md) · [EN](wave-cg-position-readme-refresh.en.md)
 - **CF** — [Wave CF — research als vendored Bundle-Skill: Self-Contained-Fix (BOO-219)](wave-cf-research-vendored-bundle-skill.md) · [EN](wave-cf-research-vendored-bundle-skill.en.md)

@@ -5623,6 +5623,20 @@ Sonnet 4.7 | 142k/200k ctx | Worker-Equiv: 2.5h / 16h | Story BOO-205 | $4.20
 
 **Boundary.** Mandatory setup stays in the interview. Only *optional* add-ons move to the post-install list. No new interview step, no gate, no activation logic — pure surfacing.
 
+## Appendix AU: Independent code reviewer — Codex as an opt-in layer (BOO-239)
+
+> **In brief:** An **independent** code reviewer — deliberately a *different* tool than the author (Claude): **Codex**. Checks code quality from a senior-dev perspective, **only proposes** (never changes code), **opt-in, no gate**. Reviewer ≠ author = CoI control. Setup: `docs/runbooks/codex-reviewer.en.md`.
+
+**Why a different vendor.** Letting the author review its own code is a conflict of interest — the same blind spots, the same model family. A reviewer from a *different* vendor (Codex instead of Claude) is the four-eyes control at the tool level (cf. BOO-150, human-in-the-lead BOO-227). It complements the deterministic gates (Semgrep/Sonar/coverage) with an LLM senior-dev pass that catches design/craft/edge cases rules cannot see.
+
+**Report-only — the fix stays in the framework.** Codex never changes code. A real finding is **triaged → backlog story + spec → `/implement` → gates → human merge**. So the *fix* passes governance, not a raw Codex patch (no auto-fix, no auto-merge, BOO-227).
+
+**Two tiers (reviewer tier follows repo tier).** Comfort (80%): native GitHub PR review, code → OpenAI cloud (US). Sovereignty (EU/CH): Codex CLI self-operated against Azure OpenAI EU (Sweden Central / West Europe / Germany West Central — **not** Switzerland North = GPT-4o only). The native cloud review is **not** EU-residency-capable. Details, `config.toml` and the two data-hop sketches: `docs/runbooks/codex-reviewer.en.md`.
+
+**AGENTS.md as the review contract.** Codex reviews against the project artifacts (SECURITY.md, ARCHITECTURE_DESIGN.md, CONVENTIONS.md) via the AGENTS.md review guidelines — not generically. Template in `bootstrap/references/file-templates.md`, existing projects via `migrate_boo_239`.
+
+**Boundary.** `/architecture-review` = framework-internal review by the author (Claude); Codex = independent second pass from a different vendor. **BOO-230 (auditor)** = process/conformance (ISO-27001-like); BOO-239 = code craft. `daily-bug-scanner.en.md` = the cron automation variant of the same reviewer. Build-vs-buy (ADR-1): Codex = engine, no MCP server, no Claude review skill, no standing agent.
+
 ---
 
 *This handbook is part of the INTENTRON.*

@@ -282,6 +282,36 @@ Das Framework ist zuerst eine sequenzielle Engineering-Pipeline mit Quality-Gate
 
 ---
 
+## AGENTS.md (Codex-Runtime + Review-Guidelines)
+
+```markdown
+# {{PROJECT_NAME}} — AGENTS.md (Codex Runtime Reference)
+
+> Codex-Pendant zu CLAUDE.md. Repo-Regeln, Sandbox-/Scope-Hinweise, Verweis auf den Projektvertrag.
+> Vom Codex-Review-Runner angewendet (3-Stufen-Aufloesung, max. 32 KiB).
+
+## Projektvertrag (Pflichtlektuere)
+- `CONVENTIONS.md` — Governance-Modus, Execution-Isolation, aktive Gates
+- `ARCHITECTURE_DESIGN.md` — Zielarchitektur, ADRs, Quality Attributes, Referenzen
+- `SECURITY.md` — Security-Regeln, Secrets, Threat-Surface, Pflichtchecks
+
+## Sandbox / Scope
+- Keine Secrets in Code, Logs, Commits, Chat. `.env` bleibt lokal + gitignored.
+- Datei erst lesen, dann aendern. Bestehende Patterns und lokale Helper nutzen.
+- Schreibbereich pro Story festlegen (Execution-Isolation, siehe CONVENTIONS §2).
+
+## Review-Guidelines — unabhaengiger Code-Reviewer (BOO-239)
+Wenn Codex als **Reviewer** laeuft (kein Auto-Fix, nur Befund):
+- **Perspektive:** Senior-Developer — Design, Handwerk, Edge-Cases, Wartbarkeit. NICHT das, was die deterministischen Gates (Semgrep/Sonar/Coverage) schon abdecken.
+- **Pruef-Massstab:** der Diff **gegen** SECURITY.md, ARCHITECTURE_DESIGN.md und CONVENTIONS.md — nicht generisch.
+- **Output:** ein **Befund/Report** mit Prioritaet (P0/P1). **Kein Patch, kein Merge** — Codex aendert nie Code.
+- **Findings-Flow:** echter Fund → triagieren → Backlog-Story + Spec → `/implement` → Gates → menschlicher Merge.
+- **Dedup:** bereits gemeldete Funde ueber `memory.md` filtern.
+- **Unabhaengigkeit:** Reviewer ≠ Autor (kein Interessenkonflikt). Setup-Pfade (Komfort GitHub-native / Souveraenitaet CLI+Azure-EU): `docs/runbooks/codex-reviewer.md`.
+```
+
+---
+
 ## ARCHITECTURE_DESIGN.md (Minimum)
 
 ```markdown

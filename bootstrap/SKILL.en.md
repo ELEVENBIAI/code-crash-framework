@@ -1,7 +1,7 @@
 ---
 name: bootstrap
 recommended_model: sonnet  # BOO-84 — tier mapping in bootstrap/references/model-tiers.json
-version: 3.49.0
+version: 3.50.0
 language: en
 description: Sets up a new project with a governance framework — interactive 4-block interview flow, docs architecture with automatic hub linking, optional learning loop L1/L2/L3. Use when the operator wants to set up a new project or says "/bootstrap".
 tools: [Read, Write, Edit, Bash, Glob, Grep]
@@ -1787,7 +1787,7 @@ After the bootstrap the framework is **baseline-functional**. The following add-
 
 | Add-on | What it gives you | Setup / runbook |
 |--------|-------------------|-----------------|
-| Independent code reviewer (Codex) | A second review pass from a *different* vendor (no conflict of interest) — catches design/craft/edge cases the deterministic gates miss. Opt-in, no gate. | `docs/runbooks/codex-reviewer.en.md` (with BOO-239) |
+| Independent code reviewer (Codex) | A second review pass from a *different* vendor (no conflict of interest) — catches design/craft/edge cases the deterministic gates miss. Opt-in, no gate. | `docs/runbooks/codex-reviewer.en.md` |
 | Daily bug scanner | A triggered routine that periodically scans the repo for bugs/regressions and returns findings as a report (no auto-fix). | `docs/runbooks/daily-bug-scanner.en.md` |
 | Headless VPS | Run sprints unattended on a server (`claude -p` as cron/systemd job). | `docs/runbooks/headless-vps.en.md` |
 | Developer VPS from your phone | Drive the dev VPS from a mobile device via Remote Control + tmux. | `docs/runbooks/vps-vom-handy.en.md` |

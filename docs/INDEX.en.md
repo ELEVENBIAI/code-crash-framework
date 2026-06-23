@@ -21,6 +21,7 @@ The **Languages** column shows whether a document is bilingual (`DE+EN`) or Germ
 | [Business case (runbook)](./runbooks/ceo-business-case.md) | Why a decision-maker invests in INTENTRON — the economic rationale. | CEO, decision-makers | DE+EN |
 | [CISO view (runbook)](./runbooks/ciso-security.md) | What INTENTRON means for cyber security, from threat model to gate. | CISO | DE+EN |
 | [Code quality & tech debt (runbook)](./runbooks/cto-code-quality.md) | How a CTO secures code quality with the quality-gate chain. | CTO | DE+EN |
+| [Codex reviewer (runbook)](./runbooks/codex-reviewer.en.md) | Independent code reviewer (Codex, a different vendor than the author): two tiers (GitHub-native / Azure-EU sovereign), report-only, findings flow, CoI control, boundary. Opt-in, no gate. | Operator, developers | DE+EN |
 | [Compliance mechanics](./compliance/compliance-mechanik.md) | End-to-end mechanics of gates and catalogs across the entire lifecycle. | Operator, compliance | DE+EN |
 | [Conventions](../CONVENTIONS.md) | Binding conventions for work, code, and documentation in the framework. | Developers, operator | DE |
 | [Daily bug scanner (runbook)](./runbooks/daily-bug-scanner.en.md) | How the Codex reviewer job works and is built: trigger/cron, prompt contract, sandbox, memory.md dedup, findings, setup, limits. | Operator, developers | DE+EN |

@@ -2946,6 +2946,9 @@ migrate_all() {
     # Sprint 10 — Post-Install Optionale-Add-ons-Surfacing (BOO-248): Add-ons-Sektion in DEVELOPER_ONBOARDING.md
     migrate_boo_248
 
+    # Sprint 10 — Codex-Reviewer AGENTS.md-Review-Guidelines (BOO-239)
+    migrate_boo_239
+
     log_info "DE: Migration abgeschlossen. Status pro Projekt in migration-status.md eintragen."
     log_info "EN: Migration finished. Record per-project status in migration-status.md."
 }
@@ -4769,6 +4772,43 @@ native_paths:
 NATIVE_PATHS_EOF
         log_info "Native-Pfade-Block an CLAUDE.md angehaengt (byte-identisch zum Template)"
     fi
+}
+
+migrate_boo_239() {
+    # BOO-239 — Unabhaengiger Codex-Reviewer: AGENTS.md-Review-Guidelines-Block
+    # https://linear.app/owlist/issue/BOO-239
+    #
+    # Reine Doku/Vertrag: das AGENTS.md-Template (bootstrap/references/file-templates.md) traegt jetzt
+    # einen Review-Guidelines-Block (Senior-Dev-Perspektive, Report-only, Findings-Flow). Neue Projekte
+    # erben ihn ueber den AGENTS.md-Pfad (RUNTIME_TARGET=codex, Anhang J). Bestandsprojekt: den
+    # Review-Guidelines-Block additiv an ein vorhandenes AGENTS.md anhaengen, falls der Marker fehlt.
+    # Nicht-destruktiv, idempotent. KEIN Gate, kein Auto-Fix.
+    log_info "BOO-239: AGENTS.md-Review-Guidelines-Block sichern"
+    local agents="AGENTS.md"
+    if [[ ! -f "$agents" ]]; then
+        log_skip "AGENTS.md fehlt — wird beim Bootstrap (RUNTIME_TARGET=codex) aus file-templates.md erzeugt (inkl. Review-Guidelines)"
+        return 0
+    fi
+    if grep -q "Review-Guidelines — unabhaengiger Code-Reviewer (BOO-239)" "$agents" 2>/dev/null; then
+        log_skip "Review-Guidelines-Block bereits in AGENTS.md"
+        return 0
+    fi
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log_dry "append Review-Guidelines-Block an $agents"
+        return 0
+    fi
+    cat >> "$agents" <<'REVGUIDE_EOF'
+
+## Review-Guidelines — unabhaengiger Code-Reviewer (BOO-239)
+Wenn Codex als Reviewer laeuft (kein Auto-Fix, nur Befund):
+- Perspektive: Senior-Developer — Design, Handwerk, Edge-Cases, Wartbarkeit. NICHT das, was die deterministischen Gates (Semgrep/Sonar/Coverage) schon abdecken.
+- Pruef-Massstab: der Diff gegen SECURITY.md, ARCHITECTURE_DESIGN.md und CONVENTIONS.md — nicht generisch.
+- Output: ein Befund/Report mit Prioritaet (P0/P1). Kein Patch, kein Merge — Codex aendert nie Code.
+- Findings-Flow: echter Fund -> triagieren -> Backlog-Story + Spec -> /implement -> Gates -> menschlicher Merge.
+- Dedup: bereits gemeldete Funde ueber memory.md filtern.
+- Setup-Pfade (Komfort GitHub-native / Souveraenitaet CLI+Azure-EU): docs/runbooks/codex-reviewer.md.
+REVGUIDE_EOF
+    log_info "Review-Guidelines-Block an $agents angehaengt"
 }
 
 migrate_boo_248() {

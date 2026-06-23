@@ -245,6 +245,36 @@ The framework is primarily a sequential engineering pipeline with quality gates,
 
 ---
 
+## AGENTS.md (Codex runtime + review guidelines)
+
+```markdown
+# {{PROJECT_NAME}} — AGENTS.md (Codex Runtime Reference)
+
+> Codex counterpart to CLAUDE.md. Repo rules, sandbox/scope notes, pointer to the project contract.
+> Applied by the Codex review runner (3-level resolution, max 32 KiB).
+
+## Project contract (required reading)
+- `CONVENTIONS.md` — governance mode, execution isolation, active gates
+- `ARCHITECTURE_DESIGN.md` — target architecture, ADRs, quality attributes, references
+- `SECURITY.md` — security rules, secrets, threat surface, mandatory checks
+
+## Sandbox / scope
+- No secrets in code, logs, commits, chat. `.env` stays local + gitignored.
+- Read a file before changing it. Use existing patterns and local helpers.
+- Define the write scope per story (execution isolation, see CONVENTIONS §2).
+
+## Review guidelines — independent code reviewer (BOO-239)
+When Codex runs as a **reviewer** (no auto-fix, finding only):
+- **Perspective:** senior developer — design, craft, edge cases, maintainability. NOT what the deterministic gates (Semgrep/Sonar/coverage) already cover.
+- **Yardstick:** the diff **against** SECURITY.md, ARCHITECTURE_DESIGN.md and CONVENTIONS.md — not generic.
+- **Output:** a **finding/report** with priority (P0/P1). **No patch, no merge** — Codex never changes code.
+- **Findings flow:** real finding → triage → backlog story + spec → `/implement` → gates → human merge.
+- **Dedup:** filter already-reported findings via `memory.md`.
+- **Independence:** reviewer ≠ author (no conflict of interest). Setup paths (comfort GitHub-native / sovereignty CLI+Azure-EU): `docs/runbooks/codex-reviewer.en.md`.
+```
+
+---
+
 ## SYSTEM_ARCHITECTURE.md (skeleton)
 
 ```markdown
