@@ -317,6 +317,7 @@ MODE NOTE:
 | Which artifact is signed off by whom and where it lives | [`../onboarding/artefakt-landkarte.en.md`](../onboarding/artefakt-landkarte.en.md) |
 | Reports convention, `meta.json` schema, persistence zones in detail | [`../../HANDBUCH.md`](../../HANDBUCH.md) — Appendix E |
 | Post-install verification (`verify-setup.sh`) | [`../../HANDBUCH.md`](../../HANDBUCH.md) — Appendix T |
+| How/where governance is enforced + trust boundaries | [`../../HANDBUCH.md`](../../HANDBUCH.md) — Appendix AV |
 | Look up terms | [`../glossar.md`](../glossar.md) |
 
 ---

@@ -30,6 +30,10 @@ In scope: the INTENTRON skills, hooks, scaffolding scripts and templates in this
 repository. Out of scope: third-party tools the framework integrates with (report those to
 their respective maintainers) and projects that were merely *generated* by INTENTRON.
 
+### Enforcement model
+
+How governance is actually enforced — and where the trust boundaries are (`--no-verify` is local-only, `enforce_admins=false`, CI vs. AI-runtime, spec-linkage): see **HANDBUCH Appendix AV — Enforcement model & trust boundaries**.
+
 ---
 
 <a name="deutsch"></a>
@@ -63,3 +67,7 @@ Im Geltungsbereich: die INTENTRON-Skills, -Hooks, -Scaffolding-Skripte und -Temp
 diesem Repository. Nicht im Geltungsbereich: Drittwerkzeuge, die das Framework einbindet
 (bitte deren Maintainer kontaktieren) sowie Projekte, die mit INTENTRON nur *generiert*
 wurden.
+
+### Durchsetzungs-Modell
+
+Wie Governance real durchgesetzt wird — und wo die Vertrauensgrenzen liegen (`--no-verify` ist nur lokal, `enforce_admins=false`, CI vs. KI-Runtime, Spec-Linkage): siehe **HANDBUCH Anhang AV — Enforcement-Modell & Vertrauensgrenzen**.

@@ -5637,6 +5637,37 @@ Sonnet 4.7 | 142k/200k ctx | Worker-Equiv: 2.5h / 16h | Story BOO-205 | $4.20
 
 **Boundary.** `/architecture-review` = framework-internal review by the author (Claude); Codex = independent second pass from a different vendor. **BOO-230 (auditor)** = process/conformance (ISO-27001-like); BOO-239 = code craft. `daily-bug-scanner.en.md` = the cron automation variant of the same reviewer. Build-vs-buy (ADR-1): Codex = engine, no MCP server, no Claude review skill, no standing agent.
 
+## Appendix AV: Enforcement model & trust boundaries (BOO-228)
+
+> **In brief:** What INTENTRON enforces *where* — and where the trust boundaries are. Honest, not marketing: "enforced" holds precisely **per layer**, not absolutely. Companion to the mechanical hardening (`CHECKPOINTS.md`, BOO-228) and the CI spec gate (BOO-254). Replicates nothing — it links.
+
+**Four enforcement layers** (different hardness):
+
+| Layer | Where | What bites | Bypassable? |
+|---|---|---|---|
+| **AI runtime** (PreToolUse) | inside the Claude session | `spec-gate.sh` (no spec → `git commit` blocked, exit 1), Layer-0 bodyguard (secrets/eval/TLS/SQL before writing) | bites **only** in the AI session; `--no-verify` doesn't touch it |
+| **Local git hook** (optional) | developer machine | same checks as `.git/hooks/*` | bypassable with `git commit --no-verify` |
+| **Server / CI** | GitHub Actions + branch protection | required checks (ESLint/Ruff/Semgrep/tests/coverage/Sonar, raw-pii-guard), `strict=true`, no force-push | **not** bypassable by the committer (`--no-verify` is local) |
+| **Policy / audit** | organization | rules (e.g. no `--no-verify` on protected branches) + audit trail | human, covered by audit |
+
+**The trust boundaries — named honestly:**
+
+- `git commit --no-verify` skips **local git hooks only** — **not** CI and **not** the PreToolUse hook (which isn't a git hook). Background: `bootstrap/references/hooks-setup.md`.
+- `enforce_admins=false` in `setup-branch-protection.sh` → an **owner/admin can override** the protection. Deliberate (solo/agent flow), but not "unbypassable for yourself".
+- `required_approving_review_count=0` → **no server-enforced four-eyes**; "human-in-the-lead" (BOO-227) is the *manual* merge, not an enforced review.
+- **Spec linkage** is today **AI-runtime-enforced, not CI server-side** — a commit outside the Claude session is checked nowhere for its spec.
+
+**How the gaps are closed — tech + governance:**
+
+- **CI spec gate** (BOO-254, opt-in): makes "no merge without a spec" true server-side — also against `--no-verify`/non-Claude paths.
+- **Autonomy hardening profile** (BOO-228, layer 2): human merge gate (CODEOWNERS / `review>=1` / bot without merge rights) for unattended runs; admin-vs-bot token split.
+- **Policy:** "no `--no-verify` on protected branches" as an org rule.
+- **Sovereignty:** self-hosted Git (GitLab/Gitea) allows server-side `pre-receive` hooks — the only *truly* unbypassable layer (Appendix Q).
+
+**Auditability — git-based, deliberately no DB.** The audit trail is file-/git-based (we decided against a central DB): `audit-trace.sh` (spec → session ID → commit diff, BOO-19), `journal/reports/`, `docs/audits/`, git history. How an auditor uses it: `docs/runbooks/audit-perspective.en.md` (question → proof → place). **Limit:** no dedicated gate-event log ("gate X blocked at Y") and no tamper-evident chain — a central, tamper-evident audit sink would be the Automation Plane's job (BOO-234).
+
+**Related (not replicated):** README "Our position" (BOO-227) · `bootstrap/references/hooks-setup.md` · `setup-branch-protection.sh` (BOO-29/149) · CONVENTIONS.md (gate table) · `docs/runbooks/audit-perspective.en.md` · `CHECKPOINTS.md` (BOO-228).
+
 ## Appendix AW: CI spec-gate — server-side spec-linkage gate (opt-in, BOO-254)
 
 > **In short:** An **opt-in** GitHub Actions workflow (`spec-gate-ci.yml`, `name: Spec-Linkage`) that, on every PR to `main`, verifies server-side that the change references an existing `specs/<ISSUE>.md`. It closes the runtime spec-gate gap named in the enforcement self-audit (appendix AV): it makes "no merge without a spec" hold even against `--no-verify` and non-Claude paths. Setup: `docs/runbooks/spec-gate-ci.en.md`.

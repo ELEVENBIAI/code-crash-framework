@@ -316,6 +316,7 @@ MODUS-HINWEIS:
 | Welches Artefakt wer abnimmt und wo es liegt | [`../onboarding/artefakt-landkarte.md`](../onboarding/artefakt-landkarte.md) |
 | Reports-Konvention, `meta.json`-Schema, Persistenz-Zonen im Detail | [`../../HANDBUCH.md`](../../HANDBUCH.md) — Anhang E |
 | Post-Install-Verifikation (`verify-setup.sh`) | [`../../HANDBUCH.md`](../../HANDBUCH.md) — Anhang T |
+| Wie/wo Governance erzwungen wird + Vertrauensgrenzen | [`../../HANDBUCH.md`](../../HANDBUCH.md) — Anhang AV |
 | Begriffe nachschlagen | [`../glossar.md`](../glossar.md) |
 
 ---

@@ -5731,6 +5731,37 @@ Sonnet 4.7 | 142k/200k ctx | Worker-Equiv: 2.5h / 16h | Story BOO-205 | $4.20
 
 **Abgrenzung.** `/architecture-review` = framework-interner Review durch den Autor (Claude); Codex = unabhängiger zweiter Pass von einem anderen Anbieter. **BOO-230 (Auditor)** = Prozess/Konformität (ISO-27001-artig); BOO-239 = Code-Handwerk. `daily-bug-scanner.md` = die Cron-Automations-Variante desselben Reviewers. Build-vs-Buy (ADR-1): Codex = Engine, kein MCP-Server, kein Claude-Review-Skill, kein stehender Agent.
 
+## Anhang AV: Enforcement-Modell & Vertrauensgrenzen (BOO-228)
+
+> **Kurz:** Was INTENTRON *wo* durchsetzt — und wo die Vertrauensgrenzen liegen. Ehrlich statt Marketing: „erzwungen" gilt präzise **pro Schicht**, nicht absolut. Companion zur mechanischen Härtung (`CHECKPOINTS.md`, BOO-228) und zum CI-Spec-Gate (BOO-254). Repliziert nichts — verlinkt.
+
+**Vier Durchsetzungs-Schichten** (unterschiedliche Härte):
+
+| Schicht | Wo | Was greift | Umgehbar? |
+|---|---|---|---|
+| **KI-Runtime** (PreToolUse) | in der Claude-Session | `spec-gate.sh` (kein Spec → `git commit` blockiert, Exit 1), Layer-0-Bodyguard (Secrets/eval/TLS/SQL vor dem Schreiben) | greift **nur** in der KI-Session; `--no-verify` fasst es nicht an |
+| **Lokaler Git-Hook** (optional) | Entwickler-Rechner | dieselben Checks als `.git/hooks/*` | mit `git commit --no-verify` umgehbar |
+| **Server / CI** | GitHub Actions + Branch-Protection | Required Checks (ESLint/Ruff/Semgrep/Tests/Coverage/Sonar, raw-pii-guard), `strict=true`, kein Force-Push | **nicht** vom Committer umgehbar (`--no-verify` ist lokal) |
+| **Policy / Audit** | Organisation | Regeln (z.B. kein `--no-verify` auf geschützten Branches) + Audit-Trail | menschlich, durch Audit gedeckt |
+
+**Die Vertrauensgrenzen — ehrlich benannt:**
+
+- `git commit --no-verify` überspringt **nur lokale Git-Hooks** — **nicht** die CI und **nicht** den PreToolUse-Hook (das ist gar kein Git-Hook). Hintergrund: `bootstrap/references/hooks-setup.md`.
+- `enforce_admins=false` in `setup-branch-protection.sh` → ein **Owner/Admin kann die Protection übersteuern**. Bewusst (Solo-/Agent-Flow), aber nicht „für einen selbst unumgehbar".
+- `required_approving_review_count=0` → **kein vom Server erzwungenes Vier-Augen**; „Human-in-the-Lead" (BOO-227) ist der *manuelle* Merge, kein erzwungener Review.
+- **Spec-Linkage** ist heute **KI-Runtime-erzwungen, nicht CI-server-seitig** — ein Commit ausserhalb der Claude-Session wird beim Spec nirgends geprüft.
+
+**Wie die Lücken geschlossen werden — Technik + Governance:**
+
+- **CI-Spec-Gate** (BOO-254, opt-in): macht „kein Merge ohne Spec" server-seitig wahr — auch gegen `--no-verify`/Nicht-Claude-Pfade.
+- **Autonomie-Härtungs-Profil** (BOO-228, Schicht 2): Mensch-Merge-Gate (CODEOWNERS / `review>=1` / Bot ohne Merge-Recht) für unbeaufsichtigte Läufe; Admin-vs-Bot-Token-Split.
+- **Policy:** „kein `--no-verify` auf geschützten Branches" als Organisations-Regel.
+- **Souveränität:** self-hosted Git (GitLab/Gitea) erlaubt server-seitige `pre-receive`-Hooks — die einzige *wirklich* unumgehbare Stufe (Anhang Q).
+
+**Auditierbarkeit — git-basiert, bewusst keine DB.** Der Audit-Trail ist datei-/git-basiert (gegen eine zentrale DB entschieden): `audit-trace.sh` (Spec → Session-ID → Commit-Diff, BOO-19), `journal/reports/`, `docs/audits/`, Git-Historie. Wie ein Auditor das nutzt: `docs/runbooks/audit-perspective.md` (Frage → Beleg → Ort). **Grenze:** kein dediziertes Gate-Event-Logbuch („Gate X blockierte um Y") und keine fälschungssichere Kette — eine zentrale, manipulationssichere Audit-Senke wäre Sache der Automation Plane (BOO-234).
+
+**Verwandt (nicht repliziert):** README „Unsere Position" (BOO-227) · `bootstrap/references/hooks-setup.md` · `setup-branch-protection.sh` (BOO-29/149) · CONVENTIONS.md (Gate-Tabelle) · `docs/runbooks/audit-perspective.md` · `CHECKPOINTS.md` (BOO-228).
+
 ## Anhang AW: CI-Spec-Gate — server-seitiges Spec-Linkage-Gate (opt-in, BOO-254)
 
 > **Kurz:** Ein **opt-in** GitHub-Actions-Workflow (`spec-gate-ci.yml`, `name: Spec-Linkage`), der auf jedem PR nach `main` server-seitig prüft, dass die Änderung eine existierende `specs/<ISSUE>.md` referenziert. Schliesst die im Enforcement-Selbst-Audit (Anhang AV) benannte Lücke des Runtime-Spec-Gates: macht „kein Merge ohne Spec" auch gegen `--no-verify` und Nicht-Claude-Pfade wahr. Setup: `docs/runbooks/spec-gate-ci.md`.

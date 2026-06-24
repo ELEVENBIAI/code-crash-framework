@@ -274,6 +274,8 @@ Every `/implement` run writes a `## Session-Referenz` block into the spec file (
 
 Layers 2 and 3 are tool-agnostic. Layers 0 and 1 depend on the editor + AI tool (Claude Code uses a PreToolUse edit hook + IDE plugins; Codex has neither and relies on the prompt-layer secure-coding default plus Layers 2/3).
 
+→ Where each layer enforces, and where the trust boundaries are (`--no-verify` is local-only, `enforce_admins`, AI-runtime vs. CI): **HANDBUCH Appendix AV — Enforcement model & trust boundaries**.
+
 ### Learning Loop (L1 / L2 / L3)
 
 | Level | Storage | Recommended when |
@@ -757,6 +759,8 @@ Jeder `/implement`-Lauf schreibt einen `## Session-Referenz`-Block ins Spec-File
 - **Layer 3 — CI / GitHub Actions:** Required Status Check, schuetzt gegen `--no-verify`-Umgehung
 
 Layer 2 und 3 sind tool-agnostisch. Layer 0 und 1 haengen vom Editor + KI-Tool ab (Claude Code nutzt einen PreToolUse-Edit-Hook + IDE-Plugins; Codex hat beides nicht und faellt auf den Prompt-Ebenen-Secure-Coding-Default plus Layer 2/3 zurueck).
+
+→ Wo jede Schicht durchsetzt und wo die Vertrauensgrenzen liegen (`--no-verify` ist nur lokal, `enforce_admins`, KI-Runtime vs. CI): **HANDBUCH Anhang AV — Enforcement-Modell & Vertrauensgrenzen**.
 
 ### Learning-Loop (L1 / L2 / L3)
 
