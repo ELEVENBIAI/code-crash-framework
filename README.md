@@ -71,53 +71,52 @@ This matches the 2026 industry consensus and documented incidents:
 
 ## How INTENTRON differs
 
-A methodical comparison against the two closest framework categories — spec-driven (Spec Kit) and harness optimizers (ECC, Everything Claude Code):
+Most of the 2026 field is spec-driven now — SDD (Spec-Driven Development: write an executable spec before the code) is the new normal, and the tools have caught up on the individual pillars. Tool-neutrality, a spec layer, even some gates are no longer ours alone. So the honest claim is not a single feature, it is the **combination**: enforced Git-governance, an intent layer *above* the spec, built-in GDPR/nDSG privacy-by-design, and one record that scales solo → enterprise — in a single contract. Checked across the field mid-2026 (the three closest repos directly against the GitHub API, the wider field via deep research): no other tool covers all four at once.
 
-| | INTENTRON | Spec Kit (spec-driven) | ECC (harness optimizer) |
-|---|---|---|---|
-| Focus | Path from intent → production, with gates | Specification → code | Breadth across Claude Code tools |
-| Hard gates (blocking) | ✅ Spec, Sensitive-Paths, Coverage, Slopsquatting | ❌ none | ❌ none |
-| Intent before spec | ✅ | ❌ | ❌ |
-| Governance scales (Solo→Enterprise) | ✅ | ❌ | ❌ |
-| Privacy/Security built in | ✅ (DPO + Security-Architect) | ❌ | ❌ |
-| Tool-neutral (1 contract) | ✅ AGENTS.md + CONVENTIONS | partial | ❌ (Claude-Code-bound) |
+| Differentiator | **INTENTRON** | Spec Kit | Spec Kitty | agentic-os | OpenSpec | Agent OS |
+|---|:--:|:--:|:--:|:--:|:--:|:--:|
+| Enforced gates (blocking) | ✅ Runtime¹ | ❌ advisory | ⚠️ one hook, rest CI | ⚠️ creds/SAST only | ❌ | ❌ |
+| Intent *above* the spec | ✅ | ⚠️ intent = the *what* | ⚠️ charter | ❌ routing only | ❌ spec layer | ⚠️ closest |
+| Tool-neutral (one contract) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Solo → enterprise (one record) | ✅ | ⚠️ repo-local | ⚠️ team | ⚠️ small team | ⚠️ lightweight | ⚠️ |
+| Privacy/security built in (GDPR/nDSG) | ✅ DPO + security-architect | ❌ | ❌ | ⚠️ security only | ❌ | ❌ |
+| Traceability idea → commit | ✅ | ⚠️ | ✅ event log | ⚠️ | ⚠️ | ⚠️ |
+| Self-heal / learning / routing | ✅ | ❌ | ⚠️ | ⚠️ | ❌ | ❌ |
 
-**A different category, not a competitor:** ECC and similar collections are *harness optimizers / tool pools* — breadth across many tools. INTENTRON is a *method with enforced discipline* — depth. Different axes: breadth does not replace gates.
+> ¹ **Runtime-enforced — honestly scoped.** The spec-gate is a Claude-Code `PreToolUse` hook: inside a governed session it blocks the AI agent mechanically (exit 1 — no spec, no commit). That is *stronger* than the field (Spec Kit's `/analyze` is read-only; agentic-os' workflow gates are honor-system), but it is not unbypassable — a `--no-verify` commit, or a commit from a non-Claude tool, slips past it. The server-side answer — a CI spec-linkage gate that also holds against `--no-verify` and human commits — ships as an opt-in (**BOO-254**). Full model: HANDBUCH appendix *"Enforcement model & trust boundaries"*.
+>
+> ² **Adjacent axes, not the same category.** The **Microsoft Agent Governance Toolkit** and **FINOS AI Governance Framework** govern at runtime or by sector — a layer above development, not a development workflow. **AWS Kiro** is an AWS-bound agentic IDE. Each solves a neighbouring problem, not this one.
 
-### The full picture — vs. the orchestration frameworks
+**Recommend vs. enforce.** Spec Kit *recommends* a "constitution"; INTENTRON *enforces* one — at the AI runtime today, in CI optionally (BOO-254). That is the line between a style guide and a gate.
 
-A dimension-by-dimension comparison against the agent-orchestration tools (an honest read — what others do better is called out below):
+**In plain words** — what the rows mean if you don't build software yourself:
 
-| Dimension | **INTENTRON** | CrewAI | AutoGen / AG2 | BMAD | Cursor Rules |
-|-----------|---------------|--------|---------------|------|--------------|
-| **Governance enforcement** | ✅ Machine-enforced (Git hooks) | ❌ none | ❌ none | ⚠️ manual | ❌ none |
-| **Traceability** | ✅ Idea → issue → spec → commit | ❌ | ❌ | ⚠️ partial | ❌ |
-| **Human-in-the-loop** | ✅ Enforced (spec sign-off) | ⚠️ optional | ⚠️ optional | ✅ explicit | ❌ |
-| **Self-healing** | ✅ Cron, 15 min, auto-corrects | ❌ | ❌ | ❌ | ❌ |
-| **Learning loop** | ✅ Outcome check + LEARNINGS.md | ❌ | ❌ | ❌ | ❌ |
-| **Model routing** | ✅ Opus/Sonnet/Haiku per task type | ⚠️ configurable | ✅ good | ❌ | ❌ |
-| **Multi-agent orchestration** | ✅ Agent teams + parallel subagents¹ | ✅ strong | ✅ very strong | ⚠️ manual | ❌ |
-| **Deploy automation** | ⚠️ partial (Git push + manual) | ❌ | ❌ | ❌ | ❌ |
-| **Portability** | ✅ Zero dependencies, 1 folder | ⚠️ pip install | ⚠️ pip install | ⚠️ prompt files | ✅ |
-| **Project setup time** | ~30 min (guided) | hours | hours | ~1h | minutes |
-| **Target audience** | Solo dev → enterprise team | Enterprise teams | Research / quality | Agile teams | Individual devs |
+- **Enforced gates** are automatic stop-signs: the AI cannot commit until the required checks pass. It is blocked, not reminded.
+- **Intent above the spec**: the *why* sits one level above the *what*. The spec says what to build; the intent says why — so the AI can't cleanly build the wrong thing.
+- **Tool-neutral**: one contract, many AI tools. The same rules drive Claude, Codex or Cursor, with no lock-in.
+- **Solo → enterprise**: the same artefacts the whole way; only the strictness of the gates is dialed up or down.
+- **Privacy/security built in**: data-protection (GDPR/nDSG) and security reviews run inside the pipeline, not bolted on after the fact.
 
-> ¹ "Multi-agent orchestration" here means delegated sub-skills inside one controlled story — not autonomous agents running on their own.
+![INTENTRON positioning — the combination at the intersection](docs/intentron-positioning.en.png)
 
-**Where others are genuinely stronger** — and when to prefer them:
+*No single 2026 tool sits where INTENTRON does. Spec-driven tools, runtime/sector governance toolkits and agentic IDEs each cover one circle; INTENTRON is the overlap — enforced governance, an intent layer above the spec, built-in GDPR/nDSG privacy and solo → enterprise scaling, in one contract.*
 
-| Framework | Real strength | When to prefer it |
-|-----------|---------------|-------------------|
-| **CrewAI** | Scalable role-based crews for enterprise — used by 60% of the Fortune 500. Best choice when coordinating >10 agents. | Large team, many parallel workflows, enterprise compliance requirements |
-| **AutoGen / AG2** | Debate pattern: two agents argue against each other toward the best solution. Highest output quality for complex analysis tasks. | Research, code review with the highest quality bar, offline batch processes |
-| **BMAD** | Structured agile workflow with clear roles (PM, Architect, Developer). Well documented, large community. | Teams already on Scrum/Agile that want an AI-native workflow |
-| **Cursor Rules** | Ready to use instantly, zero setup time, right in the editor. | Individual devs who want to start fast without governance overhead |
+### Where others are genuinely stronger — and when to prefer them
 
-*(Bootstrap's [README](bootstrap/README.md#framework-vergleich) adds the onboarding view: what makes INTENTRON unique and when to choose it.)*
+An honest read: the depth on the *combination* is ours, but on any single axis several tools beat us.
 
-![INTENTRON positioning — depth & enforcement vs. breadth](docs/intentron-positioning.en.png)
+| Tool | Real strength | When to prefer it |
+|------|---------------|-------------------|
+| **Spec Kit** | Reach: 30+ verified agent integrations, frequent releases, GitHub-owned. | You want the broadest agent support and a fast-moving, widely adopted base. |
+| **Spec Kitty** | A clean append-only event log as the single source of state. | Event-sourced traceability is your first priority. |
+| **CrewAI** | Scalable role-based agent crews at enterprise scale. | Coordinating many agents across parallel workflows. |
+| **AutoGen / AG2** | Debate pattern: agents argue toward the best answer. | Research and highest-bar code review, offline batch. |
+| **BMAD** | Structured agile roles (PM, architect, developer), large community. | A team already on Scrum/Agile that wants an AI-native flow. |
+| **Cursor Rules** | Instant, zero setup, right in the editor. | A single developer who wants to start fast without governance overhead. |
 
-*The full landscape on two axes: spec-driven, harness optimizers and orchestration frameworks all cluster on breadth/low enforcement; INTENTRON alone holds the governance zone — enforced discipline from intent to production, scaling solo → enterprise.*
+The agent-orchestration tools (CrewAI, AutoGen, BMAD) and harness pools (ECC) sit on a different axis — orchestration *breadth*, not governance *depth*. Breadth does not replace gates, and gates do not replace breadth.
+
+*(The bootstrap [README](bootstrap/README.md#framework-vergleich) adds the onboarding view: what makes INTENTRON unique and when to choose it.)*
 
 ---
 
@@ -504,53 +503,52 @@ Das deckt sich mit dem Branchen-Konsens 2026 und mit dokumentierten Vorfällen:
 
 ## Wie sich INTENTRON unterscheidet
 
-Ein methodischer Vergleich mit den zwei nächstliegenden Framework-Kategorien — Spec-Driven (Spec Kit) und Harness-Optimierer (ECC, Everything Claude Code):
+Das Feld ist 2026 grossteils Spec-Driven — SDD (Spec-Driven Development: erst eine ausführbare Spec schreiben, dann den Code) ist der neue Normalfall, und die Tools haben bei den Einzelsäulen aufgeholt. Tool-Neutralität, ein Spec-Layer, sogar einzelne Gates sind nicht mehr allein unsere. Der ehrliche Anspruch ist deshalb kein einzelnes Merkmal, sondern die **Kombination**: erzwungene Git-Governance, eine Intent-Ebene *über* der Spec, eingebautes DSGVO/nDSG-Privacy-by-Design und eine Platte, die Solo → Konzern skaliert — in einem Vertrag. Mitte 2026 quer geprüft (die drei nächsten Repos direkt gegen die GitHub-API, das weitere Feld via Deep Research): kein anderes Tool deckt alle vier zugleich ab.
 
-| | INTENTRON | Spec Kit (Spec-Driven) | ECC (Harness-Optimierer) |
-|---|---|---|---|
-| Fokus | Weg von Intent → Produktion, mit Gates | Spezifikation → Code | Breite über Claude-Code-Tools |
-| Hard Gates (blockierend) | ✅ Spec, Sensitive-Paths, Coverage, Slopsquatting | ❌ keine | ❌ keine |
-| Intent vor Spec | ✅ | ❌ | ❌ |
-| Governance skaliert (Solo→Konzern) | ✅ | ❌ | ❌ |
-| Privacy/Security eingebaut | ✅ (DPO + Security-Architect) | ❌ | ❌ |
-| Tool-neutral (1 Vertrag) | ✅ AGENTS.md + CONVENTIONS | teilweise | ❌ (Claude-Code-gebunden) |
+| Differenzierer | **INTENTRON** | Spec Kit | Spec Kitty | agentic-os | OpenSpec | Agent OS |
+|---|:--:|:--:|:--:|:--:|:--:|:--:|
+| Erzwungene Gates (blockierend) | ✅ Runtime¹ | ❌ advisory | ⚠️ 1 Hook, Rest CI | ⚠️ nur Creds/SAST | ❌ | ❌ |
+| Intent *über* der Spec | ✅ | ⚠️ Intent = das *Was* | ⚠️ Charter | ❌ nur Routing | ❌ nur Spec-Layer | ⚠️ am nächsten |
+| Tool-neutral (1 Vertrag) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Solo → Konzern (eine Platte) | ✅ | ⚠️ repo-lokal | ⚠️ Team | ⚠️ kleines Team | ⚠️ leichtgewichtig | ⚠️ |
+| Privacy/Security eingebaut (DSGVO/nDSG) | ✅ DPO + Security-Architect | ❌ | ❌ | ⚠️ nur Security | ❌ | ❌ |
+| Traceability Idee → Commit | ✅ | ⚠️ | ✅ Event-Log | ⚠️ | ⚠️ | ⚠️ |
+| Self-Heal / Learning / Routing | ✅ | ❌ | ⚠️ | ⚠️ | ❌ | ❌ |
 
-**Eine andere Kategorie, kein Wettbewerber:** ECC und ähnliche Sammlungen sind *Harness-Optimierer / Werkzeug-Pools* (Breite über viele Tools). INTENTRON ist eine *Methode mit erzwungener Disziplin* (Tiefe). Verschiedene Achsen — Breite ersetzt keine Gates.
+> ¹ **Runtime-erzwungen — ehrlich gescopet.** Das Spec-Gate ist ein Claude-Code-`PreToolUse`-Hook: in einer governten Session blockt es den KI-Agenten mechanisch (Exit 1 — kein Spec, kein Commit). Das ist *stärker* als das Feld (Spec Kits `/analyze` ist read-only, agentic-os' Workflow-Gates sind Honor-System), aber nicht unumgehbar — ein `--no-verify`-Commit oder ein Commit aus einem Nicht-Claude-Tool kommt vorbei. Die server-seitige Antwort — ein CI-Spec-Linkage-Gate, das auch gegen `--no-verify` und menschliche Commits hält — kommt als Opt-in (**BOO-254**). Volles Modell: HANDBUCH-Anhang *„Enforcement-Modell & Vertrauensgrenzen"*.
+>
+> ² **Benachbarte Achsen, nicht dieselbe Kategorie.** Das **Microsoft Agent Governance Toolkit** und das **FINOS AI Governance Framework** governen zur Laufzeit oder pro Sektor — eine Ebene über der Entwicklung, kein Dev-Workflow. **AWS Kiro** ist eine AWS-gebundene agentische IDE. Jedes löst ein benachbartes Problem, nicht dieses.
 
-### Das volle Bild — vs. die Orchestrierungs-Frameworks
+**Empfehlen vs. erzwingen.** Spec Kit *empfiehlt* eine „Constitution"; INTENTRON *erzwingt* sie — am KI-Runtime heute, in der CI optional (BOO-254). Das ist die Linie zwischen einem Style-Guide und einem Gate.
 
-Ein Dimension-für-Dimension-Vergleich gegen die Agent-Orchestrierungs-Tools (ehrlich gelesen — was andere besser machen, steht direkt darunter):
+**In einfachen Worten** — was die Zeilen bedeuten, wenn du nicht selbst Software baust:
 
-| Dimension | **INTENTRON** | CrewAI | AutoGen / AG2 | BMAD | Cursor Rules |
-|-----------|---------------|--------|---------------|------|--------------|
-| **Governance-Enforcement** | ✅ Maschinell erzwungen (Git Hooks) | ❌ Keine | ❌ Keine | ⚠️ Manuell | ❌ Keine |
-| **Traceability** | ✅ Idee → Issue → Spec → Commit | ❌ | ❌ | ⚠️ Partiell | ❌ |
-| **Human-in-the-Loop** | ✅ Erzwungen (Spec-Freigabe) | ⚠️ Optional | ⚠️ Optional | ✅ Explizit | ❌ |
-| **Self-Healing** | ✅ Cron, 15 Min, auto-korrigiert | ❌ | ❌ | ❌ | ❌ |
-| **Learning-Loop** | ✅ Outcome-Check + LEARNINGS.md | ❌ | ❌ | ❌ | ❌ |
-| **Modell-Routing** | ✅ Opus/Sonnet/Haiku je Task-Typ | ⚠️ Konfigurierbar | ✅ Gut | ❌ | ❌ |
-| **Multi-Agent Orchestrierung** | ✅ Agent-Teams + Parallel-Subagents¹ | ✅ Stark | ✅ Sehr stark | ⚠️ Manuell | ❌ |
-| **Deploy-Automation** | ⚠️ Teilweise (Git Push + Manual) | ❌ | ❌ | ❌ | ❌ |
-| **Portabilität** | ✅ Zero Dependencies, 1 Ordner | ⚠️ pip install | ⚠️ pip install | ⚠️ Prompt-Files | ✅ |
-| **Projekt-Setup-Zeit** | ~30 Min (geführt) | Stunden | Stunden | ~1h | Minuten |
-| **Zielgruppe** | Solo-Dev → Enterprise-Team | Enterprise-Teams | Forschung / Quality | Agile Teams | Einzelentwickler |
+- **Erzwungene Gates** sind automatische Stoppschilder: Die KI kann erst committen, wenn die geforderten Prüfungen bestanden sind. Sie wird blockiert, nicht erinnert.
+- **Intent über der Spec**: Das *Warum* sitzt eine Ebene über dem *Was*. Die Spec sagt, was gebaut wird; der Intent sagt warum — damit die KI nicht sauber das Falsche baut.
+- **Tool-neutral**: ein Vertrag, viele KI-Tools. Dieselben Regeln steuern Claude, Codex oder Cursor, ohne Lock-in.
+- **Solo → Konzern**: dieselben Artefakte den ganzen Weg; nur die Strenge der Gates wird hoch- oder runtergedimmt.
+- **Privacy/Security eingebaut**: Datenschutz (DSGVO/nDSG) und Security-Reviews laufen in der Pipeline, nicht nachträglich angeflanscht.
 
-> ¹ „Multi-Agent-Orchestrierung" meint hier delegierte Sub-Skills innerhalb einer kontrollierten Story — keine autonom laufenden Agenten.
+![INTENTRON Positionierung — die Kombination an der Schnittmenge](docs/intentron-positioning.png)
 
-**Was andere Frameworks besser machen** — und wann du sie bevorzugen solltest:
+*Kein einzelnes 2026-Tool sitzt dort, wo INTENTRON sitzt. Spec-Driven-Tools, Runtime-/Sektor-Governance-Toolkits und agentische IDEs decken je einen Kreis ab; INTENTRON ist die Schnittmenge — erzwungene Governance, eine Intent-Ebene über der Spec, eingebautes DSGVO/nDSG-Privacy und Solo → Konzern-Skalierung, in einem Vertrag.*
 
-| Framework | Echte Stärke | Wann bevorzugen |
-|-----------|--------------|-----------------|
-| **CrewAI** | Skalierbare Role-based Crews für Enterprise — 60% der Fortune 500 nutzen es. Beste Wahl wenn >10 Agents koordiniert werden müssen. | Großes Team, viele parallele Workflows, Enterprise-Compliance-Anforderungen |
-| **AutoGen / AG2** | Debate-Pattern: 2 Agents argumentieren gegeneinander bis zur besten Lösung. Höchste Ausgabequalität für komplexe Analyse-Aufgaben. | Forschung, Code-Review mit höchsten Qualitätsanforderungen, offline Batch-Prozesse |
-| **BMAD** | Strukturierter Agile-Workflow mit klaren Rollen (PM, Architect, Developer). Gut dokumentiert, große Community. | Teams die Scrum/Agile bereits kennen und einen AI-nativen Workflow wollen |
-| **Cursor Rules** | Sofort einsatzbereit, keine Setup-Zeit, direkt im Editor. | Einzelentwickler die schnell starten wollen ohne Governance-Overhead |
+### Wo andere wirklich stärker sind — und wann du sie bevorzugst
+
+Ehrlich gelesen: Die Tiefe auf der *Kombination* ist unsere, aber auf einer einzelnen Achse schlagen uns mehrere Tools.
+
+| Tool | Echte Stärke | Wann bevorzugen |
+|------|--------------|-----------------|
+| **Spec Kit** | Reichweite: 30+ verifizierte Agenten-Integrationen, häufige Releases, GitHub-eigen. | Du willst die breiteste Agenten-Unterstützung und eine schnelllebige, weit verbreitete Basis. |
+| **Spec Kitty** | Ein sauberes Append-only-Event-Log als einzige State-Quelle. | Event-basierte Traceability ist deine erste Priorität. |
+| **CrewAI** | Skalierbare rollenbasierte Agenten-Crews auf Enterprise-Niveau. | Viele Agenten über parallele Workflows koordinieren. |
+| **AutoGen / AG2** | Debate-Pattern: Agenten argumentieren zur besten Antwort. | Forschung und Code-Review mit höchstem Anspruch, Offline-Batch. |
+| **BMAD** | Strukturierte Agile-Rollen (PM, Architect, Developer), grosse Community. | Ein Team, das bereits Scrum/Agile fährt und einen KI-nativen Flow will. |
+| **Cursor Rules** | Sofort einsatzbereit, keine Setup-Zeit, direkt im Editor. | Ein Einzelentwickler, der schnell starten will, ohne Governance-Overhead. |
+
+Die Agent-Orchestrierungs-Tools (CrewAI, AutoGen, BMAD) und Harness-Pools (ECC) liegen auf einer anderen Achse — Orchestrierungs-*Breite*, nicht Governance-*Tiefe*. Breite ersetzt keine Gates, und Gates ersetzen keine Breite.
 
 *(Die bootstrap-[README](bootstrap/README.md#framework-vergleich) ergänzt die Onboarding-Sicht: was INTENTRON einzigartig macht und wann du es wählen solltest.)*
-
-![INTENTRON Positionierung — Tiefe & Erzwingung vs. Breite](docs/intentron-positioning.png)
-
-*Die volle Landschaft auf zwei Achsen: Spec-Driven, Harness-Optimierer und Orchestrierungs-Frameworks clustern alle bei Breite/wenig Erzwingung; nur INTENTRON hält die Governance-Zone — erzwungene Disziplin von Intent bis Produktion, skaliert Solo → Enterprise.*
 
 ---
 
