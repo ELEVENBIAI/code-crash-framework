@@ -1,7 +1,7 @@
 ---
 name: bootstrap
 recommended_model: sonnet  # BOO-84 — tier mapping in bootstrap/references/model-tiers.json
-version: 3.50.0
+version: 3.51.0
 description: Setzt ein neues Projekt mit Governance-Framework auf — interaktiver Block-Interview-Flow in 4 Schritten, Doku-Architektur mit Hub-Auto-Verlinkung, optionaler Learning-Loop L1/L2/L3. Verwenden wenn der Operator ein neues Projekt aufsetzen will oder "/bootstrap" sagt.
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 metadata:
@@ -1875,6 +1875,7 @@ Das Framework ist nach dem Bootstrap **baseline-funktionsfaehig**. Die folgenden
 | Daily-Bug-Scanner | Getriggerte Routine, die das Repo regelmaessig auf Bugs/Regressions absucht und Findings als Report liefert (kein Auto-Fix). | `docs/runbooks/daily-bug-scanner.md` |
 | Headless-VPS | Sprints unbeaufsichtigt auf einem Server laufen lassen (`claude -p` als cron/systemd-Job). | `docs/runbooks/headless-vps.md` |
 | Developer-VPS vom Handy | Den Dev-VPS via Remote Control + tmux vom Mobilgeraet steuern. | `docs/runbooks/vps-vom-handy.md` |
+| CI-Spec-Gate (server-seitig, opt-in) | Erzwingt server-seitig „kein Merge ohne referenzierte `specs/<ISSUE>.md`" — schliesst die Runtime-Hook-Luecke gegen `--no-verify`/Nicht-Claude. Empfehlung fuer `governance_mode = heavy`. | `docs/runbooks/spec-gate-ci.md` |
 
 **Regel:** Diese Liste ist **erweiterbar**. Jedes neue Opt-in-Feature traegt sich hier mit einem Einzeiler + Runbook-Pointer ein, statt eine Bootstrap-Frage hinzuzufuegen — so bleibt das Interview konstant schlank. Hintergrund + Erweiterungs-Regel: HANDBUCH Anhang AT. Siehe auch das Routinen-Setup: `docs/runbooks/routinen-vernetzen.md` (Schalter C, ADR-2).
 

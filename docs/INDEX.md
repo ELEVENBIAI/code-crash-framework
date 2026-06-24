@@ -49,6 +49,7 @@ Die Spalte **Sprachen** zeigt, ob ein Dokument zweisprachig vorliegt (`DE+EN`) o
 | [So dokumentiert dieses Framework](./how-we-document.md) | Erklärt das Doku-Modell: versionierter Markdown im Repo, per Hook erzwungen. | Operator, Doku-Autor | DE+EN |
 | [SecondBrain-Setup nachziehen (Runbook)](./runbooks/secondbrain-nachziehen.md) | SecondBrain-Anbindung ohne Re-Bootstrap in einem Bestandsprojekt nachziehen. | Operator | DE+EN |
 | [SonarCloud-Setup (Runbook)](./runbooks/sonarcloud-setup.md) | SonarCloud-Integration für neue GitHub-Repos via GitHub Actions. | Operator, DevOps | DE+EN |
+| [Spec-Gate CI (Runbook)](./runbooks/spec-gate-ci.md) | Opt-in server-seitiges Spec-Linkage-Gate: erzwingt „kein Merge ohne referenzierte `specs/<ISSUE>.md`" in der CI (`--no-verify`-resistent). Scaffolden, als Required Check aktivieren, Abgrenzung zum Runtime-Hook. | Operator, DevOps | DE+EN |
 | [Sprint-Run (Runbook)](./runbooks/sprint-run.md) | Einen ganzen Sprint mit `/sprint-run` vollautomatisch fahren. | Operator | DE+EN |
 | [Sprint unbeaufsichtigt per tmux (Runbook)](./runbooks/sprint-unattended-tmux.md) | Einen Sprint unbeaufsichtigt auf der VPS per tmux fahren. | Operator, DevOps | DE+EN |
 | [Stack-Linter integrieren (Runbook)](./runbooks/stack-linter-integrieren.md) | Einen nicht-abgedeckten Stack/Linter (z.B. PHP/TYPO3, Go) Schritt für Schritt integrieren — die 5 Stellen + Verifikation. | Operator, DevOps | DE+EN |

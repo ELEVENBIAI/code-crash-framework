@@ -49,6 +49,7 @@ The **Languages** column shows whether a document is bilingual (`DE+EN`) or Germ
 | [How this framework documents](./how-we-document.md) | Explains the doc model: versioned Markdown in the repo, enforced by hooks. | Operator, doc author | DE+EN |
 | [Catch up SecondBrain setup (runbook)](./runbooks/secondbrain-nachziehen.md) | Add the SecondBrain integration to an existing project without re-bootstrapping. | Operator | DE+EN |
 | [SonarCloud setup (runbook)](./runbooks/sonarcloud-setup.md) | SonarCloud integration for new GitHub repos via GitHub Actions. | Operator, DevOps | DE+EN |
+| [Spec-gate CI (runbook)](./runbooks/spec-gate-ci.en.md) | Opt-in server-side spec-linkage gate: enforces "no merge without a referenced `specs/<ISSUE>.md`" in CI (`--no-verify`-resistant). Scaffold, activate as required check, boundary vs. the runtime hook. | Operator, DevOps | DE+EN |
 | [Sprint run (runbook)](./runbooks/sprint-run.md) | Run an entire sprint fully automatically with `/sprint-run`. | Operator | DE+EN |
 | [Sprint unattended via tmux (runbook)](./runbooks/sprint-unattended-tmux.md) | Run a sprint unattended on the VPS with tmux. | Operator, DevOps | DE+EN |
 | [Integrate a stack linter (runbook)](./runbooks/stack-linter-integrieren.md) | Integrate a non-covered stack/linter (e.g. PHP/TYPO3, Go) step by step — the 5 places + verification. | Operator, DevOps | DE+EN |

@@ -5637,6 +5637,20 @@ Sonnet 4.7 | 142k/200k ctx | Worker-Equiv: 2.5h / 16h | Story BOO-205 | $4.20
 
 **Boundary.** `/architecture-review` = framework-internal review by the author (Claude); Codex = independent second pass from a different vendor. **BOO-230 (auditor)** = process/conformance (ISO-27001-like); BOO-239 = code craft. `daily-bug-scanner.en.md` = the cron automation variant of the same reviewer. Build-vs-buy (ADR-1): Codex = engine, no MCP server, no Claude review skill, no standing agent.
 
+## Appendix AW: CI spec-gate — server-side spec-linkage gate (opt-in, BOO-254)
+
+> **In short:** An **opt-in** GitHub Actions workflow (`spec-gate-ci.yml`, `name: Spec-Linkage`) that, on every PR to `main`, verifies server-side that the change references an existing `specs/<ISSUE>.md`. It closes the runtime spec-gate gap named in the enforcement self-audit (appendix AV): it makes "no merge without a spec" hold even against `--no-verify` and non-Claude paths. Setup: `docs/runbooks/spec-gate-ci.en.md`.
+
+**Why.** The runtime spec-gate (`hooks/spec-gate.sh`, PreToolUse) blocks the AI agent mechanically (exit 1) but only inside a Claude session — `--no-verify`, a human commit, or a different tool slip past it (trust boundary, appendix AV). The CI spec-gate is the independent server layer: `--no-verify`-resistant, tool-independent.
+
+**What it checks.** Issue key (pattern `[A-Z]+-[0-9]+`) from the branch name + PR title (squash-merge-safe, not from commit messages). If at least one referenced key has a `specs/<KEY>.md` → pass; otherwise the job fails → the PR is not mergeable.
+
+**Activation — no hand-clicking.** Scaffold the template (bootstrap §7.7 pointer for `governance_mode = heavy`, or `migrate_boo_254` for existing projects), then re-run `setup-branch-protection.sh`: it picks up the new required context `Spec-Linkage` from `.github/workflows/*.yml` automatically.
+
+**Opt-in, not an interview step.** Surfaced in §7.7 / developer onboarding (appendix AT extension rule), not as a bootstrap question — lightweight design principle. Recommended for `governance_mode = heavy` / audit-bound projects.
+
+**Boundary.** It complements the runtime hook (fast in-session feedback), it does not replace it. Orthogonal to the docs-compliance gate (BOO-229). Full enforcement model & trust boundaries: appendix AV. Audit trail: `docs/runbooks/audit-perspective.en.md`.
+
 ---
 
 *This handbook is part of the INTENTRON.*

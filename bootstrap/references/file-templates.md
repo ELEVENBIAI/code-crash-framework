@@ -1475,6 +1475,59 @@ jobs:
 
 ---
 
+## .github/workflows/spec-gate-ci.yml (BOO-254 — opt-in server-seitiges Spec-Linkage-Gate)
+
+**Opt-in CI-Gate (Standard aus; Empfehlung fuer `governance_mode = heavy` / auditpflichtige Projekte).** Prueft auf jedem PR nach `main` server-seitig, dass die Aenderung eine existierende `specs/<ISSUE>.md` referenziert — schliesst die Luecke des Runtime-Spec-Gates (`hooks/spec-gate.sh`, PreToolUse): macht „kein Merge ohne Spec" auch gegen `--no-verify` und Nicht-Claude-Pfade wahr. Aktivierung als Required Status Check via `setup-branch-protection.sh` (zieht `name: Spec-Linkage` automatisch als Required-Kontext). **Kein** Interview-Schritt — Surfacing in §7.7 (Anhang AT). Setup-Runbook: `docs/runbooks/spec-gate-ci.md`; Hintergrund: HANDBUCH Anhang AW + Anhang AV (Enforcement-Modell & Vertrauensgrenzen).
+
+```yaml
+# .github/workflows/spec-gate-ci.yml — server-seitiges Spec-Linkage-Gate (opt-in, BOO-254)
+# DE: Prueft auf PR server-seitig, dass die Aenderung eine existierende specs/<ISSUE>.md referenziert.
+# EN: On a PR, verifies server-side that the change references an existing specs/<ISSUE>.md.
+name: Spec-Linkage
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  spec-linkage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify spec linkage
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          set -euo pipefail
+          # DE: Issue-Keys aus Branch-Name + PR-Titel (squash-merge-fest; Commit-Messages werden gequetscht).
+          # EN: Issue keys from branch name + PR title (squash-merge-safe; commit messages get collapsed).
+          KEYS=$(printf '%s\n%s\n' "$HEAD_REF" "$PR_TITLE" | grep -oE '[A-Z]+-[0-9]+' | sort -u || true)
+          if [[ -z "$KEYS" ]]; then
+            echo "::error::No issue key ([A-Z]+-[0-9]+) in branch name or PR title — no spec reference provable."
+            echo "branch='$HEAD_REF' title='$PR_TITLE'"
+            exit 1
+          fi
+          FOUND=0
+          for key in $KEYS; do
+            if [[ -f "specs/${key}.md" ]]; then
+              echo "OK: specs/${key}.md referenced."
+              FOUND=1
+            fi
+          done
+          if [[ "$FOUND" -ne 1 ]]; then
+            echo "::error::No referenced specs/<ISSUE>.md found (checked: $KEYS). Add specs/<KEY>.md or name the key in branch/PR title."
+            exit 1
+          fi
+```
+
+**Squash-Merge-fest:** Der Issue-Key kommt aus Branch-Name + PR-Titel, nicht aus Commit-Messages. Bestanden, sobald **ein** referenzierter Key eine `specs/<KEY>.md` hat (ein PR darf einen zweiten Issue erwaehnen, ohne dass dieser eine eigene Spec braucht).
+
+---
+
 ## .github/workflows/eslint.yml (BOO-28 — ESLint CI Gate)
 
 **CI-Layer seit BOO-28 (2026-05-12):** Dritter Layer der Quality-Gate-Architektur fuer Linting (Pendant zur Semgrep-Action, anderer Tool-Klasse). Wird in Phase 4.4 des Bootstrap-Flows fuer Stacks `a) Node.js Backend`, `b) Frontend` und `c) Full-Stack` angelegt. Pendant fuer Python ist `ruff.yml` (naechster Block).

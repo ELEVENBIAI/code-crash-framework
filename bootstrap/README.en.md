@@ -4,7 +4,7 @@
 
 > A **portable bootstrap skill** for Claude Code, Codex, or cross-tool setups that sets up a complete AI-driven development governance framework for any new project — in 4 interview blocks (A-D) plus 7 setup phases, with zero external dependencies.
 
-**Version:** 3.50.0 — generic, interview-friendly, with portable learning loop (L1/L2/L3). No project-type lock-in, no trading-specific residue.
+**Version:** 3.51.0 — generic, interview-friendly, with portable learning loop (L1/L2/L3). No project-type lock-in, no trading-specific residue.
 
 > 3.50.0 — AGENTS.md review-guidelines block (BOO-239): Codex reviewer contract (senior-dev perspective, report-only, findings flow) as an AGENTS.md template + `migrate_boo_239`; §7.7 Codex pointer wired to the runbook `codex-reviewer.en.md`.
 > 3.49.0 — Optional add-ons / next-steps section in post-install (BOO-248): opt-in add-ons (Codex reviewer, daily bug scanner, headless VPS, VPS-from-phone) as an extensible pointer list instead of an interview question — no bloat. §7.7 + developer onboarding + HANDBUCH Appendix AT.

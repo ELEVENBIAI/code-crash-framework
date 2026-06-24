@@ -5731,6 +5731,20 @@ Sonnet 4.7 | 142k/200k ctx | Worker-Equiv: 2.5h / 16h | Story BOO-205 | $4.20
 
 **Abgrenzung.** `/architecture-review` = framework-interner Review durch den Autor (Claude); Codex = unabhängiger zweiter Pass von einem anderen Anbieter. **BOO-230 (Auditor)** = Prozess/Konformität (ISO-27001-artig); BOO-239 = Code-Handwerk. `daily-bug-scanner.md` = die Cron-Automations-Variante desselben Reviewers. Build-vs-Buy (ADR-1): Codex = Engine, kein MCP-Server, kein Claude-Review-Skill, kein stehender Agent.
 
+## Anhang AW: CI-Spec-Gate — server-seitiges Spec-Linkage-Gate (opt-in, BOO-254)
+
+> **Kurz:** Ein **opt-in** GitHub-Actions-Workflow (`spec-gate-ci.yml`, `name: Spec-Linkage`), der auf jedem PR nach `main` server-seitig prüft, dass die Änderung eine existierende `specs/<ISSUE>.md` referenziert. Schliesst die im Enforcement-Selbst-Audit (Anhang AV) benannte Lücke des Runtime-Spec-Gates: macht „kein Merge ohne Spec" auch gegen `--no-verify` und Nicht-Claude-Pfade wahr. Setup: `docs/runbooks/spec-gate-ci.md`.
+
+**Warum.** Das Runtime-Spec-Gate (`hooks/spec-gate.sh`, PreToolUse) blockt den KI-Agenten mechanisch (Exit 1), greift aber nur in der Claude-Session — `--no-verify`, ein menschlicher Commit oder ein anderes Tool kommen vorbei (Vertrauensgrenze, Anhang AV). Das CI-Spec-Gate ist die unabhängige Server-Schicht: `--no-verify`-resistent, tool-unabhängig.
+
+**Was es prüft.** Issue-Key (Pattern `[A-Z]+-[0-9]+`) aus Branch-Name + PR-Titel (squash-merge-fest, nicht aus Commit-Messages). Existiert für mindestens einen referenzierten Key eine `specs/<KEY>.md` → bestanden; sonst Job-Fail → PR nicht mergebar.
+
+**Aktivierung — kein Hand-Klicken.** Template scaffolden (Bootstrap §7.7-Pointer bei `governance_mode = heavy`, oder `migrate_boo_254` für Bestandsprojekte), dann `setup-branch-protection.sh` **erneut** laufen lassen: es zieht den neuen Required-Kontext `Spec-Linkage` automatisch aus `.github/workflows/*.yml`.
+
+**Opt-in, kein Interview-Schritt.** Surfacing in §7.7 / Developer-Onboarding (Anhang AT-Erweiterungs-Regel), nicht als Bootstrap-Frage — Leichtgewicht-Designprinzip. Empfehlung für `governance_mode = heavy` / auditpflichtige Projekte.
+
+**Abgrenzung.** Ergänzt den Runtime-Hook (schnelles In-Session-Feedback), ersetzt ihn nicht. Orthogonal zum Doku-Compliance-Gate (BOO-229). Enforcement-Modell & Vertrauensgrenzen insgesamt: Anhang AV. Audit-Trail: `docs/runbooks/audit-perspective.md`.
+
 ---
 
 *Dieses Handbuch ist Teil des INTENTRONs.*

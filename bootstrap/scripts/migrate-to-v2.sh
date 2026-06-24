@@ -2949,6 +2949,9 @@ migrate_all() {
     # Sprint 10 — Codex-Reviewer AGENTS.md-Review-Guidelines (BOO-239)
     migrate_boo_239
 
+    # Sprint 11 — CI-Spec-Gate-Workflow (BOO-254): spec-gate-ci.yml scaffolden (idempotent)
+    migrate_boo_254
+
     log_info "DE: Migration abgeschlossen. Status pro Projekt in migration-status.md eintragen."
     log_info "EN: Migration finished. Record per-project status in migration-status.md."
 }
@@ -4848,6 +4851,67 @@ Optionale, opt-in Betriebs-/Governance-Add-ons sind nicht eingerichtet und bewus
 Die Liste ist erweiterbar: neue Opt-in-Features kommen hier dazu, statt als Interview-Frage.
 ADDONS_EOF
     log_info "Optionale-Add-ons-Sektion an $onb angehaengt"
+}
+
+migrate_boo_254() {
+    # BOO-254 — CI-Spec-Gate: opt-in server-seitiges Spec-Linkage-Gate
+    # https://linear.app/owlist/issue/BOO-254
+    #
+    # Legt .github/workflows/spec-gate-ci.yml an, falls es fehlt (idempotent, nicht-destruktiv).
+    # Opt-in: Standard aus, Empfehlung governance_mode=heavy. Aktivierung als Required Check
+    # separat via setup-branch-protection.sh-Re-Run. Surfacing: DEVELOPER_ONBOARDING.md §Add-ons (BOO-248).
+    log_info "BOO-254: CI-Spec-Gate-Workflow .github/workflows/spec-gate-ci.yml sichern"
+    local wf=".github/workflows/spec-gate-ci.yml"
+    if [[ -f "$wf" ]]; then
+        log_skip "$wf bereits vorhanden"
+        return 0
+    fi
+    mkdir -p .github/workflows
+    cat > "$wf" <<'SPECGATE_EOF'
+# .github/workflows/spec-gate-ci.yml — server-seitiges Spec-Linkage-Gate (opt-in, BOO-254)
+# DE: Prueft auf PR server-seitig, dass die Aenderung eine existierende specs/<ISSUE>.md referenziert.
+# EN: On a PR, verifies server-side that the change references an existing specs/<ISSUE>.md.
+name: Spec-Linkage
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  spec-linkage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify spec linkage
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          set -euo pipefail
+          # DE: Issue-Keys aus Branch-Name + PR-Titel (squash-merge-fest; Commit-Messages werden gequetscht).
+          # EN: Issue keys from branch name + PR title (squash-merge-safe; commit messages get collapsed).
+          KEYS=$(printf '%s\n%s\n' "$HEAD_REF" "$PR_TITLE" | grep -oE '[A-Z]+-[0-9]+' | sort -u || true)
+          if [[ -z "$KEYS" ]]; then
+            echo "::error::No issue key ([A-Z]+-[0-9]+) in branch name or PR title — no spec reference provable."
+            echo "branch='$HEAD_REF' title='$PR_TITLE'"
+            exit 1
+          fi
+          FOUND=0
+          for key in $KEYS; do
+            if [[ -f "specs/${key}.md" ]]; then
+              echo "OK: specs/${key}.md referenced."
+              FOUND=1
+            fi
+          done
+          if [[ "$FOUND" -ne 1 ]]; then
+            echo "::error::No referenced specs/<ISSUE>.md found (checked: $KEYS). Add specs/<KEY>.md or name the key in branch/PR title."
+            exit 1
+          fi
+SPECGATE_EOF
+    log_info "$wf angelegt — als Required Check aktivieren: bash bootstrap/scripts/setup-branch-protection.sh (Re-Run)"
 }
 
 migrate_boo_190() {

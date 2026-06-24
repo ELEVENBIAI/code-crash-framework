@@ -98,6 +98,7 @@ Optional, **opt-in** operations/governance add-ons are **not** set up after the 
 - **Daily bug scanner** — triggered repo scan for bugs/regressions (report-only). Runbook `daily-bug-scanner`.
 - **Headless VPS** — run sprints unattended (`claude -p` as cron/systemd). Runbook `headless-vps`.
 - **Developer VPS from your phone** — remote control via Remote Control + tmux. Runbook `vps-vom-handy`.
+- **CI spec-gate (server-side)** — enforces "no merge without a referenced `specs/<ISSUE>.md`" in CI (`--no-verify`-resistant). Opt-in, recommended for `governance_mode = heavy`. Runbook `spec-gate-ci`.
 
 This list is extensible: new opt-in features are added here (and in the bootstrap post-install section §7.7) instead of as an interview question.
 

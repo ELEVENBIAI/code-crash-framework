@@ -98,6 +98,7 @@ Optionale, **opt-in** Betriebs-/Governance-Add-ons sind nach dem Setup **nicht**
 - **Daily-Bug-Scanner** — getriggerte Repo-Suche nach Bugs/Regressions (Report-only). Runbook `daily-bug-scanner`.
 - **Headless-VPS** — Sprints unbeaufsichtigt (`claude -p` als cron/systemd). Runbook `headless-vps`.
 - **Developer-VPS vom Handy** — Fernsteuerung via Remote Control + tmux. Runbook `vps-vom-handy`.
+- **CI-Spec-Gate (server-seitig)** — erzwingt „kein Merge ohne referenzierte `specs/<ISSUE>.md`" in der CI (`--no-verify`-resistent). Opt-in, Empfehlung `governance_mode = heavy`. Runbook `spec-gate-ci`.
 
 Die Liste ist erweiterbar: neue Opt-in-Features kommen hier (und in der Bootstrap-Post-Install-Sektion §7.7) dazu, statt als Interview-Frage.
 
